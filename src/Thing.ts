@@ -33,17 +33,26 @@ class Thing {
 
     get gravitationalForces() {
         if (!this.world) { return new Force(0, 0) }
-        const otherThings = this.world.things.filter(thing => thing !== this)
-        let forces = otherThings.map(otherthing => getGravitationalForce(this.world.gravity, this, otherthing))
+        const { globalGravityForce, gravitationalConstant,things } = this.world
+
+        const otherThings = things.filter(thing => thing !== this)
+        let forces = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
+
+        if (globalGravityForce) {
+            const effect = new Force(globalGravityForce.magnitude * gravitationalConstant * this.mass, globalGravityForce.direction) 
+            console.log(effect)
+            forces.push(effect)
+        }
+
         return Force.combine(forces)
     }
 
     move() {
-        const {gravitationalForces, mass} = this
+        const { gravitationalForces, mass } = this
         gravitationalForces.magnitude = gravitationalForces.magnitude / mass
 
         this.momentum = Force.combine([this.momentum, gravitationalForces])
-        
+
         this.data.y += this.momentum.vectorY
         this.data.x += this.momentum.vectorX
 
@@ -71,4 +80,34 @@ class Thing {
     }
 }
 
-export { Thing, ThingData }
+
+class LinedThing extends Thing {
+    renderOnCanvas(ctx: CanvasRenderingContext2D) {
+        const { x, y, size, color = 'white', heading } = this.data
+
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.fill();
+
+        let frontPoint = {
+            x: x + getVectorX(size, heading),
+            y: y + getVectorY(size, heading)
+        }
+
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(frontPoint.x, frontPoint.y)
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.moveTo(frontPoint.x, frontPoint.y)
+        ctx.lineTo(frontPoint.x, y)
+        ctx.moveTo(frontPoint.x, frontPoint.y)
+        ctx.lineTo(x, frontPoint.y)
+        ctx.stroke()
+
+    }
+}
+
+export { Thing, ThingData, LinedThing }

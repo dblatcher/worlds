@@ -36,8 +36,6 @@ function getMagnitude(x: number, y: number) {
     return Math.sqrt((x * x) + (y * y))
 }
 
-
-
 function getDistanceBetweenPoints(point1:Point, point2:Point) {
     let dx = point1.x - point2.x, dy=point1.y-point2.y;
     return getMagnitude(dx,dy)

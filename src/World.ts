@@ -1,15 +1,22 @@
+import { Force } from './Force'
 import { Thing } from './Thing'
 
 class World {
-    gravity: number
+    gravitationalConstant: number
     things: Thing[]
     timer: NodeJS.Timeout
     canvas?: HTMLCanvasElement
     timerSpeed: number
-    constructor(gravity: number, things: Thing[]) {
-        this.gravity = gravity
+    globalGravityForce?: Force
+
+    constructor(gravity: number, things: Thing[], config: {
+        globalGravityForce?: Force
+    } = {}) {
+
+        this.gravitationalConstant = gravity
         this.things = things
         this.timerSpeed = 0
+        this.globalGravityForce = config.globalGravityForce || null
 
         things.forEach(thing => {
             thing.world = this
@@ -17,7 +24,7 @@ class World {
     }
 
     get report() {
-        return `The local gravity is ${this.gravity}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
+        return `The local gravity is ${this.gravitationalConstant}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
     }
 
     tick() {
