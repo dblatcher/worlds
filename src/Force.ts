@@ -12,7 +12,16 @@ class Force {
     get vectorY() { return Geometry.getVectorY(this.magnitude, this.direction) }
 
     static fromVector(x: number, y: number) {
-        return new Force(Geometry.getDistance(x,y), Geometry.getDirection(x,y));
+        return new Force(Geometry.getMagnitude(x, y), Geometry.getDirection(x, y));
+    }
+
+    static combine(forces: Force[]) {
+        let totalX = 0, totalY = 0;
+        forces.forEach(force => {
+            totalX += force.vectorX
+            totalY += force.vectorY
+        })
+        return new Force(Geometry.getMagnitude(totalX,totalY), Geometry.getDirection(totalX,totalY))
     }
 }
 

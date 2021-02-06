@@ -1,6 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY,getDirection } from './geometry'
+import { getVectorX, getVectorY, getDirection, getDistanceBetweenPoints, getHeadingFromPointToPoint } from './geometry'
+import { getGravitationalForce } from './physics'
 
 
 interface ThingData {
@@ -9,6 +10,7 @@ interface ThingData {
     heading?: number
     size?: number
     color?: string
+    density?: number
 }
 
 
@@ -19,10 +21,29 @@ class Thing {
     constructor(config: ThingData, momentum: Force = null) {
         this.data = config
         this.data.heading = this.data.heading || 0
+        this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
+        this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
         this.momentum = momentum || new Force(0, 0)
     }
 
+    get mass() {
+        const { size, density } = this.data
+        return size * size * Math.PI * density
+    }
+
+    get gravitationalForces() {
+        if (!this.world) { return new Force(0, 0) }
+        const otherThings = this.world.things.filter(thing => thing !== this)
+        let forces = otherThings.map(otherthing => getGravitationalForce(this.world.gravity, this, otherthing))
+        return Force.combine(forces)
+    }
+
     move() {
+        const {gravitationalForces, mass} = this
+        gravitationalForces.magnitude = gravitationalForces.magnitude / mass
+
+        this.momentum = Force.combine([this.momentum, gravitationalForces])
+        
         this.data.y += this.momentum.vectorY
         this.data.x += this.momentum.vectorX
 
@@ -30,7 +51,7 @@ class Thing {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        const { x, y, size = 1, color = 'white', heading } = this.data
+        const { x, y, size, color = 'white', heading } = this.data
 
         ctx.beginPath();
         ctx.fillStyle = color;

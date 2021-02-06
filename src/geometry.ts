@@ -1,3 +1,5 @@
+interface Point {x:number, y:number}
+
 /**
  * Calculate the direction of an [x,y] vector
  * 
@@ -30,16 +32,27 @@ function getDirection(x: number, y: number) {
  * @param y the y value of the vector
  * @returns the vector magnitude
  */
-function getDistance(x: number, y: number) {
+function getMagnitude(x: number, y: number) {
     return Math.sqrt((x * x) + (y * y))
 }
 
 
+
+function getDistanceBetweenPoints(point1:Point, point2:Point) {
+    let dx = point1.x - point2.x, dy=point1.y-point2.y;
+    return getMagnitude(dx,dy)
+}
+
+function getHeadingFromPointToPoint (origin:Point, destination:Point) {
+    let dx = origin.x - destination.x, dy=origin.y-destination.y;
+    return getDirection(dx,dy)
+}
 
 function getVectorX(magnitude: number, direction: number) { return magnitude * Math.sin(direction) }
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
 
 export {
-    getDirection, getDistance, getVectorX, getVectorY
+    getDirection, getMagnitude, getVectorX, getVectorY,
+    getDistanceBetweenPoints, getHeadingFromPointToPoint,
 }
