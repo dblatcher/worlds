@@ -29,6 +29,12 @@ class World {
 
     tick() {
         this.things.forEach(thing => { thing.move() })
+
+        this.things.forEach(thing => {
+            const thingsColliding = thing.detectCollisions()
+            thingsColliding.forEach(collidingThing => thing.handleCollision(collidingThing))
+        })
+
         this.renderOnCanvas()
     }
 

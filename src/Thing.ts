@@ -2,6 +2,7 @@ import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY, getDirection, getDistanceBetweenPoints, getHeadingFromPointToPoint } from './geometry'
 import { getGravitationalForce } from './physics'
+import { Shape, shapes } from './Shape'
 
 
 interface ThingData {
@@ -11,6 +12,7 @@ interface ThingData {
     size?: number
     color?: string
     density?: number
+    shape?: Shape
 }
 
 
@@ -23,6 +25,7 @@ class Thing {
         this.data.heading = this.data.heading || 0
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
+        this.data.shape = this.data.shape || shapes.circle
         this.momentum = momentum || new Force(0, 0)
     }
 
@@ -59,6 +62,24 @@ class Thing {
         this.data.heading = this.momentum.direction
     }
 
+    detectCollisions() {
+        const otherThings = this.world.things.filter(otherThing => otherThing !== this)
+        const thingsCollidedWith: Thing[] = []
+
+        otherThings.forEach(otherThing => {
+            if (this.checkIfCollidingWith(otherThing)) {
+                thingsCollidedWith.push(otherThing)
+            }
+        })
+
+        return thingsCollidedWith
+    }
+
+    handleCollision(otherThing:Thing) {
+
+        console.log(`${this.data.color} thing hits ${otherThing.data.color} thing`)
+    }
+
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
         const { x, y, size, color = 'white', heading } = this.data
 
@@ -77,6 +98,14 @@ class Thing {
         ctx.lineTo(frontPoint.x, frontPoint.y)
         ctx.stroke()
 
+    }
+
+    checkIfContainsPoint(point:{x:number, y:number}) {
+        return this.data.shape.containsPoint.apply(this,[point])
+    }
+
+    checkIfCollidingWith(otherThing:Thing) {
+        return this.data.shape.collidingWithShape.apply(this,[otherThing])
     }
 }
 

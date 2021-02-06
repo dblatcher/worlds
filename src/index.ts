@@ -10,11 +10,12 @@ canvasElement.setAttribute('height', '1000');
 canvasElement.setAttribute('width', '1000');
 document.body.appendChild(canvasElement);
 
-const world = new World(.01, [
+const world = new World(0.1, [
     new LinedThing({ x: 500, y: 400, size: 60, density: 5 }),
-    new Thing({ x: 40, y: 120, size: 15, density: 40, color: 'blue' }, new Force(1, .5)),
-    new Thing({ x: 640, y: 120, size: 5, density: 1.5, color: 'red' }, new Force(2, -Math.PI/2)),
-    new Thing({x:60, y:120, size:7, color:'green', heading: .6}),
+    new Thing({ x: 40, y: 380, size: 15, density: 10, color: 'blue' }, new Force(5, Math.PI*(.51))),
+    new Thing({ x: 30, y: 800, size: 15, density: 10, color: 'blue' }, new Force(5, Math.PI*(1.51))),
+    // new Thing({ x: 640, y: 120, size: 5, density: 1.5, color: 'red' }, new Force(2, -Math.PI/2)),
+    // new Thing({x:60, y:120, size:7, color:'green', heading: .6}),
 ],{
     // globalGravityForce: new Force(4,0),
 });
