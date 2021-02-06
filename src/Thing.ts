@@ -83,30 +83,20 @@ class Thing {
 
 class LinedThing extends Thing {
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        const { x, y, size, color = 'white', heading } = this.data
+        Thing.prototype.renderOnCanvas.apply(this,[ctx])
+        const { x, y, size, heading } = this.data
 
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill();
-
-        let frontPoint = {
-            x: x + getVectorX(size, heading),
-            y: y + getVectorY(size, heading)
+        let midPoint = {
+            x: x + getVectorX(size/2, heading),
+            y: y + getVectorY(size/2, heading)
         }
 
         ctx.beginPath()
-        ctx.moveTo(x, y)
-        ctx.lineTo(frontPoint.x, frontPoint.y)
+        ctx.moveTo(midPoint.x, midPoint.y)
+        ctx.lineTo(midPoint.x, y)
+        ctx.moveTo(midPoint.x, midPoint.y)
+        ctx.lineTo(x, midPoint.y)
         ctx.stroke()
-
-        ctx.beginPath()
-        ctx.moveTo(frontPoint.x, frontPoint.y)
-        ctx.lineTo(frontPoint.x, y)
-        ctx.moveTo(frontPoint.x, frontPoint.y)
-        ctx.lineTo(x, frontPoint.y)
-        ctx.stroke()
-
     }
 }
 
