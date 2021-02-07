@@ -14,13 +14,12 @@ class World {
     } = {}) {
 
         this.gravitationalConstant = gravity
-        this.things = things
+
         this.timerSpeed = 0
         this.globalGravityForce = config.globalGravityForce || null
 
-        things.forEach(thing => {
-            thing.world = this
-        })
+        this.things = []
+        things.forEach(thing => { thing.enterWorld(this) })
     }
 
     get report() {

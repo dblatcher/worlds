@@ -58,6 +58,18 @@ class Thing {
         return Force.combine(forces)
     }
 
+    enterWorld(world: World) {
+        if (this.world) {this.leaveWorld()}
+        world.things.push(this)
+        this.world = world
+    }
+
+    leaveWorld() {
+        if (!this.world) {return}
+        this.world.things.splice(this.world.things.indexOf(this), 1)
+        this.world = null
+    }
+
     updateMomentum() {
         const { gravitationalForces, mass } = this
         gravitationalForces.magnitude = gravitationalForces.magnitude / mass
@@ -83,8 +95,8 @@ class Thing {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) { 
-            console.log(report) 
+        if (report) {
+            console.log(report)
             mutualRoundBounce(report)
         }
     }
