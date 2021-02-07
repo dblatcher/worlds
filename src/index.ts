@@ -1,16 +1,15 @@
 import { World } from './World'
 import { LinedThing, Thing } from './Thing'
 import { Force } from './Force'
+import { WorldControlPanel } from './WorldControlPanel';
 
-const divElement = document.createElement('div')
-document.body.appendChild(divElement);
 
 const canvasElement = document.createElement('canvas')
 canvasElement.setAttribute('height', '1000');
 canvasElement.setAttribute('width', '1000');
-document.body.appendChild(canvasElement);
 
-const world = new World(0.1, [
+
+const world = new World(0, [
     new LinedThing({ x: 500, y: 400, size: 60, density: 5 }),
     new Thing({ x: 40, y: 380, size: 15, density: 10, color: 'blue' }, new Force(5, Math.PI*(.51))),
     new Thing({ x: 30, y: 600, size: 15, density: 10, color: 'blue' }, new Force(5, Math.PI*(.31))),
@@ -19,9 +18,10 @@ const world = new World(0.1, [
 ],{
     // globalGravityForce: new Force(4,0),
 });
-
-
 world.canvas = canvasElement
-world.ticksPerSecond = 20
-divElement.innerText = world.report
-//globalThis.world  = world
+world.renderOnCanvas()
+
+const panel = new WorldControlPanel(world)
+
+document.body.appendChild(panel.makeElement())
+document.body.appendChild(canvasElement);
