@@ -59,13 +59,13 @@ class Thing {
     }
 
     enterWorld(world: World) {
-        if (this.world) {this.leaveWorld()}
+        if (this.world) { this.leaveWorld() }
         world.things.push(this)
         this.world = world
     }
 
     leaveWorld() {
-        if (!this.world) {return}
+        if (!this.world) { return }
         this.world.things.splice(this.world.things.indexOf(this), 1)
         this.world = null
     }
@@ -150,4 +150,14 @@ class LinedThing extends Thing {
     }
 }
 
-export { Thing, ThingData, LinedThing }
+class KillerThing extends LinedThing {
+    handleCollision(report: CollisionReport) {
+        if (report) {
+            console.log('DIE!', report)
+            if (report.item1 === this) { report.item2.leaveWorld() }
+            else { report.item1.leaveWorld() }
+        }
+    }
+}
+
+export { Thing, ThingData, LinedThing, KillerThing }

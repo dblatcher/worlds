@@ -117,7 +117,7 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
     var closestDist = Geometry.getDistanceBetweenPoints(item2.shapeValues, d);
     var closestDistSq = closestDist * closestDist;
 
-    // backdist how far back item1 needs to go from d to be at impactPoint? relative to vectorMagnitude?
+    // backdist how far back item1 needs to go from d to be at impact Point? relative to vectorMagnitude?
     var backdist = Math.sqrt(Math.pow(item1.shapeValues.radius + item2.shapeValues.radius, 2) - closestDistSq);
 
 
@@ -254,38 +254,46 @@ function findBounceVectors(body1: Thing, body2: Thing) {
 
 };
 
-
 /**
- * make a the items in a collision report bounce off each other (assumes both are circular)
+ * move the first item to the stop point in the collsion, then
+ * move the two items appart if they are still intersecting
+ * assumes round items
  * 
- * @param impactPoint the CollisionReport
+ * @param collision the collidion report
  */
-
-function mutualRoundBounce(impactPoint: CollisionReport) {
-
+function separateCollidingBodies(collision: CollisionReport) {
 
     // this seems wrong - moving out of sequence
-    impactPoint.item1.data.x = impactPoint.stopPoint.x;
-    impactPoint.item1.data.y = impactPoint.stopPoint.y;
+    collision.item1.data.x = collision.stopPoint.x;
+    collision.item1.data.y = collision.stopPoint.y;
 
-    var shape1 = impactPoint.item1.shapeValues
-    var shape2 = impactPoint.item2.shapeValues
+    var shape1 = collision.item1.shapeValues
+    var shape2 = collision.item2.shapeValues
 
     if (Geometry.areCirclesIntersecting(shape1, shape2)) {
         var distanceToSeparate = 1 + shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2);
 
         var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
         var magicV: Vector = new Force(distanceToSeparate, headingToSeparate).vector
-        impactPoint.item1.data.x += magicV.x / 2;
-        impactPoint.item1.data.y += magicV.y / 2;
-        impactPoint.item2.data.x -= magicV.x / 2;
-        impactPoint.item2.data.y -= magicV.y / 2;
+        collision.item1.data.x += magicV.x / 2;
+        collision.item1.data.y += magicV.y / 2;
+        collision.item2.data.x -= magicV.x / 2;
+        collision.item2.data.y -= magicV.y / 2;
     }
+}
 
-    var bounce = findBounceVectors(impactPoint.item1, impactPoint.item2);
+/**
+ * make a the items in a collision report bounce off each other (assumes both are circular)
+ * 
+ * @param collision the CollisionReport
+ */
+function mutualRoundBounce(collision: CollisionReport) {
 
-    impactPoint.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
-    impactPoint.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+    separateCollidingBodies(collision)
+
+    var bounce = findBounceVectors(collision.item1, collision.item2);
+    collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
+    collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
 };
 
 
