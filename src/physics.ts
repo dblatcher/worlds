@@ -202,5 +202,91 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
 }
 
+/**
+ * calculate the vectors at which two colliding bodies will bounce off each other
+ * 
+ * @param body1 
+ * @param body2 
+ * @returns the vectors they will bounce off at
+ */
+function findBounceVectors(body1: Thing, body2: Thing) {
+    //step 1 - normal unit vector and tangent unit vector
+    var n = { x: body2.shapeValues.x - body1.shapeValues.x, y: body2.shapeValues.y - body1.shapeValues.y, mag: 0 };
+    n.mag = Geometry.getDistanceBetweenPoints(n);
 
-export { getGravitationalForce, checkForCircleCollisions, CollisionReport }
+    var un = { x: n.x / n.mag, y: n.y / n.mag }
+    var ut = { x: -un.y, y: un.x };
+
+    //step 2 - define pre collision vectors
+    var v1 = body1.momentum.vector;
+    var v2 = body2.momentum.vector;
+
+    // step3 express pre collision vectors in unit normal and tangent
+    var v1n = (un.x * v1.x) + (un.y * v1.y);
+    var v1t = (ut.x * v1.x) + (ut.y * v1.y);
+    var v2n = (un.x * v2.x) + (un.y * v2.y);
+    var v2t = (ut.x * v2.x) + (ut.y * v2.y);
+
+    //step 4 tangential velocity doesn't change
+    var v_1t = v1t;
+    var v_2t = v2t;
+
+    //step 5 new normal velocity
+    var v_1n = ((v1n * (body1.mass - body2.mass)) + 2 * body2.mass * v2n) / (body1.mass + body2.mass);
+    var v_2n = ((v2n * (body2.mass - body1.mass)) + 2 * body1.mass * v1n) / (body1.mass + body2.mass);
+
+    //step 6 convert new normal and tangential velocities in Vectors 
+    //mutliply by unit vectors 
+    var V_1n = { x: v_1n * un.x, y: v_1n * un.y };
+    var V_1t = { x: v_1t * ut.x, y: v_1t * ut.y };
+
+    var V_2n = { x: v_2n * un.x, y: v_2n * un.y };
+    var V_2t = { x: v_2t * ut.x, y: v_2t * ut.y };
+
+    // step 7 - add component vectors
+    var newVector1 = { x: V_1n.x + V_1t.x, y: V_1n.y + V_1t.y } as Vector;
+    var newVector2 = { x: V_2n.x + V_2t.x, y: V_2n.y + V_2t.y } as Vector;
+
+    return {
+        vector1: newVector1,
+        vector2: newVector2
+    };
+
+};
+
+
+/**
+ * make a the items in a collision report bounce off each other (assumes both are circular)
+ * 
+ * @param impactPoint the CollisionReport
+ */
+
+function mutualRoundBounce(impactPoint: CollisionReport) {
+
+
+    // this seems wrong - moving out of sequence
+    impactPoint.item1.data.x = impactPoint.stopPoint.x;
+    impactPoint.item1.data.y = impactPoint.stopPoint.y;
+
+    var shape1 = impactPoint.item1.shapeValues
+    var shape2 = impactPoint.item2.shapeValues
+
+    if (Geometry.areCirclesIntersecting(shape1, shape2)) {
+        var distanceToSeparate = 1 + shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2);
+
+        var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
+        var magicV: Vector = new Force(distanceToSeparate, headingToSeparate).vector
+        impactPoint.item1.data.x += magicV.x / 2;
+        impactPoint.item1.data.y += magicV.y / 2;
+        impactPoint.item2.data.x -= magicV.x / 2;
+        impactPoint.item2.data.y -= magicV.y / 2;
+    }
+
+    var bounce = findBounceVectors(impactPoint.item1, impactPoint.item2);
+
+    impactPoint.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
+    impactPoint.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+};
+
+
+export { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce }

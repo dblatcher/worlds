@@ -11,6 +11,8 @@ class Force {
     get vectorX() { return Geometry.getVectorX(this.magnitude, this.direction) }
     get vectorY() { return Geometry.getVectorY(this.magnitude, this.direction) }
 
+    get vector() { return { x: this.vectorX, y: this.vectorY } }
+
     static fromVector(x: number, y: number) {
         return new Force(Geometry.getMagnitude(x, y), Geometry.getDirection(x, y));
     }
@@ -21,7 +23,7 @@ class Force {
             totalX += force.vectorX
             totalY += force.vectorY
         })
-        return new Force(Geometry.getMagnitude(totalX,totalY), Geometry.getDirection(totalX,totalY))
+        return new Force(Geometry.getMagnitude(totalX, totalY), Geometry.getDirection(totalX, totalY))
     }
 }
 

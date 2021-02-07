@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, checkForCircleCollisions, CollisionReport } from './physics'
+import { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce } from './physics'
 import { Shape, shapes } from './Shape'
 
 
@@ -83,7 +83,10 @@ class Thing {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) { console.log(report) }
+        if (report) { 
+            console.log(report) 
+            mutualRoundBounce(report)
+        }
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {

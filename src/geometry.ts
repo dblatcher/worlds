@@ -38,7 +38,8 @@ function getMagnitude(x: number, y: number) {
     return Math.sqrt((x * x) + (y * y))
 }
 
-function getDistanceBetweenPoints(point1: Point, point2: Point) {
+function getDistanceBetweenPoints(point1: Point, point2?: Point) {
+    if (!point2) { point2 = { x: 0, y: 0 } }
     let dx = point1.x - point2.x, dy = point1.y - point2.y;
     return getMagnitude(dx, dy)
 }
@@ -53,7 +54,7 @@ function getVectorX(magnitude: number, direction: number) { return magnitude * M
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
 
 
-function closestpointonline (L1: Point, L2: Point, p0: Point) {
+function closestpointonline(L1: Point, L2: Point, p0: Point) {
 
     if (!isFinite(L2.x) && !isFinite(L2.y)) {
         console.log('bad L2 passed to closestpointonline, returning L1 coords');
@@ -75,7 +76,7 @@ function closestpointonline (L1: Point, L2: Point, p0: Point) {
         cy = p0.y;
     }
 
-    if (!isFinite(cx)  || !isFinite(cy) ) {
+    if (!isFinite(cx) || !isFinite(cy)) {
         console.log('closestpointonline error');
         console.log(L1, L2, p0);
     }
@@ -83,12 +84,12 @@ function closestpointonline (L1: Point, L2: Point, p0: Point) {
     return { x: cx, y: cy } as Point;
 }
 
-function areCirclesIntersecting(circle1:Circle, circle2:Circle) {
+function areCirclesIntersecting(circle1: Circle, circle2: Circle) {
     return getDistanceBetweenPoints(circle1, circle2) < circle1.radius + circle2.radius
 }
 
 export {
     getDirection, getMagnitude, getVectorX, getVectorY,
-    getDistanceBetweenPoints, getHeadingFromPointToPoint,closestpointonline,
+    getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting
 }
