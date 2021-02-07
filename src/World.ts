@@ -8,15 +8,18 @@ class World {
     canvas?: HTMLCanvasElement
     timerSpeed: number
     globalGravityForce?: Force
+    thingsExertGravity: boolean
 
     constructor(gravity: number, things: Thing[], config: {
         globalGravityForce?: Force
+        thingsExertGravity?: boolean
     } = {}) {
 
         this.gravitationalConstant = gravity
 
         this.timerSpeed = 0
         this.globalGravityForce = config.globalGravityForce || null
+        this.thingsExertGravity = config.thingsExertGravity || false
 
         this.things = []
         things.forEach(thing => { thing.enterWorld(this) })

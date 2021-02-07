@@ -44,14 +44,18 @@ class Thing {
 
     get gravitationalForces() {
         if (!this.world) { return new Force(0, 0) }
-        const { globalGravityForce, gravitationalConstant, things } = this.world
+        const { globalGravityForce, gravitationalConstant, things, thingsExertGravity } = this.world
 
-        const otherThings = things.filter(thing => thing !== this)
-        let forces = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
+        let forces = []
+
+        if (thingsExertGravity) {
+            const otherThings = things.filter(thing => thing !== this)
+            let forcesFromOtherThings = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
+            forces.push (...forcesFromOtherThings)
+        }
 
         if (globalGravityForce) {
             const effect = new Force(globalGravityForce.magnitude * gravitationalConstant * this.mass, globalGravityForce.direction)
-            console.log(effect)
             forces.push(effect)
         }
 
