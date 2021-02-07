@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, checkForCircleCollisions } from './physics'
+import { getGravitationalForce, checkForCircleCollisions, CollisionReport } from './physics'
 import { Shape, shapes } from './Shape'
 
 
@@ -82,7 +82,7 @@ class Thing {
         return reports
     }
 
-    handleCollision(report: any) {
+    handleCollision(report: CollisionReport) {
         if (report) { console.log(report) }
     }
 

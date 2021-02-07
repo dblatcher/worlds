@@ -7,14 +7,14 @@ import * as Geometry from './geometry'
 interface Point { x: number, y: number }
 interface Vector { x: number, y: number }
 
-interface CollisionReport {
-    type: string
+class CollisionReport {
+    type: "end inside" | "passed through" | "start inside"
     x: number //the point of impact
-    y: number //the point of impace
-    stopPoint: Point,
-    item1: Thing,
-    item2: Thing,
-    force: number,
+    y: number //the point of impact
+    stopPoint: Point
+    item1: Thing
+    item2: Thing
+    force: number
     force2: number
 }
 
@@ -45,8 +45,6 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
     var vector = {
         x: item1.momentum.vectorX,
         y: item1.momentum.vectorY,
-        h: item1.momentum.direction,
-        m: item1.momentum.magnitude
     }
 
 
@@ -54,8 +52,6 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
         var badValues = [];
         if (!isFinite(Q.x)) { badValues.push('x') }
         if (!isFinite(Q.y)) { badValues.push('y') }
-        if (!isFinite(Q.m)) { badValues.push('m') }
-        if (!isFinite(Q.h)) { badValues.push('h') }
         if (badValues.length) { return badValues }
         return null;
     };
@@ -63,6 +59,7 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
     if (errorTest(vector)) {
         console.log('bad vector for ' + item1.data.color + ' ' + item1.data.shape.id + 'in checkForCircleCollisions')
         console.log(vector)
+        return null
     }
 
 
@@ -73,8 +70,7 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
         x: (item1.data.x + vector.x),
         y: (item1.data.y + vector.y),
         circular: true,
-        radius: item1.data.size,
-        size: item1.data.size
+        radius: item1.shapeValues.radius,
     }
 
     if (Geometry.areCirclesIntersecting(item1.shapeValues, item2.shapeValues)) {
@@ -116,14 +112,21 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
     // TO DO - optimise calculations - only calculate if needed
 
+    // d is the closest point to item2 on the path taken by item1
     var d = Geometry.closestpointonline(item1.shapeValues, movedObject, item2.shapeValues);
     var closestDist = Geometry.getDistanceBetweenPoints(item2.shapeValues, d);
     var closestDistSq = closestDist * closestDist;
-    var movementvectorlength = Force.fromVector(vector.x, vector.y).magnitude;
-    var backdist = Math.sqrt(Math.pow(movedObject.radius + item2.shapeValues.radius, 2) - closestDistSq);
+
+    // backdist how far back item1 needs to go from d to be at impactPoint? relative to vectorMagnitude?
+    var backdist = Math.sqrt(Math.pow(item1.shapeValues.radius + item2.shapeValues.radius, 2) - closestDistSq);
+
+
+    var vectorMagnitude = Force.fromVector(vector.x, vector.y).magnitude;
+    // check this - should be negative?
+    // changed y to be negative - (used to be positive in the old application, the y vector was reversed so plus == up)
     var item1PointWhenHit = {
-        x: d.x + backdist * (-vector.x / movementvectorlength),
-        y: d.y + backdist * (vector.y / movementvectorlength)
+        x: d.x + backdist * (-vector.x / vectorMagnitude),
+        y: d.y + backdist * (-vector.y / vectorMagnitude)
     } as Point;
 
     var directionFromItem2ToImpactPoint = Force.fromVector(item1PointWhenHit.x - item2.shapeValues.x, item1PointWhenHit.y - item2.shapeValues.y).direction
@@ -200,4 +203,4 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 }
 
 
-export { getGravitationalForce, checkForCircleCollisions }
+export { getGravitationalForce, checkForCircleCollisions, CollisionReport }
