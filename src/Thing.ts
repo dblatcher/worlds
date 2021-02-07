@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY, getDirection, getDistanceBetweenPoints, getHeadingFromPointToPoint } from './geometry'
-import { getGravitationalForce } from './physics'
+import { getVectorX, getVectorY } from './geometry'
+import { getGravitationalForce, checkForCircleCollisions } from './physics'
 import { Shape, shapes } from './Shape'
 
 
@@ -34,15 +34,23 @@ class Thing {
         return size * size * Math.PI * density
     }
 
+    get shapeValues() {
+        return {
+            radius: this.data.size,
+            x: this.data.x,
+            y: this.data.y,
+        }
+    }
+
     get gravitationalForces() {
         if (!this.world) { return new Force(0, 0) }
-        const { globalGravityForce, gravitationalConstant,things } = this.world
+        const { globalGravityForce, gravitationalConstant, things } = this.world
 
         const otherThings = things.filter(thing => thing !== this)
         let forces = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
 
         if (globalGravityForce) {
-            const effect = new Force(globalGravityForce.magnitude * gravitationalConstant * this.mass, globalGravityForce.direction) 
+            const effect = new Force(globalGravityForce.magnitude * gravitationalConstant * this.mass, globalGravityForce.direction)
             console.log(effect)
             forces.push(effect)
         }
@@ -50,34 +58,32 @@ class Thing {
         return Force.combine(forces)
     }
 
-    move() {
+    updateMomentum() {
         const { gravitationalForces, mass } = this
         gravitationalForces.magnitude = gravitationalForces.magnitude / mass
-
         this.momentum = Force.combine([this.momentum, gravitationalForces])
+    }
 
+    move() {
         this.data.y += this.momentum.vectorY
         this.data.x += this.momentum.vectorX
-
         this.data.heading = this.momentum.direction
     }
 
     detectCollisions() {
         const otherThings = this.world.things.filter(otherThing => otherThing !== this)
-        const thingsCollidedWith: Thing[] = []
+        const reports: any[] = []
 
         otherThings.forEach(otherThing => {
-            if (this.checkIfCollidingWith(otherThing)) {
-                thingsCollidedWith.push(otherThing)
-            }
+            let report = checkForCircleCollisions(this, otherThing)
+            reports.push(report)
         })
 
-        return thingsCollidedWith
+        return reports
     }
 
-    handleCollision(otherThing:Thing) {
-
-        console.log(`${this.data.color} thing hits ${otherThing.data.color} thing`)
+    handleCollision(report: any) {
+        if (report) { console.log(report) }
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
@@ -100,24 +106,24 @@ class Thing {
 
     }
 
-    checkIfContainsPoint(point:{x:number, y:number}) {
-        return this.data.shape.containsPoint.apply(this,[point])
+    checkIfContainsPoint(point: { x: number, y: number }) {
+        return this.data.shape.containsPoint.apply(this, [point])
     }
 
-    checkIfCollidingWith(otherThing:Thing) {
-        return this.data.shape.collidingWithShape.apply(this,[otherThing])
+    checkIfCollidingWith(otherThing: Thing) {
+        return this.data.shape.intersectingWithShape.apply(this, [otherThing])
     }
 }
 
 
 class LinedThing extends Thing {
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        Thing.prototype.renderOnCanvas.apply(this,[ctx])
+        Thing.prototype.renderOnCanvas.apply(this, [ctx])
         const { x, y, size, heading } = this.data
 
         let midPoint = {
-            x: x + getVectorX(size/2, heading),
-            y: y + getVectorY(size/2, heading)
+            x: x + getVectorX(size / 2, heading),
+            y: y + getVectorY(size / 2, heading)
         }
 
         ctx.beginPath()

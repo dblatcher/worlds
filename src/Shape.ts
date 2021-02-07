@@ -1,4 +1,4 @@
-import { getDistanceBetweenPoints } from "./geometry"
+import { areCirclesIntersecting, getDistanceBetweenPoints } from "./geometry"
 import { Thing } from "./Thing"
 
 interface Point { x: number, y: number }
@@ -7,18 +7,18 @@ interface ContainsPointFunction {
     (point: Point): boolean
 }
 
-interface AreCollidingFunction {
+interface AreIntersectingFunction {
     (otherThing: Thing): boolean
 }
 
 class Shape {
     id: string
     containsPoint: ContainsPointFunction
-    collidingWithShape: AreCollidingFunction
-    constructor(id: string, containsPoint: ContainsPointFunction, collidingWithShape: AreCollidingFunction) {
+    intersectingWithShape: AreIntersectingFunction
+    constructor(id: string, containsPoint: ContainsPointFunction, intersectingWithShape: AreIntersectingFunction) {
         this.id = id
         this.containsPoint = containsPoint
-        this.collidingWithShape = collidingWithShape
+        this.intersectingWithShape = intersectingWithShape
     }
 }
 
@@ -32,7 +32,7 @@ const circle = new Shape('circle',
         switch (otherThing.data.shape.id) {
 
             case 'circle':
-                return getDistanceBetweenPoints(thisThing.data, otherThing.data) < thisThing.data.size + otherThing.data.size
+                return areCirclesIntersecting(thisThing.shapeValues, otherThing.shapeValues)
             default:
                 return false
         }

@@ -1,8 +1,10 @@
-interface Point {x:number, y:number}
+interface Point { x: number, y: number }
+
+interface Circle { x: number, y: number, radius: number }
 
 /**
  * Calculate the direction of an [x,y] vector
- * 
+ *
  * @param x the x value of the vector
  * @param y the y value of the vector
  * @returns the direction in radians
@@ -27,7 +29,7 @@ function getDirection(x: number, y: number) {
 
 /**
  * Calculate the magnitude of an [x,y] vector, using pythagoras' theorum
- * 
+ *
  * @param x the x value of the vector
  * @param y the y value of the vector
  * @returns the vector magnitude
@@ -36,21 +38,57 @@ function getMagnitude(x: number, y: number) {
     return Math.sqrt((x * x) + (y * y))
 }
 
-function getDistanceBetweenPoints(point1:Point, point2:Point) {
-    let dx = point1.x - point2.x, dy=point1.y-point2.y;
-    return getMagnitude(dx,dy)
+function getDistanceBetweenPoints(point1: Point, point2: Point) {
+    let dx = point1.x - point2.x, dy = point1.y - point2.y;
+    return getMagnitude(dx, dy)
 }
 
-function getHeadingFromPointToPoint (origin:Point, destination:Point) {
-    let dx = origin.x - destination.x, dy=origin.y-destination.y;
-    return getDirection(dx,dy)
+function getHeadingFromPointToPoint(origin: Point, destination: Point) {
+    let dx = origin.x - destination.x, dy = origin.y - destination.y;
+    return getDirection(dx, dy)
 }
 
 function getVectorX(magnitude: number, direction: number) { return magnitude * Math.sin(direction) }
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
 
+
+function closestpointonline (L1: Point, L2: Point, p0: Point) {
+
+    if (!isFinite(L2.x) && !isFinite(L2.y)) {
+        console.log('bad L2 passed to closestpointonline, returning L1 coords');
+        return ({ x: L1.x, y: L1.y });
+    }
+
+    var A1 = L2.y - L1.y;
+    var B1 = L1.x - L2.x;
+    var C1 = (L2.y - L1.y) * L1.x + (L1.x - L2.x) * L1.y;
+    var C2 = -B1 * p0.x + A1 * p0.y;
+    var det = A1 * A1 - -B1 * B1;
+    var cx = 0;
+    var cy = 0;
+    if (det !== 0) {
+        cx = ((A1 * C1 - B1 * C2) / det);
+        cy = ((A1 * C2 - -B1 * C1) / det);
+    } else {
+        cx = p0.x;
+        cy = p0.y;
+    }
+
+    if (!isFinite(cx)  || !isFinite(cy) ) {
+        console.log('closestpointonline error');
+        console.log(L1, L2, p0);
+    }
+
+    return { x: cx, y: cy } as Point;
+}
+
+function areCirclesIntersecting(circle1:Circle, circle2:Circle) {
+    return getDistanceBetweenPoints(circle1, circle2) < circle1.radius + circle2.radius
+}
+
 export {
     getDirection, getMagnitude, getVectorX, getVectorY,
-    getDistanceBetweenPoints, getHeadingFromPointToPoint,
+    getDistanceBetweenPoints, getHeadingFromPointToPoint,closestpointonline,
+    areCirclesIntersecting
 }
