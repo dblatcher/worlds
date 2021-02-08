@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce } from './physics'
+import { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce, checkForEdgeCollisions, flatBounce } from './physics'
 import { Shape, shapes } from './Shape'
 
 
@@ -39,6 +39,10 @@ class Thing {
             radius: this.data.size,
             x: this.data.x,
             y: this.data.y,
+            top: this.data.y - this.data.size,
+            bottom: this.data.y + this.data.size,
+            left: this.data.x - this.data.size,
+            right: this.data.x + this.data.size,
         }
     }
 
@@ -51,7 +55,7 @@ class Thing {
         if (thingsExertGravity) {
             const otherThings = things.filter(thing => thing !== this)
             let forcesFromOtherThings = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
-            forces.push (...forcesFromOtherThings)
+            forces.push(...forcesFromOtherThings)
         }
 
         if (globalGravityForce) {
@@ -83,12 +87,23 @@ class Thing {
     move() {
         this.data.y += this.momentum.vectorY
         this.data.x += this.momentum.vectorX
+
+        const { top, bottom,radius, left, right } = this.shapeValues
+
+        if (this.world.hasHardEdges) {
+            this.data.y = top < 0 ? radius : this.data.y
+            this.data.y = bottom > this.world.height ? this.world.height - radius : this.data.y
+
+            this.data.x = left < 0 ? radius : this.data.x
+            this.data.x = right > this.world.width ? this.world.width - radius : this.data.x
+        }
+
         this.data.heading = this.momentum.direction
     }
 
     detectCollisions() {
         const otherThings = this.world.things.filter(otherThing => otherThing !== this)
-        const reports: any[] = []
+        const reports: CollisionReport[] = []
 
         otherThings.forEach(otherThing => {
             let report = checkForCircleCollisions(this, otherThing)
@@ -102,6 +117,19 @@ class Thing {
         if (report) {
             console.log(report)
             mutualRoundBounce(report)
+        }
+    }
+
+    detectWorldEdgeCollisions() {
+        const reports: CollisionReport[] = []
+        reports.push(checkForEdgeCollisions(this))
+        return reports
+    }
+
+    handleWorldEdgeCollision(report: CollisionReport) {
+        if (report) {
+            console.log(report)
+            // flatBounce(report)
         }
     }
 

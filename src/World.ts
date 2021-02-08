@@ -1,6 +1,12 @@
 import { Force } from './Force'
 import { Thing } from './Thing'
 
+class WorldConfig {
+    globalGravityForce?: Force
+    thingsExertGravity?: boolean
+    hasHardEdges?: boolean
+}
+
 class World {
     gravitationalConstant: number
     things: Thing[]
@@ -9,17 +15,16 @@ class World {
     timerSpeed: number
     globalGravityForce?: Force
     thingsExertGravity: boolean
+    hasHardEdges: boolean
 
-    constructor(gravity: number, things: Thing[], config: {
-        globalGravityForce?: Force
-        thingsExertGravity?: boolean
-    } = {}) {
+    constructor(gravity: number, things: Thing[], config: WorldConfig = {}) {
 
         this.gravitationalConstant = gravity
 
         this.timerSpeed = 0
         this.globalGravityForce = config.globalGravityForce || null
         this.thingsExertGravity = config.thingsExertGravity || false
+        this.hasHardEdges = config.hasHardEdges || false
 
         this.things = []
         things.forEach(thing => { thing.enterWorld(this) })
@@ -29,12 +34,22 @@ class World {
         return `The local gravity is ${this.gravitationalConstant}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
     }
 
+    get width() { return 1000}
+    get height() { return 1000}
+
     tick() {
         this.things.forEach(thing => { thing.updateMomentum() })
         this.things.forEach(thing => {
             const reports = thing.detectCollisions()
             reports.forEach(report => thing.handleCollision(report))
         })
+
+        if (this.hasHardEdges) {
+            this.things.forEach(thing => {
+                const reports = thing.detectWorldEdgeCollisions()
+                reports.forEach(report => thing.handleWorldEdgeCollision(report))
+            })
+        }
 
         this.things.forEach(thing => { thing.move() })
 

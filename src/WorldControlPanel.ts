@@ -19,9 +19,16 @@ class WorldControlPanel {
         startButton.innerText = "start"
         const stopButton = document.createElement('button')
         stopButton.innerText = "stop"
+        const slowButton = document.createElement('button')
+        slowButton.innerText = "slow"
 
         startButton.addEventListener('click', () => {
             this.world.ticksPerSecond = 20
+            this.updateReport()
+        })
+
+        slowButton.addEventListener('click', () => {
+            this.world.ticksPerSecond = 1
             this.updateReport()
         })
 
@@ -32,6 +39,7 @@ class WorldControlPanel {
 
         timeSection.appendChild(startButton)
         timeSection.appendChild(stopButton)
+        timeSection.appendChild(slowButton)
 
         return timeSection
     }
@@ -74,6 +82,8 @@ class WorldControlPanel {
 
         container.style.position = 'fixed'
         container.style.backgroundColor = 'red'
+        container.style.right = '0'
+
 
         return container
     }
