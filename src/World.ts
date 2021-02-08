@@ -31,7 +31,7 @@ class World {
     }
 
     get report() {
-        return `The local gravity is ${this.gravitationalConstant}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
+        return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
     }
 
     get width() { return 1000}
