@@ -5,6 +5,7 @@ class WorldConfig {
     globalGravityForce?: Force
     thingsExertGravity?: boolean
     hasHardEdges?: boolean
+    gravitationalConstant?: number
 }
 
 class World {
@@ -17,11 +18,11 @@ class World {
     thingsExertGravity: boolean
     hasHardEdges: boolean
 
-    constructor(gravity: number, things: Thing[], config: WorldConfig = {}) {
-
-        this.gravitationalConstant = gravity
+    constructor( things: Thing[], config: WorldConfig = {}) {
 
         this.timerSpeed = 0
+        
+        this.gravitationalConstant = config.gravitationalConstant || 0
         this.globalGravityForce = config.globalGravityForce || null
         this.thingsExertGravity = config.thingsExertGravity || false
         this.hasHardEdges = config.hasHardEdges || false
