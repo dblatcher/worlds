@@ -38,6 +38,15 @@ function getMagnitude(x: number, y: number) {
     return Math.sqrt((x * x) + (y * y))
 }
 
+/**
+ * Calculate he distance between point1 and either point2 if present or 
+ * between point1 and origin
+ * 
+ * @param point1 the first point
+ * @param point2 (optional) the second point
+ * @return the distance between point1 and either point2 if present or 
+ * between point1 and origin
+ */
 function getDistanceBetweenPoints(point1: Point, point2?: Point) {
     if (!point2) { point2 = { x: 0, y: 0 } }
     let dx = point1.x - point2.x, dy = point1.y - point2.y;
@@ -88,8 +97,23 @@ function areCirclesIntersecting(circle1: Circle, circle2: Circle) {
     return getDistanceBetweenPoints(circle1, circle2) < circle1.radius + circle2.radius
 }
 
+
+function reverseHeading(heading: number) {
+    let result = heading + Math.PI;
+    if (result > Math.PI * 2) { result -= Math.PI * 2 }
+    return result;
+};
+
+function reflectHeading(heading: number, wallAngle: number) {
+    let reflect = 2 * wallAngle - heading;
+    if (reflect < (Math.PI) * 0) { reflect += (Math.PI) * 2 };
+    if (reflect > (Math.PI) * 2) { reflect -= (Math.PI) * 2 };
+    if (reflect === heading) { reflect = reverseHeading(reflect) }
+    return reflect;
+}
+
 export {
     getDirection, getMagnitude, getVectorX, getVectorY,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
-    areCirclesIntersecting
+    areCirclesIntersecting, reflectHeading
 }

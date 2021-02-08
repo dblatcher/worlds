@@ -6,9 +6,10 @@ import * as Geometry from './geometry'
 
 interface Point { x: number, y: number }
 interface Vector { x: number, y: number }
+interface Circle { x: number, y: number, radius: number }
 
 class CollisionReport {
-    type: "end inside" | "passed through" | "start inside"
+    type: "end inside" | "passed through" | "start inside" | "edgeX" | "edgeY"
     x: number //the point of impact
     y: number //the point of impact
     stopPoint: Point
@@ -20,11 +21,11 @@ class CollisionReport {
 
 /**
  * Calculation the gravitational effect of one Thing on another
- * 
+ *
  * @param gravitationalConstant The gravitational constant of the world the things are in
  * @param affectedThing The Thing being pulled towards the gravity source
  * @param thing2 The gravity source
- * 
+ *
  * @return the Force exerted on the affectedThing
  */
 function getGravitationalForce(gravitationalConstant: number, affectedThing: Thing, thing2: Thing) {
@@ -37,6 +38,79 @@ function getGravitationalForce(gravitationalConstant: number, affectedThing: Thi
     return new Force(magnitude, direction)
 }
 
+function checkForEdgeCollisions(item: Thing): CollisionReport {
+
+    const { height, width } = item.world
+    const body = item.shapeValues
+    const vector = item.momentum.vector
+    const bodyAtEnd: Circle = { x: body.x + vector.x, y: body.y + vector.y, radius: body.radius }
+    const edgesCrossedAtEnd = getEdgesCrossed(bodyAtEnd)
+    const edgesCrossedAtStart = getEdgesCrossed(body)
+
+    if (edgesCrossedAtStart.length > 0 ) {
+        console.warn({item, edgesCrossedAtStart})
+    }
+
+    if (edgesCrossedAtEnd.length === 0 ) { return null }
+
+
+    let collisionType: "edgeX" | "edgeY";
+    let stopPoint: Point = { x: body.x, y: body.y }
+
+    if (edgesCrossedAtEnd.includes("BOTTOM")) {
+        stopPoint.y = height - body.radius
+        collisionType = "edgeY"
+    }
+    if (edgesCrossedAtEnd.includes("TOP")) {
+        stopPoint.y = body.radius
+        collisionType = "edgeY"
+    }
+    if (edgesCrossedAtEnd.includes("LEFT")) {
+        stopPoint.x = body.radius
+        collisionType = "edgeX"
+    }
+    if (edgesCrossedAtEnd.includes("RIGHT")) {
+        stopPoint.x = width - body.radius
+        collisionType = "edgeX"
+    }
+
+    const vectorFromStopPointToImpactPoint: Vector = new Force(body.radius, item.momentum.direction).vector
+
+    return {
+        type: collisionType,
+        x: stopPoint.x + vectorFromStopPointToImpactPoint.x,
+        y: stopPoint.y + vectorFromStopPointToImpactPoint.y,
+        item1: item,
+        item2: null,
+        stopPoint: stopPoint,
+        force: item.momentum.magnitude,
+        force2: 0,
+    }
+
+    function getEdgesCrossed(circle: Circle) {
+        const { x, y, radius } = circle
+        let edges: string[] = []
+        if (x - radius < 0) { edges.push("LEFT") }
+        if (x + radius > width) { edges.push("RIGHT") }
+        if (y - radius < 0) { edges.push("TOP") }
+        if (y + radius > width) { edges.push("BOTTOM") }
+        return edges
+    }
+}
+
+function flatBounce(edgeCollisionReport: CollisionReport) {
+    const { item1, stopPoint, type } = edgeCollisionReport
+
+    item1.data.x = stopPoint.x;
+    item1.data.y = stopPoint.y;
+    var newHeading = Geometry.reflectHeading(
+        item1.momentum.direction,
+        type === 'edgeX' ? Math.PI * 0.01 : Math.PI * 0.5
+    )
+
+    const energyConservation = .75
+    item1.momentum = new Force(item1.momentum.magnitude * energyConservation, newHeading)
+}
 
 function checkForCircleCollisions(item1: Thing, item2: Thing) {
     // can't collide with self!
@@ -204,9 +278,9 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
 /**
  * calculate the vectors at which two colliding bodies will bounce off each other
- * 
- * @param body1 
- * @param body2 
+ *
+ * @param body1
+ * @param body2
  * @returns the vectors they will bounce off at
  */
 function findBounceVectors(body1: Thing, body2: Thing) {
@@ -235,8 +309,8 @@ function findBounceVectors(body1: Thing, body2: Thing) {
     var v_1n = ((v1n * (body1.mass - body2.mass)) + 2 * body2.mass * v2n) / (body1.mass + body2.mass);
     var v_2n = ((v2n * (body2.mass - body1.mass)) + 2 * body1.mass * v1n) / (body1.mass + body2.mass);
 
-    //step 6 convert new normal and tangential velocities in Vectors 
-    //mutliply by unit vectors 
+    //step 6 convert new normal and tangential velocities in Vectors
+    //mutliply by unit vectors
     var V_1n = { x: v_1n * un.x, y: v_1n * un.y };
     var V_1t = { x: v_1t * ut.x, y: v_1t * ut.y };
 
@@ -258,7 +332,7 @@ function findBounceVectors(body1: Thing, body2: Thing) {
  * move the first item to the stop point in the collsion, then
  * move the two items appart if they are still intersecting
  * assumes round items
- * 
+ *
  * @param collision the collidion report
  */
 function separateCollidingBodies(collision: CollisionReport) {
@@ -284,7 +358,7 @@ function separateCollidingBodies(collision: CollisionReport) {
 
 /**
  * make a the items in a collision report bounce off each other (assumes both are circular)
- * 
+ *
  * @param collision the CollisionReport
  */
 function mutualRoundBounce(collision: CollisionReport) {
@@ -297,4 +371,4 @@ function mutualRoundBounce(collision: CollisionReport) {
 };
 
 
-export { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce }
+export { getGravitationalForce, checkForCircleCollisions, CollisionReport, mutualRoundBounce, checkForEdgeCollisions, flatBounce }

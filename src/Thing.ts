@@ -88,7 +88,7 @@ class Thing {
         this.data.y += this.momentum.vectorY
         this.data.x += this.momentum.vectorX
 
-        const { top, bottom,radius, left, right } = this.shapeValues
+        const { top, bottom, radius, left, right } = this.shapeValues
 
         if (this.world.hasHardEdges) {
             this.data.y = top < 0 ? radius : this.data.y
@@ -114,10 +114,7 @@ class Thing {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) {
-            console.log(report)
-            mutualRoundBounce(report)
-        }
+        if (report) { mutualRoundBounce(report) }
     }
 
     detectWorldEdgeCollisions() {
@@ -127,10 +124,7 @@ class Thing {
     }
 
     handleWorldEdgeCollision(report: CollisionReport) {
-        if (report) {
-            console.log(report)
-            // flatBounce(report)
-        }
+        if (report) { flatBounce(report) }
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
