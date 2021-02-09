@@ -1,6 +1,8 @@
 import { World } from './World'
 import { KillerThing, LinedThing, Thing } from './Thing'
 import { Force } from './Force'
+import { testWorld } from './preset-worlds/spaceShipTest'
+
 
 
 const redPlanet = new Thing({ x: 700, y: 100, size: 10, density: 1, color: 'red' })
@@ -51,4 +53,4 @@ const ground = new World([
     name: "falling rocks",
 })
 
-export { galaxy, ground }
+export { galaxy, ground, testWorld }

@@ -115,5 +115,5 @@ function reflectHeading(heading: number, wallAngle: number) {
 export {
     getDirection, getMagnitude, getVectorX, getVectorY,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
-    areCirclesIntersecting, reflectHeading
+    areCirclesIntersecting, reflectHeading,reverseHeading
 }

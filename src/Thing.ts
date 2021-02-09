@@ -13,6 +13,7 @@ interface ThingData {
     color?: string
     density?: number
     shape?: Shape
+    keepsHeading?: boolean
 }
 
 
@@ -26,6 +27,7 @@ class Thing {
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
         this.data.shape = this.data.shape || shapes.circle
+        this.data.keepsHeading = config.keepsHeading || false
         this.momentum = momentum || new Force(0, 0)
     }
 
@@ -98,7 +100,9 @@ class Thing {
             this.data.x = right > this.world.width ? this.world.width - radius : this.data.x
         }
 
-        this.data.heading = this.momentum.direction
+        if (!this.data.keepsHeading) {
+            this.data.heading = this.momentum.direction
+        }
     }
 
     detectCollisions() {
@@ -141,6 +145,7 @@ class Thing {
         }
 
         ctx.beginPath()
+        ctx.strokeStyle = 'black';
         ctx.moveTo(x, y)
         ctx.lineTo(frontPoint.x, frontPoint.y)
         ctx.stroke()
