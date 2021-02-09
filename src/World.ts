@@ -2,6 +2,7 @@ import { Force } from './Force'
 import { Thing } from './Thing'
 
 class WorldConfig {
+    name?: string
     globalGravityForce?: Force
     thingsExertGravity?: boolean
     hasHardEdges?: boolean
@@ -17,11 +18,13 @@ class World {
     globalGravityForce?: Force
     thingsExertGravity: boolean
     hasHardEdges: boolean
+    name: string
 
-    constructor( things: Thing[], config: WorldConfig = {}) {
+    constructor(things: Thing[], config: WorldConfig = {}) {
 
         this.timerSpeed = 0
-        
+
+        this.name = config.name || ""
         this.gravitationalConstant = config.gravitationalConstant || 0
         this.globalGravityForce = config.globalGravityForce || null
         this.thingsExertGravity = config.thingsExertGravity || false
@@ -35,8 +38,8 @@ class World {
         return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
     }
 
-    get width() { return 1000}
-    get height() { return 1000}
+    get width() { return 1000 }
+    get height() { return 1000 }
 
     tick() {
         this.things.forEach(thing => { thing.updateMomentum() })

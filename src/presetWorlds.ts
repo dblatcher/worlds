@@ -17,13 +17,14 @@ const galaxy = new World([
     gravitationalConstant: .2,
     thingsExertGravity: true,
     hasHardEdges: true,
+    name: "Galaxy",
 });
 
 function makeRock() {
 
     let x = 50 + Math.floor(Math.random() * 900)
     let y = 50 + Math.floor(Math.random() * 300)
-    let size = 10 + Math.floor(Math.random() * 10)
+    let size = 10 + Math.floor(Math.random() * 20)
     let density = 4
     let color = 'gray'
     let direction = Math.random() > .25
@@ -35,12 +36,19 @@ function makeRock() {
     return new Thing({ x, y, size, density, color }, new Force(4, Math.PI * direction))
 }
 
+function makeRocks(amount: number) {
+    let rocks: Thing[] = []
+    for (let i = 0; i < amount; i++) { rocks.push(makeRock()) }
+    return rocks
+}
+
 const ground = new World([
-    makeRock(), makeRock(), makeRock(), makeRock(), makeRock(), , makeRock(), makeRock(), , makeRock(), makeRock(), , makeRock(), makeRock(),
+    ...makeRocks(25),
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
     gravitationalConstant: 1,
+    name: "falling rocks",
 })
 
 export { galaxy, ground }

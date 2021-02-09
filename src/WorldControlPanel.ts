@@ -1,15 +1,33 @@
 import { World } from './World'
 
+interface WorldControlPanelConfig {
+    worldOptions?: World[]
+}
+
 class WorldControlPanel {
     world: World
+    worldOptions: World[]
     reportElement: HTMLElement
-    constructor(world: World) {
+    constructor(world: World, config: WorldControlPanelConfig = {}) {
         this.world = world
+        this.worldOptions = config.worldOptions || [world]
     }
 
     updateReport() {
-        if (!this.reportElement) {return}
-        this.reportElement.innerText = this.world.report
+        if (!this.reportElement) { return }
+        this.reportElement.innerText = (this.world.name || `World`)+ ":  " + this.world.report
+    }
+
+    changeWorld(world: World) {
+        if (this.world == world) { return }
+        const canvasElement = this.world.canvas;
+        this.world.stopTime()
+        this.world.canvas = null
+
+        world.canvas = canvasElement
+        world.renderOnCanvas()
+        this.world = world
+        this.updateReport()
     }
 
     makeTimeSection() {
@@ -69,16 +87,37 @@ class WorldControlPanel {
         return gravitySection
     }
 
+    makeWorldPickerSection() {
+        const section = document.createElement('section')
+        section.innerText = "change world:"
+
+        this.worldOptions.forEach((world, index) => {
+            const button = document.createElement('button')
+            button.innerText = world.name || `World #${index}`
+
+            button.addEventListener('click', () => { this.changeWorld(world) })
+
+            section.appendChild(button)
+        })
+
+        return section
+    }
+
     makeElement() {
         const container = document.createElement('article')
 
         const reportLine = document.createElement('p')
         reportLine.innerText = this.world.report
-        container.appendChild(reportLine)
         this.reportElement = reportLine
+        this.updateReport()
 
+        container.appendChild(reportLine)
         container.appendChild(this.makeTimeSection())
         container.appendChild(this.makeGravitySection())
+
+        if (this.worldOptions.length > 1) {
+            container.appendChild(this.makeWorldPickerSection())
+        }
 
         container.style.position = 'fixed'
         container.style.backgroundColor = 'red'
