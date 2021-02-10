@@ -14,24 +14,6 @@ class SpaceShipControlPanel {
         this.thrustMeter.innerText = `${thrust} / ${maxThrust}`
     }
 
-    throttleUp() {
-        const { spaceShip } = this
-        spaceShip.data.thrust += spaceShip.data.maxThrust / 10
-        if (spaceShip.data.thrust > spaceShip.data.maxThrust) {
-            spaceShip.data.thrust = spaceShip.data.maxThrust
-        }
-        this.updateMeter()
-    }
-
-    throttleDown() {
-        const { spaceShip } = this
-        spaceShip.data.thrust -= spaceShip.data.maxThrust / 10
-        if (spaceShip.data.thrust < 0) {
-            spaceShip.data.thrust = 0
-        }
-        this.updateMeter()
-    }
-
     steer(amount: number) {
         const { spaceShip } = this
         spaceShip.data.heading += amount
@@ -55,8 +37,14 @@ class SpaceShipControlPanel {
         this.thrustMeter = thrustMeter
         this.updateMeter()
 
-        accelerator.addEventListener('click', () => { this.throttleUp() })
-        brake.addEventListener('click', () => { this.throttleDown() })
+        accelerator.addEventListener('click', () => {
+            spaceShip.changeThrottle(spaceShip.data.maxThrust * .1)
+            this.updateMeter()
+        })
+        brake.addEventListener('click', () => {
+            spaceShip.changeThrottle(-spaceShip.data.maxThrust * .1)
+            this.updateMeter()
+        })
         leftButton.addEventListener('click', () => { this.steer(.3) })
         rightButton.addEventListener('click', () => { this.steer(-.3) })
 

@@ -85,8 +85,15 @@ class SpaceShip extends Thing {
         }
     }
 
+    changeThrottle(change:number) {
+        let newAmount = this.data.thrust + change
+        if (newAmount < 0) {newAmount = 0}
+        if (newAmount > this.data.maxThrust) {newAmount = this.data.maxThrust}
+        this.data.thrust = newAmount
+    }
+
     updateMomentum() {
-        Thing.prototype.updateMomentum.apply(this,[])
+        Thing.prototype.updateMomentum.apply(this, [])
         const { thrust, heading } = this.data
         const thrustForce = new Force(thrust / this.mass, heading)
         this.momentum = Force.combine([this.momentum, thrustForce])
