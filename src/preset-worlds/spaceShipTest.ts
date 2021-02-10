@@ -3,8 +3,6 @@ import { Thing } from '../Thing'
 
 import { Force } from '../Force'
 import { SpaceShip } from '../SpaceShip'
-import { SpaceShipControlPanel } from '../SpaceShipControlPanel'
-
 
 const myShip = new SpaceShip({
     size: 20,
@@ -24,8 +22,4 @@ const testWorld = new World([
     thingsExertGravity: true
 })
 
-const panel = new SpaceShipControlPanel(myShip)
-
-document.body.appendChild( panel.create())
-
-export { testWorld }
+export { testWorld, myShip }

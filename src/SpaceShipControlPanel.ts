@@ -20,7 +20,7 @@ class SpaceShipControlPanel {
         this.updateMeter()
     }
 
-    create() {
+    makeElement() {
         const { spaceShip } = this
         const element = document.createElement('article')
 
