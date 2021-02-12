@@ -8,13 +8,14 @@ interface Circle { x: number, y: number, radius: number }
 
 
 class CollisionReport {
-    type: "end inside" | "passed through" | "start inside" | "edgeX" | "edgeY"
+    type: "end inside" | "passed through" | "start inside" | "edge"
     impactPoint: Point
     stopPoint: Point
     item1: Thing
     item2: Thing
     force: number
     force2: number
+    wallAngle?: number
 }
 
 
@@ -34,30 +35,31 @@ function checkForEdgeCollisions(item: Thing): CollisionReport {
     if (edgesCrossedAtEnd.length === 0 ) { return null }
 
 
-    let collisionType: "edgeX" | "edgeY";
+    let wallAngle: number;
     let stopPoint: Point = { x: body.x, y: body.y }
 
     if (edgesCrossedAtEnd.includes("BOTTOM")) {
         stopPoint.y = height - body.radius
-        collisionType = "edgeY"
+        wallAngle = Math.PI * 0.5
     }
     if (edgesCrossedAtEnd.includes("TOP")) {
         stopPoint.y = body.radius
-        collisionType = "edgeY"
+        wallAngle = Math.PI * 0.5
     }
     if (edgesCrossedAtEnd.includes("LEFT")) {
         stopPoint.x = body.radius
-        collisionType = "edgeX"
+        wallAngle = Math.PI * 0.01
     }
     if (edgesCrossedAtEnd.includes("RIGHT")) {
         stopPoint.x = width - body.radius
-        collisionType = "edgeX"
+        wallAngle = Math.PI * 0.01
     }
 
     const vectorFromStopPointToImpactPoint: Vector = new Force(body.radius, item.momentum.direction).vector
 
     return {
-        type: collisionType,
+        type: "edge",
+        wallAngle,
         impactPoint : {
             x: stopPoint.x + vectorFromStopPointToImpactPoint.x,
             y: stopPoint.y + vectorFromStopPointToImpactPoint.y

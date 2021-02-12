@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, mutualRoundBounce, flatBounce } from './physics'
+import { getGravitationalForce, mutualRoundBounce, findFlatBounceVector } from './physics'
 import { checkForCircleCollisions, CollisionReport, checkForEdgeCollisions } from './collisionDetection'
 import { Shape, shapes } from './Shape'
 
@@ -129,7 +129,7 @@ class Thing {
     }
 
     handleWorldEdgeCollision(report: CollisionReport) {
-        if (report) { flatBounce(report) }
+        if (report) { findFlatBounceVector(report) }
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {

@@ -26,28 +26,33 @@ function getGravitationalForce(gravitationalConstant: number, affectedThing: Thi
     return new Force(magnitude, direction)
 }
 
-function flatBounce(edgeCollisionReport: CollisionReport) {
-    const { item1, stopPoint, type } = edgeCollisionReport
+/**
+ * Find the vector resulting from a round body bouncing off a straight edge
+ * 
+ * @param edgeCollisionReport the collision report, with type edge
+ */
+function findFlatBounceVector(edgeCollisionReport: CollisionReport) {
+    const { item1, stopPoint, wallAngle } = edgeCollisionReport
 
     item1.data.x = stopPoint.x;
     item1.data.y = stopPoint.y;
-    var newHeading = Geometry.reflectHeading(
-        item1.momentum.direction,
-        type === 'edgeX' ? Math.PI * 0.01 : Math.PI * 0.5
-    )
 
     const energyConservation = .75
-    item1.momentum = new Force(item1.momentum.magnitude * energyConservation, newHeading)
+    item1.momentum = new Force(
+        item1.momentum.magnitude * energyConservation,
+        Geometry.reflectHeading(item1.momentum.direction,wallAngle)
+    )
 }
 
 /**
  * calculate the vectors at which two colliding bodies will bounce off each other
+ * with an elastic collision
  *
  * @param body1
  * @param body2
  * @returns the vectors they will bounce off at
  */
-function findBounceVectors(body1: Thing, body2: Thing) {
+function findElasticCollisionVectors(body1: Thing, body2: Thing) {
     //step 1 - normal unit vector and tangent unit vector
     var n = { x: body2.shapeValues.x - body1.shapeValues.x, y: body2.shapeValues.y - body1.shapeValues.y, mag: 0 };
     n.mag = Geometry.getDistanceBetweenPoints(n);
@@ -97,7 +102,7 @@ function findBounceVectors(body1: Thing, body2: Thing) {
  * move the two items appart if they are still intersecting
  * assumes round items
  *
- * @param collision the collidion report
+ * @param collision the collision report
  */
 function separateCollidingBodies(collision: CollisionReport) {
 
@@ -129,10 +134,10 @@ function mutualRoundBounce(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
-    var bounce = findBounceVectors(collision.item1, collision.item2);
+    var bounce = findElasticCollisionVectors(collision.item1, collision.item2);
     collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
     collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
 };
 
 
-export { getGravitationalForce,  mutualRoundBounce, flatBounce }
+export { getGravitationalForce,  mutualRoundBounce, findFlatBounceVector }
