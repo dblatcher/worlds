@@ -11,10 +11,10 @@ interface ThingData {
     y: number
     heading?: number
     size?: number
+    keepsHeading?: boolean
+    shape?: Shape
     color?: string
     density?: number
-    shape?: Shape
-    keepsHeading?: boolean
     elasticity?: number
 }
 

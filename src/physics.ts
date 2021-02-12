@@ -39,7 +39,7 @@ function findFlatBounceVector(edgeCollisionReport: CollisionReport) {
 
     item1.momentum = new Force(
         item1.momentum.magnitude * item1.data.elasticity,
-        Geometry.reflectHeading(item1.momentum.direction,wallAngle)
+        Geometry.reflectHeading(item1.momentum.direction, wallAngle)
     )
 }
 
@@ -47,21 +47,21 @@ function findFlatBounceVector(edgeCollisionReport: CollisionReport) {
  * calculate the vectors at which two colliding bodies will bounce off each other
  * with an elastic collision
  *
- * @param body1
- * @param body2
+ * @param collision the collision report
  * @returns the vectors they will bounce off at
  */
-function findElasticCollisionVectors(body1: Thing, body2: Thing) {
+function findElasticCollisionVectors(collision: CollisionReport) {
+    const { item1, item2 } = collision
     //step 1 - normal unit vector and tangent unit vector
-    var n = { x: body2.shapeValues.x - body1.shapeValues.x, y: body2.shapeValues.y - body1.shapeValues.y, mag: 0 };
+    var n = { x: item2.shapeValues.x - item1.shapeValues.x, y: item2.shapeValues.y - item1.shapeValues.y, mag: 0 };
     n.mag = Geometry.getDistanceBetweenPoints(n);
 
     var un = { x: n.x / n.mag, y: n.y / n.mag }
     var ut = { x: -un.y, y: un.x };
 
     //step 2 - define pre collision vectors
-    var v1 = body1.momentum.vector;
-    var v2 = body2.momentum.vector;
+    var v1 = item1.momentum.vector;
+    var v2 = item2.momentum.vector;
 
     // step3 express pre collision vectors in unit normal and tangent
     var v1n = (un.x * v1.x) + (un.y * v1.y);
@@ -74,8 +74,8 @@ function findElasticCollisionVectors(body1: Thing, body2: Thing) {
     var v_2t = v2t;
 
     //step 5 new normal velocity
-    var v_1n = ((v1n * (body1.mass - body2.mass)) + 2 * body2.mass * v2n) / (body1.mass + body2.mass);
-    var v_2n = ((v2n * (body2.mass - body1.mass)) + 2 * body1.mass * v1n) / (body1.mass + body2.mass);
+    var v_1n = ((v1n * (item1.mass - item2.mass)) + 2 * item2.mass * v2n) / (item1.mass + item2.mass);
+    var v_2n = ((v2n * (item2.mass - item1.mass)) + 2 * item1.mass * v1n) / (item1.mass + item2.mass);
 
     //step 6 convert new normal and tangential velocities in Vectors
     //mutliply by unit vectors
@@ -124,6 +124,45 @@ function separateCollidingBodies(collision: CollisionReport) {
     }
 }
 
+
+/**
+ * calculate the vectors at which two colliding bodies will bounce off each other
+ * taking account of energy lost to inelasticity
+ *
+ * @param collision the collision report
+ * @returns the vectors they will bounce off at
+ */
+function findInelasticCollisionVectors(collision: CollisionReport) {
+    //step 1 - normal unit vector and tangent unit vector
+    const { item1, item2 } = collision
+    const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity)/2)
+
+        // is the coefficient of restitution; if it is 1 we have an elastic collision; if it is 0 we have a perfectly inelastic collision, see below.
+
+    function getVectorComponent(item: Thing, property: "vectorX" | "vectorY") {
+        const otherItem = item === item1 ? item2 : item1
+        return (
+            coefficientOfRestitution * otherItem.mass * (otherItem.momentum[property] - item.momentum[property]) +
+            item1.mass * item.momentum[property] +
+            otherItem.mass * otherItem.momentum[property]
+        ) / (item.mass + otherItem.mass)
+    }
+
+    const vector1: Vector = {
+        x: getVectorComponent(item1, "vectorX"),
+        y: getVectorComponent(item1, "vectorY")
+    }
+    const vector2: Vector = {
+        x: getVectorComponent(item2, "vectorX"),
+        y: getVectorComponent(item2, "vectorY")
+    }
+
+    return {
+        vector1, vector2
+    };
+
+};
+
 /**
  * make a the items in a collision report bounce off each other (assumes both are circular)
  *
@@ -133,10 +172,10 @@ function mutualRoundBounce(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
-    var bounce = findElasticCollisionVectors(collision.item1, collision.item2);
+    const bounce = findInelasticCollisionVectors(collision);
     collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
     collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
 };
 
 
-export { getGravitationalForce,  mutualRoundBounce, findFlatBounceVector }
+export { getGravitationalForce, mutualRoundBounce, findFlatBounceVector }

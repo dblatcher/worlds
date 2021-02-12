@@ -45,7 +45,7 @@ function makeRocksAndBallons(amount: number) {
 }
 
 const rocksAndBallons = new World([
-    ...makeRocksAndBallons(2),
+    ...makeRocksAndBallons(10),
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
