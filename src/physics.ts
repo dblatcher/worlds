@@ -37,9 +37,8 @@ function findFlatBounceVector(edgeCollisionReport: CollisionReport) {
     item1.data.x = stopPoint.x;
     item1.data.y = stopPoint.y;
 
-    const energyConservation = .75
     item1.momentum = new Force(
-        item1.momentum.magnitude * energyConservation,
+        item1.momentum.magnitude * item1.data.elasticity,
         Geometry.reflectHeading(item1.momentum.direction,wallAngle)
     )
 }

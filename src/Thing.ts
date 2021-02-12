@@ -15,6 +15,7 @@ interface ThingData {
     density?: number
     shape?: Shape
     keepsHeading?: boolean
+    elasticity?: number
 }
 
 
@@ -29,6 +30,7 @@ class Thing {
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
         this.data.shape = this.data.shape || shapes.circle
         this.data.keepsHeading = config.keepsHeading || false
+        this.data.elasticity = typeof this.data.elasticity === 'number' ? this.data.elasticity : 1
         this.momentum = momentum || new Force(0, 0)
     }
 

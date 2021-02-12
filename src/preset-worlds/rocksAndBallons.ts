@@ -9,6 +9,7 @@ function makeRock() {
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 4
+    let elasticity = .25
     let color = 'gray'
     let direction = Math.random() > .25
         ? Math.random() > .5
@@ -16,7 +17,7 @@ function makeRock() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color }, new Force(4, Math.PI * direction))
+    return new Thing({ x, y, size, density, color, elasticity })
 }
 
 function makeBallon() {
@@ -25,6 +26,7 @@ function makeBallon() {
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 0.1
+    let elasticity = .90
     let color = 'red'
     let direction = Math.random() > .25
         ? Math.random() > .5
@@ -32,7 +34,7 @@ function makeBallon() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color }, new Force(4, Math.PI * direction))
+    return new Thing({ x, y, size, density, color, elasticity })
 }
 
 function makeRocksAndBallons(amount: number) {
@@ -43,7 +45,7 @@ function makeRocksAndBallons(amount: number) {
 }
 
 const rocksAndBallons = new World([
-    ...makeRocksAndBallons(15),
+    ...makeRocksAndBallons(2),
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
