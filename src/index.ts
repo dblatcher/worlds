@@ -9,12 +9,13 @@ canvasElement.setAttribute('height', '1000');
 canvasElement.setAttribute('width', '1000');
 
 
-const world = testWorld
-world.canvas = canvasElement
-world.renderOnCanvas()
 
-const panel = new WorldControlPanel(world, { worldOptions: [galaxy, rocksAndBallons, testWorld] })
+
+const panel = new WorldControlPanel(galaxy, { worldOptions: [galaxy, rocksAndBallons, testWorld] })
 const shipPanel = new SpaceShipControlPanel(myShip)
+
+panel.world.canvas = canvasElement
+panel.world.renderOnCanvas()
 
 document.body.appendChild(shipPanel.makeElement())
 document.body.appendChild(panel.makeElement())

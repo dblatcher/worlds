@@ -57,6 +57,26 @@ function getHeadingFromPointToPoint(origin: Point, destination: Point) {
     return getDirection(dx, dy)
 }
 
+
+/**
+ * Calculate tangent at the point on the circle circumference which intersects
+ * with radius to the point
+ * 
+ * @param circle a circle
+ * @param point a point
+ * 
+ * @return the tangent at the point on the circle circumference which intersects
+ * with radius to the point
+ */
+
+function getCircleTangentAtPoint (circle: Circle, point:Point) {
+    var radiusHeading = getHeadingFromPointToPoint (circle, point);
+    var tangentHeading = radiusHeading + (Math.PI)*0.5;
+    if (tangentHeading > (Math.PI)*2) {tangentHeading -= (Math.PI)*2};
+    return tangentHeading;
+};
+
+
 function getVectorX(magnitude: number, direction: number) { return magnitude * Math.sin(direction) }
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
@@ -114,5 +134,5 @@ function reflectHeading(heading: number, wallAngle: number) {
 export {
     getDirection, getMagnitude, getVectorX, getVectorY,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
-    areCirclesIntersecting, reflectHeading,reverseHeading
+    areCirclesIntersecting, reflectHeading,reverseHeading, getCircleTangentAtPoint
 }

@@ -2,7 +2,7 @@ import { Thing } from './Thing'
 import { Force } from './Force'
 
 import * as Geometry from './geometry'
-import { CollisionReport } from './collisionDetection'
+import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 
 interface Vector { x: number, y: number }
 
@@ -29,17 +29,35 @@ function getGravitationalForce(gravitationalConstant: number, affectedThing: Thi
 /**
  * Find the vector resulting from a round body bouncing off a straight edge
  * 
- * @param edgeCollisionReport the collision report, with type edge
+ * @param edgeCollisionReport the edge collision report
  */
-function findFlatBounceVector(edgeCollisionReport: CollisionReport) {
+function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
     const { item1, stopPoint, wallAngle } = edgeCollisionReport
 
     item1.data.x = stopPoint.x;
     item1.data.y = stopPoint.y;
 
-    item1.momentum = new Force(
+    return new Force(
         item1.momentum.magnitude * item1.data.elasticity,
         Geometry.reflectHeading(item1.momentum.direction, wallAngle)
+    )
+}
+
+/**
+ * Find the vector resulting from a round body bouncing off an immobile thing
+ * assumes the immobile thing is circular
+ * 
+ * @param edgeCollisionReport the collision report, with type edge
+ */
+function findBounceOfImmobileThingForce(edgeCollisionReport: CollisionReport) {
+    const { item1, stopPoint, item2, impactPoint } = edgeCollisionReport
+
+    item1.data.x = stopPoint.x;
+    item1.data.y = stopPoint.y;
+
+    return new Force(
+        item1.momentum.magnitude * (item1.data.elasticity + item2.data.elasticity) / 2,
+        Geometry.reflectHeading(item1.momentum.direction, Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint))
     )
 }
 
@@ -105,7 +123,7 @@ function findElasticCollisionVectors(collision: CollisionReport) {
  */
 function separateCollidingBodies(collision: CollisionReport) {
 
-    const {item1, item2, stopPoint} = collision;
+    const { item1, item2, stopPoint } = collision;
 
     // this seems wrong - moving out of sequence
     item1.data.x = stopPoint.x;
@@ -119,7 +137,7 @@ function separateCollidingBodies(collision: CollisionReport) {
 
         var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
         var magicV: Vector = new Force(distanceToSeparate, headingToSeparate).vector
-        
+
         if (item2.data.immobile) {
             item1.data.x += magicV.x;
             item1.data.y += magicV.y;
@@ -144,7 +162,7 @@ function separateCollidingBodies(collision: CollisionReport) {
 function findInelasticCollisionVectors(collision: CollisionReport) {
     //step 1 - normal unit vector and tangent unit vector
     const { item1, item2 } = collision
-    const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity)/2)
+    const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity) / 2)
 
     // is the coefficient of restitution; if it is 1 we have an elastic collision; if it is 0 we have a perfectly inelastic collision, see below.
 
@@ -181,10 +199,14 @@ function mutualRoundBounce(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
-    const bounce = findInelasticCollisionVectors(collision);
-    collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
-    collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+    if (collision.item2.data.immobile) {
+        collision.item1.momentum = findBounceOfImmobileThingForce(collision)
+    } else {
+        const bounce = findInelasticCollisionVectors(collision)
+        collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
+        collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+    }
 };
 
 
-export { getGravitationalForce, mutualRoundBounce, findFlatBounceVector }
+export { getGravitationalForce, mutualRoundBounce, findEdgeBounceForce }

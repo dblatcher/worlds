@@ -1,8 +1,8 @@
 import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, mutualRoundBounce, findFlatBounceVector } from './physics'
-import { checkForCircleCollisions, CollisionReport, checkForEdgeCollisions } from './collisionDetection'
+import { getGravitationalForce, mutualRoundBounce, findEdgeBounceForce } from './physics'
+import { checkForCircleCollisions, CollisionReport, checkForEdgeCollisions, EdgeCollisionReport } from './collisionDetection'
 import { Shape, shapes } from './Shape'
 
 
@@ -133,13 +133,13 @@ class Thing {
     }
 
     detectWorldEdgeCollisions() {
-        const reports: CollisionReport[] = []
+        const reports: EdgeCollisionReport[] = []
         reports.push(checkForEdgeCollisions(this))
         return reports
     }
 
-    handleWorldEdgeCollision(report: CollisionReport) {
-        if (report) { findFlatBounceVector(report) }
+    handleWorldEdgeCollision(report: EdgeCollisionReport) {
+        if (report) { this.momentum = findEdgeBounceForce(report) }
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {

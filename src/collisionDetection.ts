@@ -15,11 +15,17 @@ class CollisionReport {
     item2: Thing
     force: number
     force2: number
-    wallAngle?: number
+}
+
+class EdgeCollisionReport extends CollisionReport {
+    type: "end inside" | "passed through" | "start inside" | "edge"
+    item2: null
+    force2: 0
+    wallAngle: number
 }
 
 
-function checkForEdgeCollisions(item: Thing): CollisionReport {
+function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
 
     const { height, width } = item.world
     const body = item.shapeValues
@@ -249,4 +255,4 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
 }
 
-export {CollisionReport, checkForEdgeCollisions, checkForCircleCollisions}
+export {CollisionReport, EdgeCollisionReport, checkForEdgeCollisions, checkForCircleCollisions}
