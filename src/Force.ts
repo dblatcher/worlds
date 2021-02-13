@@ -25,6 +25,10 @@ class Force {
         })
         return new Force(Geometry.getMagnitude(totalX, totalY), Geometry.getDirection(totalX, totalY))
     }
+
+    static get none() {
+        return new Force(0,0);
+    }
 }
 
 

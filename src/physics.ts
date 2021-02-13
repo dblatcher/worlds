@@ -17,8 +17,8 @@ interface Vector { x: number, y: number }
  * @return the Force exerted on the affectedThing
  */
 function getGravitationalForce(gravitationalConstant: number, affectedThing: Thing, thing2: Thing) {
-    if (affectedThing === thing2) { return new Force(0, 0) }
-    if (Geometry.areCirclesIntersecting(affectedThing.shapeValues, thing2.shapeValues)) { return new Force(0, 0) }
+    if (affectedThing === thing2) { return Force.none }
+    if (Geometry.areCirclesIntersecting(affectedThing.shapeValues, thing2.shapeValues)) { return Force.none }
 
     const r = Geometry.getDistanceBetweenPoints(affectedThing.data, thing2.data);
     const magnitude = gravitationalConstant * ((affectedThing.mass * thing2.mass / Math.pow(r, 2)));
@@ -105,22 +105,31 @@ function findElasticCollisionVectors(collision: CollisionReport) {
  */
 function separateCollidingBodies(collision: CollisionReport) {
 
-    // this seems wrong - moving out of sequence
-    collision.item1.data.x = collision.stopPoint.x;
-    collision.item1.data.y = collision.stopPoint.y;
+    const {item1, item2, stopPoint} = collision;
 
-    var shape1 = collision.item1.shapeValues
-    var shape2 = collision.item2.shapeValues
+    // this seems wrong - moving out of sequence
+    item1.data.x = stopPoint.x;
+    item1.data.y = stopPoint.y;
+
+    var shape1 = item1.shapeValues
+    var shape2 = item2.shapeValues
 
     if (Geometry.areCirclesIntersecting(shape1, shape2)) {
         var distanceToSeparate = 1 + shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2);
 
         var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
         var magicV: Vector = new Force(distanceToSeparate, headingToSeparate).vector
-        collision.item1.data.x += magicV.x / 2;
-        collision.item1.data.y += magicV.y / 2;
-        collision.item2.data.x -= magicV.x / 2;
-        collision.item2.data.y -= magicV.y / 2;
+        
+        if (item2.data.immobile) {
+            item1.data.x += magicV.x;
+            item1.data.y += magicV.y;
+        } else {
+            item1.data.x += magicV.x / 2;
+            item1.data.y += magicV.y / 2;
+            item2.data.x -= magicV.x / 2;
+            item2.data.y -= magicV.y / 2;
+        }
+
     }
 }
 
@@ -137,7 +146,7 @@ function findInelasticCollisionVectors(collision: CollisionReport) {
     const { item1, item2 } = collision
     const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity)/2)
 
-        // is the coefficient of restitution; if it is 1 we have an elastic collision; if it is 0 we have a perfectly inelastic collision, see below.
+    // is the coefficient of restitution; if it is 1 we have an elastic collision; if it is 0 we have a perfectly inelastic collision, see below.
 
     function getVectorComponent(item: Thing, property: "vectorX" | "vectorY") {
         const otherItem = item === item1 ? item2 : item1

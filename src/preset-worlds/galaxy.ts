@@ -4,7 +4,7 @@ import { Force } from '../Force'
 
 
 const redPlanet = new Thing({ x: 700, y: 100, size: 10, density: 5, color: 'red', elasticity: 1 })
-const whitePlanet = new LinedThing({ x: 500, y: 500, size: 100, density: 5 })
+const whitePlanet = new LinedThing({ x: 500, y: 500, size: 100, density: 5, immobile:true })
 
 const galaxy = new World([
     whitePlanet, redPlanet,

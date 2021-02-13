@@ -16,6 +16,7 @@ interface ThingData {
     color?: string
     density?: number
     elasticity?: number
+    immobile?: boolean
 }
 
 
@@ -23,15 +24,16 @@ class Thing {
     world: World
     data: ThingData
     momentum: Force
-    constructor(config: ThingData, momentum: Force = null) {
+    constructor(config: ThingData, momentum: Force = Force.none) {
         this.data = config
         this.data.heading = this.data.heading || 0
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
         this.data.shape = this.data.shape || shapes.circle
         this.data.keepsHeading = config.keepsHeading || false
+        this.data.immobile = config.immobile || false
         this.data.elasticity = typeof this.data.elasticity === 'number' ? this.data.elasticity : 1
-        this.momentum = momentum || new Force(0, 0)
+        this.momentum = momentum || Force.none
     }
 
     get mass() {
@@ -52,7 +54,7 @@ class Thing {
     }
 
     get gravitationalForces() {
-        if (!this.world) { return new Force(0, 0) }
+        if (!this.world) { return Force.none }
         const { globalGravityForce, gravitationalConstant, things, thingsExertGravity } = this.world
 
         let forces = []
@@ -85,15 +87,21 @@ class Thing {
 
     updateMomentum() {
         const { gravitationalForces, mass } = this
+        if (this.data.immobile) {
+            this.momentum = Force.none
+            return
+        }
         gravitationalForces.magnitude = gravitationalForces.magnitude / mass
         this.momentum = Force.combine([this.momentum, gravitationalForces])
     }
 
     move() {
-        this.data.y += this.momentum.vectorY
-        this.data.x += this.momentum.vectorX
-
         const { top, bottom, radius, left, right } = this.shapeValues
+
+        if (!this.data.immobile) {
+            this.data.y += this.momentum.vectorY
+            this.data.x += this.momentum.vectorX
+        }
 
         if (this.world.hasHardEdges) {
             this.data.y = top < 0 ? radius : this.data.y

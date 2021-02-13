@@ -42,21 +42,20 @@ class World {
     get height() { return 1000 }
 
     tick() {
-        this.things.forEach(thing => { thing.updateMomentum() })
-        this.things.forEach(thing => {
+        const mobileThings = this.things.filter(thing => !thing.data.immobile)
+
+        mobileThings.forEach(thing => { thing.updateMomentum() })
+        mobileThings.forEach(thing => {
             const reports = thing.detectCollisions()
             reports.forEach(report => thing.handleCollision(report))
         })
-
         if (this.hasHardEdges) {
             this.things.forEach(thing => {
                 const reports = thing.detectWorldEdgeCollisions()
                 reports.forEach(report => thing.handleWorldEdgeCollision(report))
             })
         }
-
-        this.things.forEach(thing => { thing.move() })
-
+        mobileThings.forEach(thing => { thing.move() })
 
         this.renderOnCanvas()
     }
