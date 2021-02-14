@@ -7,6 +7,7 @@ class WorldConfig {
     thingsExertGravity?: boolean
     hasHardEdges?: boolean
     gravitationalConstant?: number
+    minimumMassToExertGravity?: number
 }
 
 class World {
@@ -17,6 +18,7 @@ class World {
     timerSpeed: number
     globalGravityForce?: Force
     thingsExertGravity: boolean
+    minimumMassToExertGravity: number
     hasHardEdges: boolean
     name: string
 
@@ -26,6 +28,7 @@ class World {
 
         this.name = config.name || ""
         this.gravitationalConstant = config.gravitationalConstant || 0
+        this.minimumMassToExertGravity = config.minimumMassToExertGravity || 0
         this.globalGravityForce = config.globalGravityForce || null
         this.thingsExertGravity = config.thingsExertGravity || false
         this.hasHardEdges = config.hasHardEdges || false

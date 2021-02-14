@@ -55,12 +55,15 @@ class Thing {
 
     get gravitationalForces() {
         if (!this.world) { return Force.none }
-        const { globalGravityForce, gravitationalConstant, things, thingsExertGravity } = this.world
+        const { globalGravityForce, gravitationalConstant, things, thingsExertGravity, minimumMassToExertGravity } = this.world
 
         let forces = []
 
         if (thingsExertGravity) {
-            const otherThings = things.filter(thing => thing !== this)
+            let otherThings = minimumMassToExertGravity
+                ? things.filter(thing => thing !== this && thing.mass >= minimumMassToExertGravity)
+                : things.filter(thing => thing !== this)
+
             let forcesFromOtherThings = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
             forces.push(...forcesFromOtherThings)
         }
