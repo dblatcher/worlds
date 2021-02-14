@@ -24,8 +24,7 @@ class WorldControlPanel {
         this.world.stopTime()
         this.world.canvas = null
 
-        world.canvas = canvasElement
-        world.renderOnCanvas()
+        world.setCanvas(canvasElement)
         this.world = world
         this.updateReport()
     }

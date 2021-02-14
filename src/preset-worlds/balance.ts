@@ -27,6 +27,7 @@ const balance = new World([
     // pinkPlanet,
 ], {
     gravitationalConstant: .2,
+    height:1200,
     thingsExertGravity: true,
     minimumMassToExertGravity: 10000,
     hasHardEdges: true,

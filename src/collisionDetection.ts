@@ -83,7 +83,7 @@ function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
         if (x - radius < 0) { edges.push("LEFT") }
         if (x + radius > width) { edges.push("RIGHT") }
         if (y - radius < 0) { edges.push("TOP") }
-        if (y + radius > width) { edges.push("BOTTOM") }
+        if (y + radius > height) { edges.push("BOTTOM") }
         return edges
     }
 }

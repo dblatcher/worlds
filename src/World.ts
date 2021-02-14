@@ -3,30 +3,38 @@ import { Thing } from './Thing'
 
 class WorldConfig {
     name?: string
+    width?: number
+    height?:number
+    gravitationalConstant?: number
     globalGravityForce?: Force
     thingsExertGravity?: boolean
     hasHardEdges?: boolean
-    gravitationalConstant?: number
     minimumMassToExertGravity?: number
 }
 
 class World {
+    name: string
+    width: number
+    height: number
     gravitationalConstant: number
-    things: Thing[]
-    timer: NodeJS.Timeout
-    canvas?: HTMLCanvasElement
-    timerSpeed: number
     globalGravityForce?: Force
     thingsExertGravity: boolean
-    minimumMassToExertGravity: number
     hasHardEdges: boolean
-    name: string
+    minimumMassToExertGravity: number
+
+    canvas?: HTMLCanvasElement
+    timerSpeed: number
+    things: Thing[]
+    timer: NodeJS.Timeout
 
     constructor(things: Thing[], config: WorldConfig = {}) {
 
         this.timerSpeed = 0
 
         this.name = config.name || ""
+        this.width = config.width || 1000
+        this.height = config.height || 1000
+
         this.gravitationalConstant = config.gravitationalConstant || 0
         this.minimumMassToExertGravity = config.minimumMassToExertGravity || 0
         this.globalGravityForce = config.globalGravityForce || null
@@ -40,9 +48,6 @@ class World {
     get report() {
         return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
     }
-
-    get width() { return 1000 }
-    get height() { return 1000 }
 
     tick() {
         const mobileThings = this.things.filter(thing => !thing.data.immobile)
@@ -84,6 +89,13 @@ class World {
         clearInterval(this.timer)
         this.timerSpeed = 0
         return this
+    }
+
+    setCanvas(canvasElement:HTMLCanvasElement) {
+        this.canvas = canvasElement
+        canvasElement.setAttribute('height', this.height.toString());
+        canvasElement.setAttribute('width', this.width.toString());
+        this.renderOnCanvas()
     }
 
     renderOnCanvas() {
