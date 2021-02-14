@@ -32,10 +32,7 @@ function getGravitationalForce(gravitationalConstant: number, affectedThing: Thi
  * @param edgeCollisionReport the edge collision report
  */
 function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
-    const { item1, stopPoint, wallAngle } = edgeCollisionReport
-
-    item1.data.x = stopPoint.x;
-    item1.data.y = stopPoint.y;
+    const { item1, wallAngle } = edgeCollisionReport
 
     return new Force(
         item1.momentum.magnitude * item1.data.elasticity,
@@ -47,18 +44,17 @@ function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
  * Find the vector resulting from a round body bouncing off an immobile thing
  * assumes the immobile thing is circular
  * 
- * @param edgeCollisionReport the collision report, with type edge
+ * @param collisionReport the collision report
  */
-function findBounceOfImmobileThingForce(edgeCollisionReport: CollisionReport) {
-    const { item1, stopPoint, item2, impactPoint } = edgeCollisionReport
+function findBounceOfImmobileThingForce(collisionReport: CollisionReport) {
+    const { item1, item2, impactPoint } = collisionReport
 
-    item1.data.x = stopPoint.x;
-    item1.data.y = stopPoint.y;
-
-    return new Force(
+    const reflectedForce = new Force(
         item1.momentum.magnitude * (item1.data.elasticity + item2.data.elasticity) / 2,
         Geometry.reflectHeading(item1.momentum.direction, Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint))
     )
+
+    return reflectedForce
 }
 
 /**
@@ -199,6 +195,9 @@ function mutualRoundBounce(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
+    // problem - after a collision, the only force acting to form the momentum used by Thing.move()
+    // is the reflected force - for gravity from other bodies, thrust etc are ignored
+    // need to recalculate withouth them 'applying double'
     if (collision.item2.data.immobile) {
         collision.item1.momentum = findBounceOfImmobileThingForce(collision)
     } else {
@@ -208,5 +207,13 @@ function mutualRoundBounce(collision: CollisionReport) {
     }
 };
 
+function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
-export { getGravitationalForce, mutualRoundBounce, findEdgeBounceForce }
+    const {item1, stopPoint} = edgeCollisionReport 
+    item1.data.x = stopPoint.x;
+    item1.data.y = stopPoint.y;
+
+    edgeCollisionReport.item1.momentum = findEdgeBounceForce(edgeCollisionReport)
+}
+
+export { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge }
