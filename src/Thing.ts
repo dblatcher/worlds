@@ -3,7 +3,7 @@ import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
 import { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge } from './physics'
 import { checkForCircleCollisions, CollisionReport, checkForEdgeCollisions, EdgeCollisionReport } from './collisionDetection'
-import { Shape, shapes } from './Shape'
+import { Shape, shapes, ShapeValues } from './Shape'
 
 
 interface ThingData {
@@ -42,15 +42,7 @@ class Thing {
     }
 
     get shapeValues() {
-        return {
-            radius: this.data.size,
-            x: this.data.x,
-            y: this.data.y,
-            top: this.data.y - this.data.size,
-            bottom: this.data.y + this.data.size,
-            left: this.data.x - this.data.size,
-            right: this.data.x + this.data.size,
-        }
+        return this.data.shape.getShapeValues.apply(this,[]) as ShapeValues
     }
 
     get gravitationalForces() {
@@ -167,11 +159,11 @@ class Thing {
     }
 
     checkIfContainsPoint(point: { x: number, y: number }) {
-        return this.data.shape.containsPoint.apply(this, [point])
+        return this.data.shape.containsPoint.apply(this, [point]) as boolean
     }
 
-    checkIfCollidingWith(otherThing: Thing) {
-        return this.data.shape.intersectingWithShape.apply(this, [otherThing])
+    isIntersectingWith(otherThing: Thing) {
+        return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
     }
 }
 

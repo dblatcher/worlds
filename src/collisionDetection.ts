@@ -1,11 +1,7 @@
 import { Thing } from './Thing'
 import { Force } from './Force'
 import * as Geometry from './geometry'
-
-interface Point { x: number, y: number }
-interface Vector { x: number, y: number }
-interface Circle { x: number, y: number, radius: number }
-
+import { Vector, Point, Circle } from './geometry'
 
 class CollisionReport {
     type: "end inside" | "passed through" | "start inside" | "edge"
@@ -18,7 +14,6 @@ class CollisionReport {
 }
 
 class EdgeCollisionReport extends CollisionReport {
-    type: "end inside" | "passed through" | "start inside" | "edge"
     item2: null
     force2: 0
     wallAngle: number
@@ -124,7 +119,7 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
         radius: item1.shapeValues.radius,
     }
 
-    if (Geometry.areCirclesIntersecting(item1.shapeValues, item2.shapeValues)) {
+    if (item1.isIntersectingWith(item2)) {
         var unitVector: Vector = { x: undefined, y: undefined };
         var stopPoint: Point = { x: item1.data.x, y: item1.data.y };
 
@@ -184,7 +179,7 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
     var directionFromItem2ToImpactPoint = Force.fromVector(item1PointWhenHit.x - item2.shapeValues.x, item1PointWhenHit.y - item2.shapeValues.y).direction
 
-    if (Geometry.areCirclesIntersecting(movedObject, item2.shapeValues)) {
+    if (item1.isIntersectingWith(item2)) {
 
         var impactPoint = {
             x: item1PointWhenHit.x + (movedObject.radius * -Math.sin(

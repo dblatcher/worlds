@@ -1,5 +1,6 @@
 interface Point { x: number, y: number }
 interface Circle { x: number, y: number, radius: number }
+interface Vector { x: number, y: number }
 
 /**
  * Calculate the direction of an [x,y] vector
@@ -38,7 +39,7 @@ function getMagnitude(x: number, y: number) {
 }
 
 /**
- * Calculate he distance between point1 and either point2 if present or 
+ * Calculate the distance between point1 and either point2 if present or 
  * between point1 and origin
  * 
  * @param point1 the first point
@@ -132,6 +133,7 @@ function reflectHeading(heading: number, wallAngle: number) {
 }
 
 export {
+    Point, Circle, Vector,
     getDirection, getMagnitude, getVectorX, getVectorY,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading,reverseHeading, getCircleTangentAtPoint

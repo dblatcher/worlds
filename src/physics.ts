@@ -2,9 +2,9 @@ import { Thing } from './Thing'
 import { Force } from './Force'
 
 import * as Geometry from './geometry'
+import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 
-interface Vector { x: number, y: number }
 
 
 /**
@@ -18,7 +18,8 @@ interface Vector { x: number, y: number }
  */
 function getGravitationalForce(gravitationalConstant: number, affectedThing: Thing, thing2: Thing) {
     if (affectedThing === thing2) { return Force.none }
-    if (Geometry.areCirclesIntersecting(affectedThing.shapeValues, thing2.shapeValues)) { return Force.none }
+
+    if (affectedThing.isIntersectingWith(thing2)) { return Force.none }
 
     const r = Geometry.getDistanceBetweenPoints(affectedThing.data, thing2.data);
     const magnitude = gravitationalConstant * ((affectedThing.mass * thing2.mass / Math.pow(r, 2)));
@@ -128,7 +129,7 @@ function separateCollidingBodies(collision: CollisionReport) {
     var shape1 = item1.shapeValues
     var shape2 = item2.shapeValues
 
-    if (Geometry.areCirclesIntersecting(shape1, shape2)) {
+    if (item1.isIntersectingWith(item2)) {
         var distanceToSeparate = 1 + shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2);
 
         var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
@@ -209,7 +210,7 @@ function mutualRoundBounce(collision: CollisionReport) {
 
 function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
-    const {item1, stopPoint} = edgeCollisionReport 
+    const { item1, stopPoint } = edgeCollisionReport
     item1.data.x = stopPoint.x;
     item1.data.y = stopPoint.y;
 
