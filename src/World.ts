@@ -50,7 +50,7 @@ class World {
             reports.forEach(report => thing.handleCollision(report))
         })
         if (this.hasHardEdges) {
-            this.things.forEach(thing => {
+            mobileThings.forEach(thing => {
                 const reports = thing.detectWorldEdgeCollisions()
                 reports.forEach(report => thing.handleWorldEdgeCollision(report))
             })
