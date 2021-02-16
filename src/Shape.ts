@@ -19,7 +19,7 @@ interface CanvasRenderFunction {
 }
 
 class ShapeConfig {
-    id: string
+    id: "circle" | "square"
     getShapeValues: ShapeValuesFunction
     containsPoint: ContainsPointFunction
     intersectingWithShape: AreIntersectingFunction

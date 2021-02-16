@@ -20,8 +20,13 @@ class EdgeCollisionReport extends CollisionReport {
     wallAngle: number
 }
 
-
-function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
+/**
+ * detect collision of one a moving circular thing with an edge of its World
+ * 
+ * @param item a circular thing
+ * @return a collision report describing how item will hit the fixed edge, or null if it won't
+ */
+function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
 
     const { height, width } = item.world
     const body = item.shapeValues
@@ -86,14 +91,14 @@ function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
 
 
 /**
- * detect if one moving circular object would collide with another circular object whilst moving
+ * detect collision of one a moving circular thing with another circular thing
  * 
  * @param item1 a circular thing
  * @param item2 another circular thing
  * @returns a collision report describing how item1 will intersect with item2 on item1's path
  * or null if no collision will occur
  */
-function checkForCircleCollisions(item1: Thing, item2: Thing) {
+function detectCircleCollidingWithCircle(item1: Thing, item2: Thing) {
     // can't collide with self!
     if (item1 === item2) { return null };
 
@@ -261,11 +266,30 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
 function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
 
-    if (shape1.id == "circle" && shape2.id == "circle") {
-        return checkForCircleCollisions
-    }
+    const collisionType = shape1.id + "-" + shape2.id;
 
-    return () => null as CollisionReport
+    switch (collisionType) {
+        case "circle-circle":
+            return detectCircleCollidingWithCircle
+        case "square-circle": // TO DO - more detection functions
+        case "circle-square":
+        case "square-square":
+        default:
+            return () => null as CollisionReport
+    }
 }
 
-export { CollisionReport, EdgeCollisionReport, checkForEdgeCollisions, checkForCircleCollisions, getCollisionDetectionFunction }
+function getEdgeCollisionDetectionFunction(shape: Shape) {
+
+    switch (shape.id) {
+        case "circle":
+            return detectCircleCollidingWithEdge
+        case "square": // TO DO - write detectSquareCollidingWithEdge
+            return detectCircleCollidingWithEdge
+        default:
+            return detectCircleCollidingWithEdge
+    }
+
+}
+
+export { CollisionReport, EdgeCollisionReport, getEdgeCollisionDetectionFunction, getCollisionDetectionFunction }

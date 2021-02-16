@@ -2,7 +2,7 @@ import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
 import { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge } from './physics'
-import { CollisionReport, checkForEdgeCollisions, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
+import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
 
 
@@ -36,6 +36,7 @@ class Thing {
         this.momentum = momentum || Force.none
     }
 
+    // TO DO - delegate mass to Shape
     get mass() {
         const { size, density } = this.data
         return size * size * Math.PI * density
@@ -133,7 +134,8 @@ class Thing {
 
     detectWorldEdgeCollisions() {
         const reports: EdgeCollisionReport[] = []
-        reports.push(checkForEdgeCollisions(this))
+        const edgeCollisionDetectionFunction = getEdgeCollisionDetectionFunction(this.data.shape)
+        reports.push(edgeCollisionDetectionFunction(this))
         return reports
     }
 
