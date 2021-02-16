@@ -2,7 +2,7 @@ import { World } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY } from './geometry'
 import { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge } from './physics'
-import { checkForCircleCollisions, CollisionReport, checkForEdgeCollisions, EdgeCollisionReport } from './collisionDetection'
+import { CollisionReport, checkForEdgeCollisions, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
 
 
@@ -116,7 +116,8 @@ class Thing {
         const reports: CollisionReport[] = []
 
         otherThings.forEach(otherThing => {
-            let report = checkForCircleCollisions(this, otherThing)
+            const collisionDetectionFunction = getCollisionDetectionFunction(this.data.shape, otherThing.data.shape)
+            let report = collisionDetectionFunction(this, otherThing)
             reports.push(report)
         })
 
@@ -124,7 +125,10 @@ class Thing {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) { mutualRoundBounce(report) }
+        if (report) { 
+            console.log(`This is a ${this.data.shape.id} - a ${report.item1.data.shape.id} hit a ${report.item2.data.shape.id}`)
+            mutualRoundBounce(report) 
+        }
     }
 
     detectWorldEdgeCollisions() {
@@ -138,24 +142,7 @@ class Thing {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        const { x, y, size, color = 'white', heading } = this.data
-
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill();
-
-        let frontPoint = {
-            x: x + getVectorX(size, heading),
-            y: y + getVectorY(size, heading)
-        }
-
-        ctx.beginPath()
-        ctx.strokeStyle = 'black';
-        ctx.moveTo(x, y)
-        ctx.lineTo(frontPoint.x, frontPoint.y)
-        ctx.stroke()
-
+        this.data.shape.renderOnCanvas(ctx,this);
     }
 
     checkIfContainsPoint(point: { x: number, y: number }) {
@@ -170,7 +157,7 @@ class Thing {
 
 class LinedThing extends Thing {
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        Thing.prototype.renderOnCanvas.apply(this, [ctx])
+        this.data.shape.renderOnCanvas(ctx,this);
         const { x, y, size, heading } = this.data
 
         let midPoint = {

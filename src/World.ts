@@ -12,23 +12,14 @@ class WorldConfig {
     minimumMassToExertGravity?: number
 }
 
-class World {
-    name: string
-    width: number
-    height: number
-    gravitationalConstant: number
-    globalGravityForce?: Force
-    thingsExertGravity: boolean
-    hasHardEdges: boolean
-    minimumMassToExertGravity: number
-
+class World extends WorldConfig {
     canvas?: HTMLCanvasElement
     timerSpeed: number
     things: Thing[]
     timer: NodeJS.Timeout
 
     constructor(things: Thing[], config: WorldConfig = {}) {
-
+        super()
         this.timerSpeed = 0
 
         this.name = config.name || ""

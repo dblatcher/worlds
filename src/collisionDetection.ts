@@ -2,6 +2,7 @@ import { Thing } from './Thing'
 import { Force } from './Force'
 import * as Geometry from './geometry'
 import { Vector, Point, Circle } from './geometry'
+import { Shape } from './Shape'
 
 class CollisionReport {
     type: "end inside" | "passed through" | "start inside" | "edge"
@@ -29,11 +30,11 @@ function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
     const edgesCrossedAtEnd = getEdgesCrossed(bodyAtEnd)
     const edgesCrossedAtStart = getEdgesCrossed(body)
 
-    if (edgesCrossedAtStart.length > 0 ) {
-        console.warn({item, edgesCrossedAtStart})
+    if (edgesCrossedAtStart.length > 0) {
+        console.warn({ item, edgesCrossedAtStart })
     }
 
-    if (edgesCrossedAtEnd.length === 0 ) { return null }
+    if (edgesCrossedAtEnd.length === 0) { return null }
 
 
     let wallAngle: number;
@@ -61,7 +62,7 @@ function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
     return {
         type: "edge",
         wallAngle,
-        impactPoint : {
+        impactPoint: {
             x: stopPoint.x + vectorFromStopPointToImpactPoint.x,
             y: stopPoint.y + vectorFromStopPointToImpactPoint.y
         },
@@ -84,6 +85,14 @@ function checkForEdgeCollisions(item: Thing): EdgeCollisionReport {
 }
 
 
+/**
+ * detect if one moving circular object would collide with another circular object whilst moving
+ * 
+ * @param item1 a circular thing
+ * @param item2 another circular thing
+ * @returns a collision report describing how item1 will intersect with item2 on item1's path
+ * or null if no collision will occur
+ */
 function checkForCircleCollisions(item1: Thing, item2: Thing) {
     // can't collide with self!
     if (item1 === item2) { return null };
@@ -250,4 +259,13 @@ function checkForCircleCollisions(item1: Thing, item2: Thing) {
 
 }
 
-export {CollisionReport, EdgeCollisionReport, checkForEdgeCollisions, checkForCircleCollisions}
+function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
+
+    if (shape1.id == "circle" && shape2.id == "circle") {
+        return checkForCircleCollisions
+    }
+
+    return () => null as CollisionReport
+}
+
+export { CollisionReport, EdgeCollisionReport, checkForEdgeCollisions, checkForCircleCollisions, getCollisionDetectionFunction }

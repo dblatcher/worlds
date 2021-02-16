@@ -2,6 +2,7 @@ interface Point { x: number, y: number }
 interface Circle { x: number, y: number, radius: number }
 interface Vector { x: number, y: number }
 
+
 /**
  * Calculate the direction of an [x,y] vector
  *
@@ -70,10 +71,10 @@ function getHeadingFromPointToPoint(origin: Point, destination: Point) {
  * with radius to the point
  */
 
-function getCircleTangentAtPoint (circle: Circle, point:Point) {
-    var radiusHeading = getHeadingFromPointToPoint (circle, point);
-    var tangentHeading = radiusHeading + (Math.PI)*0.5;
-    if (tangentHeading > (Math.PI)*2) {tangentHeading -= (Math.PI)*2};
+function getCircleTangentAtPoint(circle: Circle, point: Point) {
+    let radiusHeading = getHeadingFromPointToPoint(circle, point);
+    let tangentHeading = radiusHeading + (Math.PI) * 0.5;
+    if (tangentHeading > (Math.PI) * 2) { tangentHeading -= (Math.PI) * 2 };
     return tangentHeading;
 };
 
@@ -90,13 +91,13 @@ function closestpointonline(L1: Point, L2: Point, p0: Point) {
         return ({ x: L1.x, y: L1.y });
     }
 
-    var A1 = L2.y - L1.y;
-    var B1 = L1.x - L2.x;
-    var C1 = (L2.y - L1.y) * L1.x + (L1.x - L2.x) * L1.y;
-    var C2 = -B1 * p0.x + A1 * p0.y;
-    var det = A1 * A1 - -B1 * B1;
-    var cx = 0;
-    var cy = 0;
+    let A1 = L2.y - L1.y;
+    let B1 = L1.x - L2.x;
+    let C1 = (L2.y - L1.y) * L1.x + (L1.x - L2.x) * L1.y;
+    let C2 = -B1 * p0.x + A1 * p0.y;
+    let det = A1 * A1 - -B1 * B1;
+    let cx = 0;
+    let cy = 0;
     if (det !== 0) {
         cx = ((A1 * C1 - B1 * C2) / det);
         cy = ((A1 * C2 - -B1 * C1) / det);
@@ -132,9 +133,68 @@ function reflectHeading(heading: number, wallAngle: number) {
     return reflect;
 }
 
+
+
+/**
+ * Check if two line segments will intersect
+ * 
+ * @param segment1 the two points of the first segment
+ * @param segment2 the two points of the second segment
+ * @returns whether the sements intersect
+ */
+function doLineSegmentsIntersect(segment1:[Point, Point], segment2:[Point, Point]) {
+    // Given three colinear points p, q, r, the function checks if 
+    // point q lies on line segment 'pr' 
+    function onSegment(p: Point, q: Point, r: Point) {
+        if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y)) {
+            return true;
+        }
+        return false;
+    }
+
+    // To find orientation of ordered triplet (p, q, r). 
+    // The function returns following values 
+    // 0 --> p, q and r are colinear 
+    // 1 --> Clockwise 
+    // 2 --> Counterclockwise 
+    function orientation(p: Point, q: Point, r: Point) {
+        let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+        if (val == 0) return 0;  // colinear 
+        return (val > 0) ? 1 : 2; // clock or counterclock wise 
+    }
+
+    // Find the four orientations needed for general and 
+    // special cases 
+    let o1 = orientation(segment1[0], segment1[1], segment2[0]);
+    let o2 = orientation(segment1[0], segment1[1], segment2[1]);
+    let o3 = orientation(segment2[0], segment2[1], segment1[0]);
+    let o4 = orientation(segment2[0], segment2[1], segment1[1]);
+
+    // General case 
+    if (o1 != o2 && o3 != o4) { return true };
+
+    // Special Cases 
+    // segment1[0], segment1[1] and segment2[0] are colinear and segment2[0] lies on segment p1q1 
+    if (o1 == 0 && onSegment(segment1[0], segment2[0], segment1[1])) { return true };
+
+    // segment1[0], segment1[1] and segment2[1] are colinear and segment2[1] lies on segment p1q1 
+    if (o2 == 0 && onSegment(segment1[0], segment2[1], segment1[1])) { return true };
+
+    // segment2[0], segment2[1] and segment1[0] are colinear and segment1[0] lies on segment p2q2 
+    if (o3 == 0 && onSegment(segment2[0], segment1[0], segment2[1])) { return true };
+
+    // segment2[0], segment2[1] and segment1[1] are colinear and segment1[1] lies on segment p2q2 
+    if (o4 == 0 && onSegment(segment2[0], segment1[1], segment2[1])) { return true };
+
+    return false; // Doesn't fall in any of the above cases 
+}
+
+
+
 export {
     Point, Circle, Vector,
     getDirection, getMagnitude, getVectorX, getVectorY,
+    doLineSegmentsIntersect,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
-    areCirclesIntersecting, reflectHeading,reverseHeading, getCircleTangentAtPoint
+    areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint
 }

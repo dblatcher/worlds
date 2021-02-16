@@ -4,6 +4,7 @@ import { Force } from './Force'
 import * as Geometry from './geometry'
 import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
+import { Shape } from './Shape'
 
 
 
