@@ -218,4 +218,21 @@ function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
     edgeCollisionReport.item1.momentum = findEdgeBounceForce(edgeCollisionReport)
 }
 
-export { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge }
+function handleCollisionAccordingToShape(collisionReport:CollisionReport) {
+    
+    const collisionType = collisionReport.item1.data.shape.id + "-" + collisionReport.item2.data.shape.id;
+
+    switch (collisionType) {
+        case "circle-circle":
+            return mutualRoundBounce(collisionReport)
+        case "circle-square":
+        case "square-circle": // TO DO - more detection functions
+        case "square-square":
+        default:
+            console.log(`Unhandled ${collisionType} collision`, collisionReport)
+            return 
+    }
+
+}
+
+export { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge, handleCollisionAccordingToShape }

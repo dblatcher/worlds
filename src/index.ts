@@ -4,6 +4,8 @@ import { testWorld, myShip } from './preset-worlds/spaceShipTest'
 import { rocksAndBallons } from './preset-worlds/rocksAndBallons'
 import { galaxy } from './preset-worlds/galaxy'
 import { balance } from './preset-worlds/balance';
+import { squareTestWorld } from './preset-worlds/squareTest';
+
 
 const canvasElement = document.createElement('canvas')
 
@@ -28,7 +30,7 @@ canvas {
 }
 `
 
-const panel = new WorldControlPanel(balance, { worldOptions: [balance, galaxy, rocksAndBallons, testWorld] })
+const panel = new WorldControlPanel(squareTestWorld, { worldOptions: [squareTestWorld,balance, galaxy, rocksAndBallons, testWorld] })
 const shipPanel = new SpaceShipControlPanel(myShip)
 
 panel.world.setCanvas(canvasElement)

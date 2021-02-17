@@ -1,7 +1,7 @@
 import { Thing } from './Thing'
 import { Force } from './Force'
 import * as Geometry from './geometry'
-import { Vector, Point, Circle } from './geometry'
+import { Vector, Point, Circle, areCircleAndPolygonIntersecting, _90deg } from './geometry'
 import { Shape } from './Shape'
 
 class CollisionReport {
@@ -264,6 +264,82 @@ function detectCircleCollidingWithCircle(item1: Thing, item2: Thing) {
 
 }
 
+
+function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
+
+    if (item1 === item2) { return null };
+
+    var vector = {
+        x: item1.momentum.vectorX,
+        y: item1.momentum.vectorY,
+    }
+
+    var force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
+    var force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
+
+    var result: CollisionReport = {
+        type: null,
+        impactPoint: {
+            x: item1.data.x,
+            y: item1.data.y
+        },
+        stopPoint: {
+            x: item1.data.x,
+            y: item1.data.y
+        },
+        item1: item1,
+        item2: item2,
+        force: force,
+        force2: force2
+    }
+
+    var movedObject: Circle = {
+        x: (item1.data.x + vector.x),
+        y: (item1.data.y + vector.y),
+        radius: item1.data.size
+    }
+
+    // path of the circular item1 is described by circle for start position(item1), circle for end position (movedObject) and a rectangle(pathArea)
+    // the pathArea's length is the distance traveled by item1, its height is item1's radius*2 (diameter). 
+    // The mid point of each height edge are the centers of (item1) and (movedObject)
+
+
+    if (areCircleAndPolygonIntersecting(item1.shapeValues, item2.polygonPoints)) {
+        result.type = "start inside";
+        //result.stopPoint = findStopPoint();
+        console.log(result)
+        return result;
+    };
+
+    if (areCircleAndPolygonIntersecting(movedObject, item2.polygonPoints)) {
+        result.type = "end inside";
+        //result.stopPoint = findStopPoint();
+        console.log(result)
+        return result;
+    };
+
+    const rightX = Geometry.getVectorX(item1.data.size, item1.momentum.direction + _90deg)
+    const rightY = Geometry.getVectorY(item1.data.size, item1.momentum.direction + _90deg)
+
+    const pathArea: Point[] = [
+        { x: item1.data.x + rightX, y: item1.data.y + rightY },
+        { x: item1.data.x - rightX, y: item1.data.y - rightY },
+        { x: movedObject.x - rightX, y: movedObject.y - rightY },
+        { x: movedObject.x + rightX, y: movedObject.y + rightY },
+    ]
+
+    if (Geometry.arePolygonsIntersecting(pathArea, item2.polygonPoints)) {
+        result.type = "passed through";
+        //result.stopPoint = findStopPoint();
+        console.log(result)
+        return result;
+    }
+
+    return null;
+}
+
+
+
 function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
 
     const collisionType = shape1.id + "-" + shape2.id;
@@ -271,8 +347,9 @@ function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
     switch (collisionType) {
         case "circle-circle":
             return detectCircleCollidingWithCircle
-        case "square-circle": // TO DO - more detection functions
         case "circle-square":
+            return detectSquareCollidingWithCircle
+        case "square-circle": // TO DO - more detection functions
         case "square-square":
         default:
             return () => null as CollisionReport

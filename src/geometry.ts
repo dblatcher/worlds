@@ -3,6 +3,19 @@ interface Circle { x: number, y: number, radius: number }
 interface Vector { x: number, y: number }
 
 
+const extreme = 10 ** 30
+const _90deg = Math.PI * .5
+const origin: Point = { x: 0, y: 0 }
+
+function getPolygonLineSegments(polygon: Point[]) {
+    const segments: [Point, Point][] = []
+    for (let i = 0; i < polygon.length; i++) {
+        segments.push([polygon[i], i + 1 >= polygon.length ? polygon[0] : polygon[i + 1]])
+    }
+    return segments
+}
+
+
 /**
  * Calculate the direction of an [x,y] vector
  *
@@ -49,13 +62,13 @@ function getMagnitude(x: number, y: number) {
  * between point1 and origin
  */
 function getDistanceBetweenPoints(point1: Point, point2?: Point) {
-    if (!point2) { point2 = { x: 0, y: 0 } }
+    if (!point2) { point2 = origin }
     let dx = point1.x - point2.x, dy = point1.y - point2.y;
     return getMagnitude(dx, dy)
 }
 
-function getHeadingFromPointToPoint(origin: Point, destination: Point) {
-    let dx = origin.x - destination.x, dy = origin.y - destination.y;
+function getHeadingFromPointToPoint(startingPoint: Point, destination: Point) {
+    let dx = startingPoint.x - destination.x, dy = startingPoint.y - destination.y;
     return getDirection(dx, dy)
 }
 
@@ -82,6 +95,30 @@ function getCircleTangentAtPoint(circle: Circle, point: Point) {
 function getVectorX(magnitude: number, direction: number) { return magnitude * Math.sin(direction) }
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
+
+
+
+function closestPointOnLineSegment(segmentPoint1: Point, segmentPoint2: Point, p0: Point) {
+    const v: Vector = { x: segmentPoint2.x - segmentPoint1.x, y: segmentPoint2.y - segmentPoint1.y }
+    const u: Vector = { x: segmentPoint1.x - p0.x, y: segmentPoint1.y - p0.y }
+    const vu = v.x * u.x + v.y * u.y
+    const vv = v.x ** 2 + v.y ** 2
+    const t = -vu / vv
+    if (t >= 0 && t <= 1) return _vectorToSegment2D(t, origin, segmentPoint1, segmentPoint2)
+    const g0 = _sqDiag2D(_vectorToSegment2D(0, p0, segmentPoint1, segmentPoint2))
+    const g1 = _sqDiag2D(_vectorToSegment2D(1, p0, segmentPoint1, segmentPoint2))
+    return g0 <= g1 ? segmentPoint1 : segmentPoint2
+}
+
+function _vectorToSegment2D(t: number, P: Point, A: Point, B: Point) {
+    return {
+        x: (1 - t) * A.x + t * B.x - P.x,
+        y: (1 - t) * A.y + t * B.y - P.y,
+    } as Vector
+}
+
+function _sqDiag2D(P: Vector) { return P.x ** 2 + P.y ** 2 }
+
 
 
 function closestpointonline(L1: Point, L2: Point, p0: Point) {
@@ -118,6 +155,73 @@ function areCirclesIntersecting(circle1: Circle, circle2: Circle) {
     return getDistanceBetweenPoints(circle1, circle2) < circle1.radius + circle2.radius
 }
 
+function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[]) {
+
+    let point1, point2, closestPointToCenter, edgeIntersects = false
+    for (let i = 0; i < polygon.length; i++) {
+        point1 = polygon[i]
+        point2 = i + 1 >= polygon.length ? polygon[0] : polygon[i + 1]
+        closestPointToCenter = closestPointOnLineSegment(point1, point2, circle)
+        if (getDistanceBetweenPoints(closestPointToCenter, circle) <= circle.radius) {
+            console.log('TEST', getDistanceBetweenPoints(closestPointToCenter, circle), { circle, polygon })
+            edgeIntersects = true
+            break
+        }
+    }
+    if (edgeIntersects) { return true }
+
+    // is the circle inside the polygon?
+    return isPointInsidePolygon(circle, polygon);
+}
+
+function arePolygonsIntersecting(polygon1: Point[], polygon2: Point[]) {
+
+    const edges1 = getPolygonLineSegments(polygon1)
+    const edges2 = getPolygonLineSegments(polygon2)
+    let i, j
+    for (i = 0; i < edges1.length; i++) {
+        for (j = 0; j < edges2.length; j++) {
+            if (doLineSegmentsIntersect(edges1[i], edges2[j])) {
+                console.log('polygon edges intersect', edges1[i], edges2[j])
+                return true
+            }
+        }
+    }
+
+    for (i = 0; i < polygon1.length; i++) {
+        if (isPointInsidePolygon(polygon1[i], polygon2)) {
+            console.log('polygon vertex inside other polygon', polygon1[i])
+            return true
+        }
+    }
+
+    for (i = 0; i < polygon2.length; i++) {
+        if (isPointInsidePolygon(polygon2[i], polygon1)) {
+            console.log('polygon vertex inside other polygon', polygon2[i])
+            return true
+        }
+    }
+
+    return false
+}
+
+
+function isPointInsidePolygon(point: Point, polygon: Point[]) {
+    var n = polygon.length;
+    if (n < 3) { return false };
+    var extremeXPoint = { y: point.y, x: extreme };
+    var intersections = 0;
+
+    let point1, point2
+    for (let i = 0; i < polygon.length; i++) {
+        point1 = polygon[i]
+        point2 = i + 1 >= polygon.length ? polygon[0] : polygon[i + 1]
+        if (doLineSegmentsIntersect([point, extremeXPoint], [point1, point2])) { intersections++ }
+    }
+
+    return intersections % 2 !== 0
+}
+
 
 function reverseHeading(heading: number) {
     let result = heading + Math.PI;
@@ -142,7 +246,7 @@ function reflectHeading(heading: number, wallAngle: number) {
  * @param segment2 the two points of the second segment
  * @returns whether the sements intersect
  */
-function doLineSegmentsIntersect(segment1:[Point, Point], segment2:[Point, Point]) {
+function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Point]) {
     // Given three colinear points p, q, r, the function checks if 
     // point q lies on line segment 'pr' 
     function onSegment(p: Point, q: Point, r: Point) {
@@ -193,8 +297,11 @@ function doLineSegmentsIntersect(segment1:[Point, Point], segment2:[Point, Point
 
 export {
     Point, Circle, Vector,
+    _90deg,
     getDirection, getMagnitude, getVectorX, getVectorY,
     doLineSegmentsIntersect,
+    arePolygonsIntersecting,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
-    areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint
+    areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
+    areCircleAndPolygonIntersecting,
 }

@@ -1,7 +1,7 @@
 import { World } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY } from './geometry'
-import { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge } from './physics'
+import { getVectorX, getVectorY, Point } from './geometry'
+import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
 
@@ -40,6 +40,10 @@ class Thing {
     get mass() {
         const { size, density } = this.data
         return size * size * Math.PI * density
+    }
+
+    get polygonPoints() {
+        return this.data.shape.getPolygonPoints.apply(this,[]) as Point[]
     }
 
     get shapeValues() {
@@ -127,8 +131,7 @@ class Thing {
 
     handleCollision(report: CollisionReport) {
         if (report) { 
-            console.log(`This is a ${this.data.shape.id} - a ${report.item1.data.shape.id} hit a ${report.item2.data.shape.id}`)
-            mutualRoundBounce(report) 
+            handleCollisionAccordingToShape(report)
         }
     }
 
