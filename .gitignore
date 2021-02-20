@@ -87,4 +87,4 @@ typings/
 dist/
 
 # built tests folder
-test/built
+tests/built/
