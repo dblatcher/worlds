@@ -163,7 +163,6 @@ function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[]) {
         point2 = i + 1 >= polygon.length ? polygon[0] : polygon[i + 1]
         closestPointToCenter = closestPointOnLineSegment(point1, point2, circle)
         if (getDistanceBetweenPoints(closestPointToCenter, circle) <= circle.radius) {
-            console.log('TEST', getDistanceBetweenPoints(closestPointToCenter, circle), { circle, polygon })
             edgeIntersects = true
             break
         }
@@ -246,7 +245,7 @@ function reflectHeading(heading: number, wallAngle: number) {
  * @param segment2 the two points of the second segment
  * @returns whether the sements intersect
  */
-function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Point]) {
+function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Point]): boolean {
     // Given three colinear points p, q, r, the function checks if 
     // point q lies on line segment 'pr' 
     function onSegment(p: Point, q: Point, r: Point) {
@@ -294,13 +293,51 @@ function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Poi
 }
 
 
+function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2: [Point, Point]): Point {
+
+    if (!doLineSegmentsIntersect(segment1, segment2)) { return null }
+
+    const gradient1 = (segment1[0].y - segment1[1].y) / (segment1[0].x - segment1[1].x)
+    const gradient2 = (segment2[0].y - segment2[1].y) / (segment2[0].x - segment2[1].x)
+    let constant1, constant2;
+
+    if (gradient1 == gradient2) {
+        console.warn('SAME GRADIENT - NOT HANDLED')
+        return null
+    }
+
+    if (isFinite(gradient1) && isFinite(gradient2) ) {
+        constant1 = segment1[0].y - (gradient1 * segment1[0].x)
+        constant2 = segment2[0].y - (gradient2 * segment2[0].x)
+        console.log(`segment1 is y = ${gradient1} * x + ${constant1}`)
+        console.log(`segment2 is y = ${gradient2} * x + ${constant2}`)
+
+
+        
+
+
+        // (g1 * x) + c1 == (g2 * x) + c2
+        // (g1 * x) == (g2 * x) + c2 - c1
+        // (g1 * x) - (g2 * x) ==  + c2 - c1
+        // x * (g1 - g2) ==  + c2 - c1
+        // x  ==  (c2 - c1) / (g1 - g2)
+        const intersectX = (constant2 - constant1) / (gradient1 - gradient2)
+        const intersectY = (gradient1 * intersectX) + constant1
+        return ({ x: intersectX, y: intersectY })
+    }
+
+    console.warn('infinite gradient(vertical) - NOT HANDLED')
+    return null
+
+}
+
 
 export {
     Point, Circle, Vector,
     _90deg,
     getDirection, getMagnitude, getVectorX, getVectorY,
-    doLineSegmentsIntersect,
-    arePolygonsIntersecting,
+    doLineSegmentsIntersect, findIntersectionPointOfLineSegments,
+    arePolygonsIntersecting, getPolygonLineSegments,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
     areCircleAndPolygonIntersecting,

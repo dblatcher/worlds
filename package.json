@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
     "build": "webpack --mode=development"
   },
   "keywords": [],
