@@ -299,36 +299,48 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
 
     const gradient1 = (segment1[0].y - segment1[1].y) / (segment1[0].x - segment1[1].x)
     const gradient2 = (segment2[0].y - segment2[1].y) / (segment2[0].x - segment2[1].x)
-    let constant1, constant2;
 
     if (gradient1 == gradient2) {
-        console.warn('SAME GRADIENT - NOT HANDLED')
-        return null
+        const pointsInOrder  = isFinite(gradient1) 
+            ? [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.x-pointB.x)
+            : [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.y-pointB.y)
+
+        return {
+            x: (pointsInOrder[1].x + pointsInOrder[2].x)/2,
+            y: (pointsInOrder[1].y + pointsInOrder[2].y)/2,
+        }
     }
 
-    if (isFinite(gradient1) && isFinite(gradient2) ) {
-        constant1 = segment1[0].y - (gradient1 * segment1[0].x)
-        constant2 = segment2[0].y - (gradient2 * segment2[0].x)
-        console.log(`segment1 is y = ${gradient1} * x + ${constant1}`)
-        console.log(`segment2 is y = ${gradient2} * x + ${constant2}`)
+    if (isFinite(gradient1) && isFinite(gradient2)) {
+        const constant1 = segment1[0].y - (gradient1 * segment1[0].x)
+        const constant2 = segment2[0].y - (gradient2 * segment2[0].x)
 
-
-        
-
-
-        // (g1 * x) + c1 == (g2 * x) + c2
-        // (g1 * x) == (g2 * x) + c2 - c1
-        // (g1 * x) - (g2 * x) ==  + c2 - c1
-        // x * (g1 - g2) ==  + c2 - c1
-        // x  ==  (c2 - c1) / (g1 - g2)
         const intersectX = (constant2 - constant1) / (gradient1 - gradient2)
         const intersectY = (gradient1 * intersectX) + constant1
         return ({ x: intersectX, y: intersectY })
     }
 
-    console.warn('infinite gradient(vertical) - NOT HANDLED')
+    if (isFinite(gradient1) && !isFinite(gradient2)) {
+        return getIntersectionWithAVertical(segment1, segment2)
+    }
+
+    if (isFinite(gradient2) && !isFinite(gradient1)) {
+        return getIntersectionWithAVertical(segment2, segment1)
+    }
+
     return null
 
+    function getIntersectionWithAVertical(nonVerticalSegment:[Point, Point], verticalSegment:[Point, Point]):Point {
+
+        const verticalConstant = verticalSegment[0].x
+        const nonVerticalGradient = (nonVerticalSegment[0].y - nonVerticalSegment[1].y) / (nonVerticalSegment[0].x - nonVerticalSegment[1].x)
+        const nonVerticalConstant = nonVerticalSegment[0].y - (nonVerticalGradient * nonVerticalSegment[0].x)
+
+        return ({ 
+            x: verticalConstant,
+            y: (nonVerticalGradient * verticalConstant) + nonVerticalConstant
+        })
+    }
 }
 
 
