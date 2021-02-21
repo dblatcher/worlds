@@ -51,9 +51,13 @@ function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
 function findBounceOfImmobileThingForce(collisionReport: CollisionReport) {
     const { item1, item2, impactPoint } = collisionReport
 
+    const angleToReflectOff = typeof collisionReport.wallAngle === 'number' 
+        ? collisionReport.wallAngle
+        : Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint) 
+
     const reflectedForce = new Force(
         item1.momentum.magnitude * (item1.data.elasticity + item2.data.elasticity) / 2,
-        Geometry.reflectHeading(item1.momentum.direction, Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint))
+        Geometry.reflectHeading(item1.momentum.direction, angleToReflectOff)
     )
 
     return reflectedForce
@@ -193,7 +197,7 @@ function findInelasticCollisionVectors(collision: CollisionReport) {
  *
  * @param collision the CollisionReport
  */
-function mutualRoundBounce(collision: CollisionReport) {
+function bounceCircleOffCircle(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
@@ -208,6 +212,20 @@ function mutualRoundBounce(collision: CollisionReport) {
         collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
     }
 };
+
+
+function bounceCircleOffSquare (collision:CollisionReport) {
+
+    if (collision.item2.data.immobile) {
+        // console.log(`Unhandled circle-immobileSquare collision`, collision)
+        collision.item1.data.x = collision.stopPoint.x
+        collision.item1.data.y = collision.stopPoint.y
+        collision.item1.momentum = findBounceOfImmobileThingForce(collision)
+    } else {
+        // console.log(`Unhandled circle-square collision`, collision)
+    }
+
+}
 
 function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
@@ -224,8 +242,9 @@ function handleCollisionAccordingToShape(collisionReport:CollisionReport) {
 
     switch (collisionType) {
         case "circle-circle":
-            return mutualRoundBounce(collisionReport)
+            return bounceCircleOffCircle(collisionReport)
         case "circle-square":
+            return bounceCircleOffSquare(collisionReport)
         case "square-circle": // TO DO - more detection functions
         case "square-square":
         default:
@@ -235,4 +254,4 @@ function handleCollisionAccordingToShape(collisionReport:CollisionReport) {
 
 }
 
-export { getGravitationalForce, mutualRoundBounce, bounceOffWorldEdge, handleCollisionAccordingToShape }
+export { getGravitationalForce, bounceCircleOffCircle, bounceOffWorldEdge, handleCollisionAccordingToShape }

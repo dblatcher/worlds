@@ -12,6 +12,7 @@ class CollisionReport {
     item2: Thing
     force: number
     force2: number
+    wallAngle?: number
 }
 
 class EdgeCollisionReport extends CollisionReport {
@@ -397,6 +398,8 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
             }
 
             result.impactPoint = Geometry.closestpointonline(edgeWhichCircleWillHit[0], edgeWhichCircleWillHit[1], result.stopPoint)
+
+            result.wallAngle = angleOfEdge
             return
         }
 
