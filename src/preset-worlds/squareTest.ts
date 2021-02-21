@@ -6,12 +6,13 @@ import { shapes } from '../Shape'
 
 
 const bigWhiteSquare = new LinedThing({ 
-    heading: .9, 
+    heading: .7, 
     x: 200, y: 200, 
     size: 100, density: 1, 
     immobile: true, 
     color: 'antiquewhite', 
-    shape: shapes.square 
+    shape: shapes.square,
+    keepsHeading: true, 
 })
 
 const litteWhiteSquare = new Thing({ 
@@ -22,11 +23,12 @@ const litteWhiteSquare = new Thing({
     density: .1, 
     immobile: true, 
     color: 'antiquewhite', 
-    shape: shapes.square 
+    shape: shapes.square,
+    keepsHeading: true,  
 })
 
 const redPlanet = new Thing({
-    x: 280, y: 500, size: 25, density: 1, color: 'red', elasticity: 1
+    x: 280, y: 500, size: 50, density: 1, color: 'red', elasticity: 1
 }, new Force(15, Math.PI * 1))
 
 const bluePlanet = new Thing({
