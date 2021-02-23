@@ -51,9 +51,9 @@ function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
 function findBounceOfImmobileThingForce(collisionReport: CollisionReport) {
     const { item1, item2, impactPoint } = collisionReport
 
-    const angleToReflectOff = typeof collisionReport.wallAngle === 'number' 
+    const angleToReflectOff = typeof collisionReport.wallAngle === 'number'
         ? collisionReport.wallAngle
-        : Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint) 
+        : Geometry.getCircleTangentAtPoint(item2.shapeValues, impactPoint)
 
     const reflectedForce = new Force(
         item1.momentum.magnitude * (item1.data.elasticity + item2.data.elasticity) / 2,
@@ -214,15 +214,19 @@ function bounceCircleOffCircle(collision: CollisionReport) {
 };
 
 
-function bounceCircleOffSquare (collision:CollisionReport) {
+function bounceCircleOffSquare(collision: CollisionReport) {
 
     if (collision.item2.data.immobile) {
-        // console.log(`Unhandled circle-immobileSquare collision`, collision)
+
+        if (collision.type === 'start inside') {
+            console.warn('circle started inside immobile square',collision)
+        }
         collision.item1.data.x = collision.stopPoint.x
         collision.item1.data.y = collision.stopPoint.y
+
         collision.item1.momentum = findBounceOfImmobileThingForce(collision)
     } else {
-        // console.log(`Unhandled circle-square collision`, collision)
+        console.warn(`Unhandled circle-mobile square collision`, collision)
     }
 
 }
@@ -236,8 +240,8 @@ function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
     edgeCollisionReport.item1.momentum = findEdgeBounceForce(edgeCollisionReport)
 }
 
-function handleCollisionAccordingToShape(collisionReport:CollisionReport) {
-    
+function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
+
     const collisionType = collisionReport.item1.data.shape.id + "-" + collisionReport.item2.data.shape.id;
 
     switch (collisionType) {
@@ -249,7 +253,7 @@ function handleCollisionAccordingToShape(collisionReport:CollisionReport) {
         case "square-square":
         default:
             console.log(`Unhandled ${collisionType} collision`, collisionReport)
-            return 
+            return
     }
 
 }

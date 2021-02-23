@@ -45,7 +45,11 @@ class World extends WorldConfig {
 
         mobileThings.forEach(thing => { thing.updateMomentum() })
         mobileThings.forEach(thing => {
-            const reports = thing.detectCollisions()
+            const reports = thing.detectCollisions(true, false)
+            reports.forEach(report => thing.handleCollision(report))
+        })
+        mobileThings.forEach(thing => {
+            const reports = thing.detectCollisions(false, true)
             reports.forEach(report => thing.handleCollision(report))
         })
         if (this.hasHardEdges) {

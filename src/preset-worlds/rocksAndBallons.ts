@@ -1,6 +1,7 @@
 import { World } from '../World'
 import { Thing } from '../Thing'
 import { Force } from '../Force'
+import { shapes } from '../Shape'
 
 
 function makeRock() {
@@ -44,8 +45,11 @@ function makeRocksAndBallons(amount: number) {
     return things
 }
 
+const slope = new Thing({shape:shapes.square, x:-100, y:1100, size:400, heading:-2,immobile:true})
+
 const rocksAndBallons = new World([
-    ...makeRocksAndBallons(10),
+    ...makeRocksAndBallons(5),
+    slope,
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,

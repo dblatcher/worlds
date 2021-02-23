@@ -19,7 +19,7 @@ const litteWhiteSquare = new Thing({
     heading: 1, 
     x: 500, 
     y: 525, 
-    size: 10, 
+    size: 20, 
     density: .1, 
     immobile: true, 
     color: 'antiquewhite', 
@@ -38,12 +38,12 @@ const bluePlanet = new Thing({
 
 const squareTestWorld = new World([
     bigWhiteSquare,
-    // litteWhiteSquare, 
-    // bluePlanet,
+    litteWhiteSquare, 
+    bluePlanet,
     redPlanet,
 ], {
-    height: 600,
-    width:600,
+    height: 800,
+    width:800,
 
     gravitationalConstant: 0,
     thingsExertGravity: true,

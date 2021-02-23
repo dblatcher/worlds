@@ -99,7 +99,7 @@ function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
  * @returns a collision report describing how item1 will intersect with item2 on item1's path
  * or null if no collision will occur
  */
-function detectCircleCollidingWithCircle(item1: Thing, item2: Thing) {
+function detectCircleCollidingWithCircle(item1: Thing, item2: Thing): CollisionReport {
     // can't collide with self!
     if (item1 === item2) { return null };
 
@@ -266,7 +266,7 @@ function detectCircleCollidingWithCircle(item1: Thing, item2: Thing) {
 }
 
 
-function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
+function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionReport {
 
     if (item1 === item2) { return null };
 
@@ -280,8 +280,42 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
 
     const force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
     const force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
+    const squareEdges = Geometry.getPolygonLineSegments(polygonPoints)
 
-    var result: CollisionReport = {
+
+    // path of the circular item1 is described by circle for start position(item1), circle for end position (movedObject) and a rectangle(pathArea)
+    // the pathArea's length is the distance traveled by item1, its height is item1's radius*2 (diameter). 
+    // The mid point of each height edge are the centers of (item1) and (movedObject)
+
+
+    if (areCircleAndPolygonIntersecting(item1.shapeValues, polygonPoints)) {
+
+        const intersectionsFromInside = squareEdges.map(edge => {
+            const point = Geometry.closestpointonline(edge[0],edge[1], circleShapeValues)
+            const distance = Geometry.getDistanceBetweenPoints(point, circleShapeValues)
+            return {edge,point,distance}
+        })
+        .sort((intersectionA, intersectionB) => intersectionA.distance - intersectionB.distance)
+
+        const directionToImpactPoint = Geometry.getHeadingFromPointToPoint(intersectionsFromInside[0].point, circleShapeValues) 
+
+        return {
+            type: "start inside",
+            impactPoint: intersectionsFromInside[0].point,
+            wallAngle: Geometry.getHeadingFromPointToPoint(...intersectionsFromInside[0].edge),
+            stopPoint: {
+                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius, directionToImpactPoint),
+                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius, directionToImpactPoint)
+            },
+            item1: item1,
+            item2: item2,
+            force: force,
+            force2: force2
+        }
+
+    };
+
+    const result: CollisionReport = {
         type: null,
         impactPoint: {
             x: item1.data.x,
@@ -302,16 +336,6 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
         y: (item1.data.y + vector.y),
         radius: item1.data.size
     }
-
-    // path of the circular item1 is described by circle for start position(item1), circle for end position (movedObject) and a rectangle(pathArea)
-    // the pathArea's length is the distance traveled by item1, its height is item1's radius*2 (diameter). 
-    // The mid point of each height edge are the centers of (item1) and (movedObject)
-
-
-    if (areCircleAndPolygonIntersecting(item1.shapeValues, polygonPoints)) {
-        result.type = "start inside";
-        return result;
-    };
 
     if (areCircleAndPolygonIntersecting(movedObject, polygonPoints)) {
         result.type = "end inside";
@@ -339,26 +363,15 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing) {
 
     function setImpactAndStopPoint() {
 
-        // code below won't work - try this
-        // determine which egde the circle is moving towards
-        // split vector into 'forward' vector moving at that edge and 'tangent' vector to the forward
-        // calculate how far along the forward vector until circle hits the edge OR point of intersection betwen edge and center path
-
-        
-
         const fromCenterToFront: Vector = {
             x: Geometry.getVectorX(item1.data.size, item1.momentum.direction),
             y: Geometry.getVectorY(item1.data.size, item1.momentum.direction),
         }
 
-
         const centerPathOfCircle: [Point, Point] = [
             { x: item1.data.x,  y: item1.data.y },
             { x: item1.data.x + fromCenterToFront.x*2 + vector.x, y: item1.data.y + vector.y + fromCenterToFront.y*2 },
         ]
-
-        const squareEdges = Geometry.getPolygonLineSegments(polygonPoints)
-
 
         let intersections: {edgeIndex:number, point:Point, edge:[Point, Point]}[] = []
 

@@ -43,11 +43,11 @@ class Thing {
     }
 
     get polygonPoints() {
-        return this.data.shape.getPolygonPoints.apply(this,[]) as Point[]
+        return this.data.shape.getPolygonPoints.apply(this, []) as Point[]
     }
 
     get shapeValues() {
-        return this.data.shape.getShapeValues.apply(this,[]) as ShapeValues
+        return this.data.shape.getShapeValues.apply(this, []) as ShapeValues
     }
 
     get gravitationalForces() {
@@ -116,8 +116,12 @@ class Thing {
         }
     }
 
-    detectCollisions() {
-        const otherThings = this.world.things.filter(otherThing => otherThing !== this)
+    detectCollisions(withMobileThings: boolean = true, withImmobileThings: boolean = true) {
+        const otherThings = this.world.things.filter(otherThing =>
+            otherThing !== this && (withMobileThings || otherThing.data.immobile) && (withImmobileThings || !otherThing.data.immobile)
+        )
+
+
         const reports: CollisionReport[] = []
 
         otherThings.forEach(otherThing => {
@@ -130,7 +134,7 @@ class Thing {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) { 
+        if (report) {
             handleCollisionAccordingToShape(report)
         }
     }
@@ -147,7 +151,7 @@ class Thing {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        this.data.shape.renderOnCanvas(ctx,this);
+        this.data.shape.renderOnCanvas(ctx, this);
     }
 
     checkIfContainsPoint(point: { x: number, y: number }) {
@@ -162,7 +166,7 @@ class Thing {
 
 class LinedThing extends Thing {
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        this.data.shape.renderOnCanvas(ctx,this);
+        this.data.shape.renderOnCanvas(ctx, this);
         const { x, y, size, heading } = this.data
 
         let midPoint = {
