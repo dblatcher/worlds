@@ -1,7 +1,4 @@
-import { World } from '../World'
-import { Thing } from '../Thing'
-import { Force } from '../Force'
-import { shapes } from '../Shape'
+import { World, shapes, Thing, Force } from '../index'
 
 
 function makeRock() {

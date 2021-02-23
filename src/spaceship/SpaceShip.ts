@@ -1,8 +1,6 @@
-import { Force } from './Force'
-import { getVectorX, getVectorY, reverseHeading } from './geometry'
-import { Shape } from './Shape'
-import { Thing, ThingData } from './Thing'
+import { Thing, Force, ThingData, Shape, Geometry } from '../index'
 
+const { getVectorX, getVectorY, reverseHeading } = Geometry
 
 class SpaceShipData implements ThingData {
     x: number

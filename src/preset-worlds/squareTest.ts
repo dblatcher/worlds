@@ -1,8 +1,4 @@
-import { World } from '../World'
-import { LinedThing, Thing } from '../Thing'
-import { Force } from '../Force'
-import { shapes } from '../Shape'
-
+import { World, Thing, Force, LinedThing, shapes } from '../index'
 
 
 const bigWhiteSquare = new LinedThing({ 

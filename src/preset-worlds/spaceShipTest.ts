@@ -1,8 +1,5 @@
-import { World } from '../World'
-import { Thing } from '../Thing'
-
-import { Force } from '../Force'
-import { SpaceShip } from '../SpaceShip'
+import { World, Thing, Force } from '../index'
+import { SpaceShip } from '../spaceship/SpaceShip'
 
 const myShip = new SpaceShip({
     size: 20,

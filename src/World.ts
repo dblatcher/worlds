@@ -107,4 +107,4 @@ class World extends WorldConfig {
     }
 }
 
-export { World }
+export { World, WorldConfig }
