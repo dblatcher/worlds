@@ -8,7 +8,7 @@ const bigWhiteSquare = new LinedThing({
     immobile: true, 
     color: 'antiquewhite', 
     shape: shapes.square,
-    keepsHeading: true, 
+    headingFollowsDirection: true,
 })
 
 const litteWhiteSquare = new Thing({ 
@@ -20,15 +20,29 @@ const litteWhiteSquare = new Thing({
     immobile: true, 
     color: 'antiquewhite', 
     shape: shapes.square,
-    keepsHeading: true,  
+    headingFollowsDirection: true,
 })
 
 const redPlanet = new Thing({
-    x: 280, y: 500, size: 50, density: 1, color: 'red', elasticity: 1
+    x: 280, 
+    y: 500, 
+    size: 50, 
+    density: 1, 
+    color: 'red', 
+    elasticity: 1, 
+    headingFollowsDirection: true, 
+    renderHeadingIndicator:true,
 }, new Force(15, Math.PI * 1))
 
 const bluePlanet = new Thing({
-    x: 250, y: 210, size: 10, density: 1, color: 'blue', elasticity: 1
+    x: 250, 
+    y: 210, 
+    size: 10, 
+    density: 1, 
+    color: 'blue', 
+    elasticity: 1, 
+    headingFollowsDirection: true,
+    renderHeadingIndicator:true,
 }, new Force(0, Math.PI * 1.5))
 
 

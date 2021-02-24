@@ -11,7 +11,7 @@ class SpaceShipData implements ThingData {
     density?: number
     shape?: Shape
 
-    keepsHeading?: true
+    headingFollowsDirection?: false
     fillColor?: string
     thrust?: number
     maxThrust?: number
@@ -21,7 +21,6 @@ class SpaceShip extends Thing {
     data: SpaceShipData
     constructor(config: SpaceShipData, momentum: Force = null) {
         super(config, momentum);
-        this.data.keepsHeading = true
         this.data.color = config.color || 'red'
         this.data.fillColor = config.fillColor || 'white'
         this.data.thrust = config.thrust || 0

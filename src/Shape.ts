@@ -87,46 +87,12 @@ const circle = new Shape({
         }
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
-        const { x, y, size, color = 'white', heading } = thisThing.data
-
-        const renderPathAhead = false
-
-        if (renderPathAhead) {
-            const rightX = getVectorX(thisThing.data.size, thisThing.momentum.direction + _90deg)
-            const rightY = getVectorY(thisThing.data.size, thisThing.momentum.direction + _90deg)
-
-            const pathArea: Point[] = [
-                { x: thisThing.data.x + rightX, y: thisThing.data.y + rightY },
-                { x: thisThing.data.x - rightX, y: thisThing.data.y - rightY },
-                { x: thisThing.data.x + thisThing.momentum.vectorX - rightX, y: thisThing.data.y + thisThing.momentum.vectorY - rightY },
-                { x: thisThing.data.x + thisThing.momentum.vectorX + rightX, y: thisThing.data.y + thisThing.momentum.vectorY + rightY },
-            ]
-
-            ctx.beginPath();
-            ctx.fillStyle = 'yellow';
-            ctx.moveTo(pathArea[0].x, pathArea[0].y)
-            for (let i = 1; i < pathArea.length; i++) {
-                ctx.lineTo(pathArea[i].x, pathArea[i].y)
-            }
-            ctx.lineTo(pathArea[0].x, pathArea[0].y)
-            ctx.fill();
-        }
+        const { x, y, size, color = 'white' } = thisThing.data
 
         ctx.beginPath();
         ctx.fillStyle = color;
         ctx.arc(x, y, size, 0, Math.PI * 2)
         ctx.fill();
-
-        let frontPoint = {
-            x: x + getVectorX(size, heading),
-            y: y + getVectorY(size, heading)
-        }
-
-        ctx.beginPath()
-        ctx.strokeStyle = 'black';
-        ctx.moveTo(x, y)
-        ctx.lineTo(frontPoint.x, frontPoint.y)
-        ctx.stroke()
 
     }
 })
@@ -184,9 +150,8 @@ const square = new Shape({
         }
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
-        const { size, color = 'white', heading } = thisThing.data
+        const { color = 'white' } = thisThing.data
         const { polygonPoints } = thisThing
-        const { x, y } = thisThing.shapeValues
 
         ctx.beginPath();
         ctx.fillStyle = color;
@@ -197,17 +162,6 @@ const square = new Shape({
         ctx.lineTo(polygonPoints[0].x, polygonPoints[0].y)
         ctx.fill();
 
-
-        let frontPoint = {
-            x: x + getVectorX(size, heading),
-            y: y + getVectorY(size, heading)
-        }
-
-        ctx.beginPath()
-        ctx.strokeStyle = 'black';
-        ctx.moveTo(x, y)
-        ctx.lineTo(frontPoint.x, frontPoint.y)
-        ctx.stroke()
     }
 })
 

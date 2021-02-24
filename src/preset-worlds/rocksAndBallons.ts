@@ -8,6 +8,7 @@ function makeRock() {
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 4
     let elasticity = .25
+    let headingFollowsDirection = true
     let color = 'gray'
     let direction = Math.random() > .25
         ? Math.random() > .5
@@ -15,7 +16,7 @@ function makeRock() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, elasticity })
+    return new Thing({ x, y, size, density, color, elasticity, headingFollowsDirection })
 }
 
 function makeBallon() {
@@ -25,6 +26,7 @@ function makeBallon() {
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 0.1
     let elasticity = .90
+    let headingFollowsDirection = true
     let color = 'red'
     let direction = Math.random() > .25
         ? Math.random() > .5
@@ -32,7 +34,7 @@ function makeBallon() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, elasticity })
+    return new Thing({ x, y, size, density, color, elasticity, headingFollowsDirection })
 }
 
 function makeRocksAndBallons(amount: number) {

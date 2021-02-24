@@ -1,9 +1,11 @@
 import { World } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY, Point } from './geometry'
+import { getVectorX, getVectorY, Point, _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
+import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
+
 
 
 interface ThingData {
@@ -11,12 +13,14 @@ interface ThingData {
     y: number
     heading?: number
     size?: number
-    keepsHeading?: boolean
+    headingFollowsDirection?: boolean
     shape?: Shape
     color?: string
     density?: number
     elasticity?: number
     immobile?: boolean
+    renderHeadingIndicator?: boolean
+    renderPathAhead?: boolean
 }
 
 
@@ -30,8 +34,10 @@ class Thing {
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
         this.data.shape = this.data.shape || shapes.circle
-        this.data.keepsHeading = config.keepsHeading || false
+        this.data.headingFollowsDirection = config.headingFollowsDirection || false
         this.data.immobile = config.immobile || false
+        this.data.renderHeadingIndicator = config.renderHeadingIndicator || false
+        this.data.renderPathAhead = config.renderPathAhead || false
         this.data.elasticity = typeof this.data.elasticity === 'number' ? this.data.elasticity : 1
         this.momentum = momentum || Force.none
     }
@@ -111,7 +117,7 @@ class Thing {
             this.data.x = right > this.world.width ? this.world.width - radius : this.data.x
         }
 
-        if (!this.data.keepsHeading) {
+        if (this.data.headingFollowsDirection) {
             this.data.heading = this.momentum.direction
         }
     }
@@ -151,7 +157,15 @@ class Thing {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {
+        if (this.data.renderPathAhead) {
+            renderPathAhead.onCanvas(ctx, this);
+        }
+
         this.data.shape.renderOnCanvas(ctx, this);
+
+        if (this.data.renderHeadingIndicator) {
+            renderHeadingIndicator.onCanvas(ctx,this)
+        }
     }
 
     checkIfContainsPoint(point: { x: number, y: number }) {
