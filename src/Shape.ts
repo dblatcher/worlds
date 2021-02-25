@@ -1,4 +1,4 @@
-import { areCirclesIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, Point, _90deg } from "./geometry"
+import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, Point, _90deg } from "./geometry"
 import { Thing } from "./Thing"
 
 
@@ -82,6 +82,8 @@ const circle = new Shape({
 
             case 'circle':
                 return areCirclesIntersecting(thisThing.shapeValues, otherThing.shapeValues)
+            case 'square':
+                return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThing.polygonPoints)
             default:
                 return false
         }
@@ -142,9 +144,10 @@ const square = new Shape({
     intersectingWithShape(otherThing: Thing) {
         const thisThing = this as Thing
         switch (otherThing.data.shape.id) {
-
             case 'square':
+                arePolygonsIntersecting(otherThing.polygonPoints, thisThing.polygonPoints)
             case 'circle':
+                return areCircleAndPolygonIntersecting(otherThing.shapeValues, thisThing.polygonPoints)
             default:
                 return false
         }
