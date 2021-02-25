@@ -37,7 +37,7 @@ function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
     const edgesCrossedAtStart = getEdgesCrossed(body)
 
     if (edgesCrossedAtStart.length > 0) {
-        console.warn({ item, edgesCrossedAtStart })
+   //     console.warn({ item, edgesCrossedAtStart })
     }
 
     if (edgesCrossedAtEnd.length === 0) { return null }
@@ -304,8 +304,8 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionR
             impactPoint: intersectionsFromInside[0].point,
             wallAngle: Geometry.getHeadingFromPointToPoint(...intersectionsFromInside[0].edge),
             stopPoint: {
-                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius, directionToImpactPoint),
-                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius, directionToImpactPoint)
+                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius+1, directionToImpactPoint),
+                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius+1, directionToImpactPoint)
             },
             item1: item1,
             item2: item2,

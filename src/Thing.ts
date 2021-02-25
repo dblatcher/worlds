@@ -42,6 +42,10 @@ class Thing {
         this.momentum = momentum || Force.none
     }
 
+    duplicate() {
+        return new Thing ( Object.assign({}, this.data),  new Force (this.momentum.magnitude, this.momentum.direction))
+    }
+
     // TO DO - delegate mass to Shape
     get mass() {
         const { size, density } = this.data
@@ -102,24 +106,43 @@ class Thing {
     }
 
     move() {
-        const { top, bottom, radius, left, right } = this.shapeValues
+        const copyOfThis = this.duplicate();
+        const { top, bottom, radius, left, right } = copyOfThis.shapeValues
 
         if (!this.data.immobile) {
-            this.data.y += this.momentum.vectorY
-            this.data.x += this.momentum.vectorX
+            copyOfThis.data.y += copyOfThis.momentum.vectorY
+            copyOfThis.data.x += copyOfThis.momentum.vectorX
         }
 
-        if (this.world.hasHardEdges) {
-            this.data.y = top < 0 ? radius : this.data.y
-            this.data.y = bottom > this.world.height ? this.world.height - radius : this.data.y
+        const immobileThings = this.world.things.filter(thing => thing.data.immobile && thing !== this)
 
-            this.data.x = left < 0 ? radius : this.data.x
-            this.data.x = right > this.world.width ? this.world.width - radius : this.data.x
+        //undo any moves that would put this inside an immobile thing
+        // problem - this won't undo moves made by the physics module to separate collising things or put a thing at its stop point
+
+        let i=0;
+        for (i=0; i< immobileThings.length; i++) {
+            if (copyOfThis.isIntersectingWith(immobileThings[i])) {
+                copyOfThis.data.x = this.data.x
+                copyOfThis.data.y = this.data.y
+            } 
+        }
+
+        if (this.world.hasHardEdges && !this.data.immobile) {
+            copyOfThis.data.y = top < 0 ? radius : copyOfThis.data.y
+            copyOfThis.data.y = bottom > this.world.height ? this.world.height - radius : copyOfThis.data.y
+
+            copyOfThis.data.x = left < 0 ? radius : copyOfThis.data.x
+            copyOfThis.data.x = right > this.world.width ? this.world.width - radius : copyOfThis.data.x
         }
 
         if (this.data.headingFollowsDirection) {
-            this.data.heading = this.momentum.direction
+            copyOfThis.data.heading = copyOfThis.momentum.direction
         }
+
+
+        this.data.x = copyOfThis.data.x
+        this.data.y = copyOfThis.data.y
+        this.data.heading = copyOfThis.data.heading
     }
 
     detectCollisions(withMobileThings: boolean = true, withImmobileThings: boolean = true) {
