@@ -352,5 +352,5 @@ export {
     arePolygonsIntersecting, getPolygonLineSegments,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
-    areCircleAndPolygonIntersecting,
+    areCircleAndPolygonIntersecting, isPointInsidePolygon,
 }

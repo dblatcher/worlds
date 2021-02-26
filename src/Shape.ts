@@ -1,4 +1,4 @@
-import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, Point, _90deg } from "./geometry"
+import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, isPointInsidePolygon, Point, _90deg } from "./geometry"
 import { Thing } from "./Thing"
 
 
@@ -138,8 +138,9 @@ const square = new Shape({
 
         return [frontLeft, frontRight, backRight, backLeft]
     },
-    containsPoint() {
-        return false
+    containsPoint(point:Point) {
+        const thisThing = this as Thing
+        return isPointInsidePolygon(point, thisThing.polygonPoints)
     },
     intersectingWithShape(otherThing: Thing) {
         const thisThing = this as Thing

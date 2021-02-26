@@ -37,7 +37,7 @@ function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
     const edgesCrossedAtStart = getEdgesCrossed(body)
 
     if (edgesCrossedAtStart.length > 0) {
-   //     console.warn({ item, edgesCrossedAtStart })
+        //     console.warn({ item, edgesCrossedAtStart })
     }
 
     if (edgesCrossedAtEnd.length === 0) { return null }
@@ -288,25 +288,48 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionR
     // The mid point of each height edge are the centers of (item1) and (movedObject)
 
 
-    if (areCircleAndPolygonIntersecting(item1.shapeValues, polygonPoints)) {
+    if (areCircleAndPolygonIntersecting(circleShapeValues, polygonPoints)) {
 
         const intersectionsFromInside = squareEdges.map(edge => {
-            const point = Geometry.closestpointonline(edge[0],edge[1], circleShapeValues)
+            const point = Geometry.closestpointonline(edge[0], edge[1], circleShapeValues)
             const distance = Geometry.getDistanceBetweenPoints(point, circleShapeValues)
-            return {edge,point,distance}
+            return { edge, point, distance }
         })
-        .sort((intersectionA, intersectionB) => intersectionA.distance - intersectionB.distance)
+            .sort((intersectionA, intersectionB) => intersectionA.distance - intersectionB.distance)
 
-        const directionToImpactPoint = Geometry.getHeadingFromPointToPoint(intersectionsFromInside[0].point, circleShapeValues) 
+        // problem - assuming that center is inside!
+        const centerIsInside = Geometry.isPointInsidePolygon(circleShapeValues, polygonPoints)
+
+        let stopPoint
+
+        if (centerIsInside) {
+            const directionToImpactPoint = Geometry.getHeadingFromPointToPoint(intersectionsFromInside[0].point, circleShapeValues)
+            stopPoint = {
+                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius + 1, directionToImpactPoint),
+                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius + 1, directionToImpactPoint)
+            }
+        } else {
+            const angleOfEdge = Geometry.getHeadingFromPointToPoint(intersectionsFromInside[0].edge[0], intersectionsFromInside[0].edge[1])
+            stopPoint = {
+                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius + 1, angleOfEdge - _90deg),
+                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius + 1, angleOfEdge - _90deg)
+            }
+        }
+
+
+        if (Geometry.areCircleAndPolygonIntersecting({
+            x: stopPoint.x,
+            y: stopPoint.y,
+            radius: circleShapeValues.radius
+        }, polygonPoints)) {
+            console.warn('start inside stop point still intersecting')
+        }
 
         return {
             type: "start inside",
             impactPoint: intersectionsFromInside[0].point,
             wallAngle: Geometry.getHeadingFromPointToPoint(...intersectionsFromInside[0].edge),
-            stopPoint: {
-                x: intersectionsFromInside[0].point.x + Geometry.getVectorX(circleShapeValues.radius+1, directionToImpactPoint),
-                y: intersectionsFromInside[0].point.y + Geometry.getVectorY(circleShapeValues.radius+1, directionToImpactPoint)
-            },
+            stopPoint,
             item1: item1,
             item2: item2,
             force: force,
@@ -369,25 +392,25 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionR
         }
 
         const centerPathOfCircle: [Point, Point] = [
-            { x: item1.data.x,  y: item1.data.y },
-            { x: item1.data.x + fromCenterToFront.x*2 + vector.x, y: item1.data.y + vector.y + fromCenterToFront.y*2 },
+            { x: item1.data.x, y: item1.data.y },
+            { x: item1.data.x + fromCenterToFront.x * 2 + vector.x, y: item1.data.y + vector.y + fromCenterToFront.y * 2 },
         ]
 
-        let intersections: {edgeIndex:number, point:Point, edge:[Point, Point]}[] = []
+        let intersections: { edgeIndex: number, point: Point, edge: [Point, Point] }[] = []
 
         squareEdges.forEach((edge, edgeIndex) => {
             let point = Geometry.findIntersectionPointOfLineSegments(edge, centerPathOfCircle)
 
             if (point !== null) {
-                intersections.push({edgeIndex, point, edge})
+                intersections.push({ edgeIndex, point, edge })
             }
         })
 
         if (intersections.length > 0) {
             intersections = intersections
-            .sort((intersectionA, intersectionB) => 
-                Geometry.getDistanceBetweenPoints(intersectionA.point, circleShapeValues) - Geometry.getDistanceBetweenPoints(intersectionB.point, circleShapeValues)
-            )
+                .sort((intersectionA, intersectionB) =>
+                    Geometry.getDistanceBetweenPoints(intersectionA.point, circleShapeValues) - Geometry.getDistanceBetweenPoints(intersectionB.point, circleShapeValues)
+                )
 
 
             const pointWherePathWouldIntersectEdge = intersections[0].point
@@ -400,14 +423,14 @@ function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionR
 
             const distanceFromPointWherePathWouldIntersectEdge = circleShapeValues.radius / Math.sin(angleBetweenEdgeAndPath)
 
-            const vectorFromPointWherePathWouldIntersectEdgeToStopPoint:Vector = {
-                x: Geometry.getVectorX(-distanceFromPointWherePathWouldIntersectEdge, item1.momentum.direction ),
-                y: Geometry.getVectorY(-distanceFromPointWherePathWouldIntersectEdge, item1.momentum.direction ),
+            const vectorFromPointWherePathWouldIntersectEdgeToStopPoint: Vector = {
+                x: Geometry.getVectorX(-distanceFromPointWherePathWouldIntersectEdge, item1.momentum.direction),
+                y: Geometry.getVectorY(-distanceFromPointWherePathWouldIntersectEdge, item1.momentum.direction),
             }
 
             result.stopPoint = {
-                x: pointWherePathWouldIntersectEdge.x + vectorFromPointWherePathWouldIntersectEdgeToStopPoint.x-vector.x,
-                y: pointWherePathWouldIntersectEdge.y + vectorFromPointWherePathWouldIntersectEdgeToStopPoint.y-vector.y,
+                x: pointWherePathWouldIntersectEdge.x + vectorFromPointWherePathWouldIntersectEdgeToStopPoint.x - vector.x,
+                y: pointWherePathWouldIntersectEdge.y + vectorFromPointWherePathWouldIntersectEdgeToStopPoint.y - vector.y,
             }
 
             result.impactPoint = Geometry.closestpointonline(edgeWhichCircleWillHit[0], edgeWhichCircleWillHit[1], result.stopPoint)

@@ -3,7 +3,7 @@ import { World, shapes, Thing, Force } from '../index'
 
 function makeRock() {
 
-    let x = 50 + Math.floor(Math.random() * 900)
+    let x = 50 + Math.floor(Math.random() * 500)
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 4
@@ -21,7 +21,7 @@ function makeRock() {
 
 function makeBallon() {
 
-    let x = 50 + Math.floor(Math.random() * 900)
+    let x = 50 + Math.floor(Math.random() * 500)
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
     let density = 0.1
@@ -44,11 +44,11 @@ function makeRocksAndBallons(amount: number) {
     return things
 }
 
-const slope = new Thing({shape:shapes.square, x:-100, y:1100, size:400, heading:-2,immobile:true})
+const slope = new Thing({shape:shapes.square, x:-100, y:900, size:400, heading:-2.1,immobile:true})
 
 const rocksAndBallons = new World([
-    ...makeRocksAndBallons(5),
     slope,
+    ...makeRocksAndBallons(10),
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
