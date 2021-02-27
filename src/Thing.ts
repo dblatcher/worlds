@@ -16,6 +16,7 @@ interface ThingData {
     headingFollowsDirection?: boolean
     shape?: Shape
     color?: string
+    fillColor?: string
     density?: number
     elasticity?: number
     immobile?: boolean

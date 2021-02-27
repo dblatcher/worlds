@@ -37,6 +37,7 @@ const redPlanet = new Thing({
 const blueMatter = {
     density: 1,
     color: 'blue',
+    fillColor: 'purple',
     elasticity: 1,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,

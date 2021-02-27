@@ -1,5 +1,7 @@
 import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, isPointInsidePolygon, Point, _90deg } from "./geometry"
+import { renderCircle, renderPolygon } from "./renderFunctions"
 import { Thing } from "./Thing"
+
 
 
 interface ContainsPointFunction {
@@ -89,13 +91,8 @@ const circle = new Shape({
         }
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
-        const { x, y, size, color = 'white' } = thisThing.data
-
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill();
-
+        const { color = 'white', fillColor } = thisThing.data
+        renderCircle.onCanvas(ctx, thisThing.shapeValues, {strokeColor: color, fillColor})
     }
 })
 
@@ -138,7 +135,7 @@ const square = new Shape({
 
         return [frontLeft, frontRight, backRight, backLeft]
     },
-    containsPoint(point:Point) {
+    containsPoint(point: Point) {
         const thisThing = this as Thing
         return isPointInsidePolygon(point, thisThing.polygonPoints)
     },
@@ -154,18 +151,9 @@ const square = new Shape({
         }
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
-        const { color = 'white' } = thisThing.data
+        const { color = 'white', fillColor } = thisThing.data
         const { polygonPoints } = thisThing
-
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.moveTo(polygonPoints[0].x, polygonPoints[0].y)
-        for (let i = 1; i < polygonPoints.length; i++) {
-            ctx.lineTo(polygonPoints[i].x, polygonPoints[i].y)
-        }
-        ctx.lineTo(polygonPoints[0].x, polygonPoints[0].y)
-        ctx.fill();
-
+        renderPolygon.onCanvas(ctx, polygonPoints, {strokeColor: color, fillColor})
     }
 })
 
