@@ -94,8 +94,7 @@ class Thing {
 
     leaveWorld() {
         if (!this.world) { return }
-        this.world.things.splice(this.world.things.indexOf(this), 1)
-        this.world = null
+        this.world.thingsLeavingAtNextTick.push(this)
     }
 
     updateMomentum() {

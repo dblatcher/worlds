@@ -16,6 +16,7 @@ class World extends WorldConfig {
     canvas?: HTMLCanvasElement
     timerSpeed: number
     things: Thing[]
+    thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
 
     constructor(things: Thing[], config: WorldConfig = {}) {
@@ -34,6 +35,8 @@ class World extends WorldConfig {
 
         this.things = []
         things.forEach(thing => { thing.enterWorld(this) })
+
+        this.thingsLeavingAtNextTick = []
     }
 
     get report() {
@@ -41,6 +44,15 @@ class World extends WorldConfig {
     }
 
     tick() {
+
+        this.thingsLeavingAtNextTick.forEach(thing => {
+            if (this.things.indexOf(thing) !== -1) {
+                this.things.splice(this.things.indexOf(thing),1)
+                thing.world = null
+            }
+        })
+        this.thingsLeavingAtNextTick = []
+
         const mobileThings = this.things.filter(thing => !thing.data.immobile)
 
         // filter at each stage in case any Things have left the world during the previous stage
