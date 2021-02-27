@@ -1,11 +1,11 @@
-import { testWorld, myShip } from './preset-worlds/spaceShipTest'
+
 import { rocksAndBallons } from './preset-worlds/rocksAndBallons'
 import { galaxy } from './preset-worlds/galaxy'
 import { balance } from './preset-worlds/balance';
 import { squareTestWorld } from './preset-worlds/squareTest';
 
 import { WorldControlPanel } from './WorldControlPanel';
-import { SpaceShipControlPanel } from './spaceship/SpaceShipControlPanel'
+
 
 
 console.log("DEMO FILE")
@@ -31,13 +31,11 @@ canvas {
 }
 `
 
-const panel = new WorldControlPanel(squareTestWorld, { worldOptions: [squareTestWorld,balance, galaxy, rocksAndBallons, testWorld] })
-const shipPanel = new SpaceShipControlPanel(myShip)
+const panel = new WorldControlPanel(squareTestWorld, { worldOptions: [squareTestWorld,balance, galaxy, rocksAndBallons] })
 
 panel.world.setCanvas(canvasElement)
 
 document.head.appendChild(styleSheet)
-document.body.appendChild(shipPanel.makeElement())
 document.body.appendChild(panel.makeElement())
 
 const frame = document.createElement('div')
