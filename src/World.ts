@@ -4,7 +4,7 @@ import { Thing } from './Thing'
 class WorldConfig {
     name?: string
     width?: number
-    height?:number
+    height?: number
     gravitationalConstant?: number
     globalGravityForce?: Force
     thingsExertGravity?: boolean
@@ -43,22 +43,23 @@ class World extends WorldConfig {
     tick() {
         const mobileThings = this.things.filter(thing => !thing.data.immobile)
 
+        // filter at each stage in case any Things have left the world during the previous stage
         mobileThings.forEach(thing => { thing.updateMomentum() })
-        mobileThings.forEach(thing => {
+        mobileThings.filter(thing => thing.world == this).forEach(thing => {
             const reports = thing.detectCollisions(false, true)
             reports.forEach(report => thing.handleCollision(report))
         })
-        mobileThings.forEach(thing => {
-            const reports = thing.detectCollisions(true,false)
+        mobileThings.filter(thing => thing.world == this).forEach(thing => {
+            const reports = thing.detectCollisions(true, false)
             reports.forEach(report => thing.handleCollision(report))
         })
         if (this.hasHardEdges) {
-            mobileThings.forEach(thing => {
+            mobileThings.filter(thing => thing.world == this).forEach(thing => {
                 const reports = thing.detectWorldEdgeCollisions()
                 reports.forEach(report => thing.handleWorldEdgeCollision(report))
             })
         }
-        mobileThings.forEach(thing => { thing.move() })
+        mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
         this.renderOnCanvas()
     }
@@ -86,7 +87,7 @@ class World extends WorldConfig {
         return this
     }
 
-    setCanvas(canvasElement:HTMLCanvasElement) {
+    setCanvas(canvasElement: HTMLCanvasElement) {
         this.canvas = canvasElement
         canvasElement.setAttribute('height', this.height.toString());
         canvasElement.setAttribute('width', this.width.toString());

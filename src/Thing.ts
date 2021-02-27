@@ -43,8 +43,10 @@ class Thing {
         this.momentum = momentum || Force.none
     }
 
+    get typeId() { return 'Thing' }
+
     duplicate() {
-        return new Thing ( Object.assign({}, this.data),  new Force (this.momentum.magnitude, this.momentum.direction))
+        return new Thing(Object.assign({}, this.data), new Force(this.momentum.magnitude, this.momentum.direction))
     }
 
     // TO DO - delegate mass to Shape
@@ -120,12 +122,12 @@ class Thing {
         //undo any moves that would put this inside an immobile thing
         // problem - this won't undo moves made by the physics module to separate collising things or put a thing at its stop point
 
-        let i=0;
-        for (i=0; i< immobileThings.length; i++) {
+        let i = 0;
+        for (i = 0; i < immobileThings.length; i++) {
             if (copyOfThis.isIntersectingWith(immobileThings[i])) {
                 copyOfThis.data.x = this.data.x
                 copyOfThis.data.y = this.data.y
-            } 
+            }
         }
 
         if (this.world.hasHardEdges && !this.data.immobile) {
@@ -170,6 +172,7 @@ class Thing {
     }
 
     detectWorldEdgeCollisions() {
+        if (!this.world) { return [] }
         const reports: EdgeCollisionReport[] = []
         const edgeCollisionDetectionFunction = getEdgeCollisionDetectionFunction(this.data.shape)
         reports.push(edgeCollisionDetectionFunction(this))
@@ -188,7 +191,7 @@ class Thing {
         this.data.shape.renderOnCanvas(ctx, this);
 
         if (this.data.renderHeadingIndicator) {
-            renderHeadingIndicator.onCanvas(ctx,this)
+            renderHeadingIndicator.onCanvas(ctx, this)
         }
     }
 
