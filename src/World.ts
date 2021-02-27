@@ -1,5 +1,6 @@
 import { Force } from './Force'
 import { Thing } from './Thing'
+import {TinyEmitter} from 'tiny-emitter'
 
 class WorldConfig {
     name?: string
@@ -18,6 +19,7 @@ class World extends WorldConfig {
     things: Thing[]
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
+    emitter: TinyEmitter
 
     constructor(things: Thing[], config: WorldConfig = {}) {
         super()
@@ -37,6 +39,8 @@ class World extends WorldConfig {
         things.forEach(thing => { thing.enterWorld(this) })
 
         this.thingsLeavingAtNextTick = []
+
+        this.emitter = new TinyEmitter
     }
 
     get report() {
@@ -44,7 +48,7 @@ class World extends WorldConfig {
     }
 
     tick() {
-
+        this.emitter.emit('tick')
         this.thingsLeavingAtNextTick.forEach(thing => {
             if (this.things.indexOf(thing) !== -1) {
                 this.things.splice(this.things.indexOf(thing),1)
