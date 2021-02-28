@@ -1,8 +1,8 @@
 
-import { rocksAndBallons } from './preset-worlds/rocksAndBallons'
-import { galaxy } from './preset-worlds/galaxy'
-import { balance } from './preset-worlds/balance';
-import { squareTestWorld } from './preset-worlds/squareTest';
+import { rocksAndBallons } from './rocksAndBallons'
+import { galaxy } from './galaxy'
+import { balance } from './balance';
+import { squareTestWorld } from './squareTest';
 
 import { WorldControlPanel } from './WorldControlPanel';
 
