@@ -4,8 +4,63 @@ import { Force } from './Force'
 import * as Geometry from './geometry'
 import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
+import { Fluid } from './Fluid'
 
 
+function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, thing: Thing, fluid: Fluid): Force {
+    if (!globalGravityForce) { return Force.none }
+
+    const { shapeValues } = thing
+    const distanceAboveFluidSurface = fluid.level - shapeValues.top
+
+    // https://en.wikipedia.org/wiki/Spherical_cap
+    const volumeAboveSurface = distanceAboveFluidSurface < 0
+    ? 0
+    : ((Math.PI * distanceAboveFluidSurface**2) / 3) * ((3*shapeValues.radius) - distanceAboveFluidSurface )
+
+    const volumeOfFluidDisplaced = thing.volume - volumeAboveSurface
+
+    // boyancy = fluid.density * [volume of fluid displaced] * g
+    const bouyancy = gravitationalConstant * globalGravityForce.magnitude * fluid.data.density * volumeOfFluidDisplaced
+    return new Force(bouyancy, globalGravityForce.direction + Math.PI)
+}
+
+
+function calculateDragForce(body:Thing, currentForce:Force):Force {
+    if (!body.world) { return Force.none }
+    const { fluids, airDensity } = body.world
+
+    const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
+    let velocity = currentForce.magnitude
+
+    // to do - build list of the mediums (air, fluid) on the body's path with distances traveled through each
+    // calculate the drag through the first
+    // if drag through the first would stop the body reaching the second
+    // calculate the drag through the remaining velocity in the second
+    // apply total drag
+
+    // to do after that - calculat effect of REFRACTION at medium boundary....
+
+    let fluidThingStartsIn: Fluid = null
+    fluids.forEach(fluid => {
+        if (Geometry.isPointInsidePolygon(body.shapeValues, fluid.polygonPoints)) {
+            fluidThingStartsIn = fluid
+        }
+    })
+
+    const drag = calculateDragThroughMedium(fluidThingStartsIn ? fluidThingStartsIn.data.density : airDensity, body.mass, velocity, crossSectionalArea)
+
+    return new Force(
+        Math.min(drag, velocity),
+        currentForce.direction + Math.PI
+    )
+
+    // https://en.wikipedia.org/wiki/Drag_(physics)
+    //dragForce = (1/2) * density * (speed**2) * dragCoefficient * crossSectionalArea
+    function calculateDragThroughMedium(mediumDensity: number, bodyMass: number, bodyVelocity: number, bodyCrossSectionalArea: number, dragCoefficient: number = 1) {
+        return ((1 / 2) * mediumDensity * (bodyVelocity * 2) * dragCoefficient * bodyCrossSectionalArea) / bodyMass
+    }
+}
 
 /**
  * Calculation the gravitational effect of one Thing on another
@@ -217,7 +272,6 @@ function bounceCircleOffSquare(collision: CollisionReport) {
 
     if (collision.item2.data.immobile) {
 
-
         const copyOfCircle = collision.item1.duplicate()
         copyOfCircle.data.x = collision.stopPoint.x
         copyOfCircle.data.y = collision.stopPoint.y
@@ -269,4 +323,4 @@ function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
 
 }
 
-export { getGravitationalForce, bounceCircleOffCircle, bounceOffWorldEdge, handleCollisionAccordingToShape }
+export { getUpthrustForce, getGravitationalForce, bounceCircleOffCircle, bounceOffWorldEdge, handleCollisionAccordingToShape, calculateDragForce }

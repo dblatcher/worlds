@@ -1,10 +1,12 @@
 import { World } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY, Point, _90deg } from './geometry'
-import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape } from './physics'
+import { getVectorX, getVectorY, Point, reverseHeading, _90deg } from './geometry'
+import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
+import { Fluid } from './Fluid'
+
 
 
 
@@ -43,16 +45,24 @@ class Thing {
         this.momentum = momentum || Force.none
     }
 
+    get isThing() { return true }
+    get isFluid() { return false }
     get typeId() { return 'Thing' }
 
     duplicate() {
         return new Thing(Object.assign({}, this.data), new Force(this.momentum.magnitude, this.momentum.direction))
     }
 
-    // TO DO - delegate mass to Shape
+    // TO DO - delegate mass + volume to Shape
+    get volume() {
+        const { size } = this.data
+        return (4 / 3) * size ** 3 * Math.PI
+    }
+
     get mass() {
-        const { size, density } = this.data
-        return size * size * Math.PI * density
+        const { density } = this.data
+        const { volume } = this
+        return volume * density
     }
 
     get polygonPoints() {
@@ -63,7 +73,7 @@ class Thing {
         return this.data.shape.getShapeValues.apply(this, []) as ShapeValues
     }
 
-    get gravitationalForces() {
+    get gravitationalForces(): Force {
         if (!this.world) { return Force.none }
         const { globalGravityForce, gravitationalConstant, things, thingsExertGravity, minimumMassToExertGravity } = this.world
 
@@ -86,6 +96,20 @@ class Thing {
         return Force.combine(forces)
     }
 
+    get upthrustForces(): Force {
+        if (!this.world) { return Force.none }
+        const { gravitationalConstant, fluids, globalGravityForce } = this.world
+        let forces: Force[] = []
+
+        fluids.forEach(fluid => {
+            if (this.isIntersectingWith(fluid)) {
+                forces.push(getUpthrustForce(gravitationalConstant, globalGravityForce, this, fluid))
+            }
+        })
+
+        return Force.combine(forces)
+    }
+
     enterWorld(world: World) {
         if (this.world) { this.leaveWorld() }
         world.things.push(this)
@@ -98,13 +122,19 @@ class Thing {
     }
 
     updateMomentum() {
-        const { gravitationalForces, mass } = this
+        const { gravitationalForces, mass, upthrustForces } = this
         if (this.data.immobile) {
             this.momentum = Force.none
             return
         }
         gravitationalForces.magnitude = gravitationalForces.magnitude / mass
-        this.momentum = Force.combine([this.momentum, gravitationalForces])
+        upthrustForces.magnitude = upthrustForces.magnitude / mass
+
+        // console.log(`gravity: ${gravitationalForces.magnitude} : upthrust: ${upthrustForces.magnitude} = ${upthrustForces.magnitude-gravitationalForces.magnitude}`)
+
+        const drag = calculateDragForce(this, Force.combine([this.momentum, gravitationalForces, upthrustForces]))
+
+        this.momentum = Force.combine([this.momentum, gravitationalForces, upthrustForces, drag])
     }
 
     move() {
@@ -198,7 +228,7 @@ class Thing {
         return this.data.shape.containsPoint.apply(this, [point]) as boolean
     }
 
-    isIntersectingWith(otherThing: Thing) {
+    isIntersectingWith(otherThing: Thing | Fluid) {
         return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
     }
 }

@@ -66,7 +66,7 @@ const squareTestWorld = new World([
 ], {
     height: 800,
     width: 800,
-
+    airDensity: .5,
     gravitationalConstant: 0,
     thingsExertGravity: true,
     minimumMassToExertGravity: 1000,

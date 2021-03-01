@@ -3,6 +3,7 @@ import { rocksAndBallons } from './rocksAndBallons'
 import { galaxy } from './galaxy'
 import { balance } from './balance';
 import { squareTestWorld } from './squareTest';
+import { fluidTest } from './fluidTest';
 
 import { WorldControlPanel } from './WorldControlPanel';
 
@@ -31,7 +32,7 @@ canvas {
 }
 `
 
-const panel = new WorldControlPanel(squareTestWorld, { worldOptions: [squareTestWorld,balance, galaxy, rocksAndBallons] })
+const panel = new WorldControlPanel(fluidTest, { worldOptions: [fluidTest,squareTestWorld,balance, galaxy, rocksAndBallons] })
 
 panel.world.setCanvas(canvasElement)
 

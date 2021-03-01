@@ -1,6 +1,7 @@
 import { Force } from './Force'
 import { Thing } from './Thing'
-import {TinyEmitter} from 'tiny-emitter'
+import { Fluid } from './Fluid'
+import { TinyEmitter } from 'tiny-emitter'
 
 class WorldConfig {
     name?: string
@@ -11,17 +12,19 @@ class WorldConfig {
     thingsExertGravity?: boolean
     hasHardEdges?: boolean
     minimumMassToExertGravity?: number
+    airDensity?: number
 }
 
 class World extends WorldConfig {
     canvas?: HTMLCanvasElement
     timerSpeed: number
     things: Thing[]
+    fluids: Fluid[]
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
 
-    constructor(things: Thing[], config: WorldConfig = {}) {
+    constructor(contents: (Thing|Fluid)[], config: WorldConfig = {}) {
         super()
         this.timerSpeed = 0
 
@@ -31,12 +34,19 @@ class World extends WorldConfig {
 
         this.gravitationalConstant = config.gravitationalConstant || 0
         this.minimumMassToExertGravity = config.minimumMassToExertGravity || 0
+        this.airDensity = config.airDensity || 0
         this.globalGravityForce = config.globalGravityForce || null
         this.thingsExertGravity = config.thingsExertGravity || false
         this.hasHardEdges = config.hasHardEdges || false
 
+        const things = contents.filter(content => content.isThing) as Thing[]
+        const fluids = contents.filter(content => content.isFluid) as Fluid[]
+
         this.things = []
         things.forEach(thing => { thing.enterWorld(this) })
+
+        this.fluids = []
+        fluids.forEach(fluid => fluid.enterWorld(this))
 
         this.thingsLeavingAtNextTick = []
 
@@ -51,7 +61,7 @@ class World extends WorldConfig {
         this.emitter.emit('tick')
         this.thingsLeavingAtNextTick.forEach(thing => {
             if (this.things.indexOf(thing) !== -1) {
-                this.things.splice(this.things.indexOf(thing),1)
+                this.things.splice(this.things.indexOf(thing), 1)
                 thing.world = null
             }
         })
@@ -116,6 +126,10 @@ class World extends WorldConfig {
 
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.fluids.forEach(fluid => {
+            fluid.renderOnCanvas(ctx)
+        })
 
         this.things.forEach(thing => {
             thing.renderOnCanvas(ctx)

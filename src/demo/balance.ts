@@ -23,14 +23,14 @@ const balance = new World([
     bluePlanet,
     // pinkPlanet,
 ], {
-    gravitationalConstant: .2,
+    gravitationalConstant: .005,
     height:1200,
     thingsExertGravity: true,
-    minimumMassToExertGravity: 10000,
+    minimumMassToExertGravity: 100000,
     hasHardEdges: true,
     name: "balance",
 });
 
-
+console.log(balance.things.map(thing => thing.mass))
 
 export { balance }
