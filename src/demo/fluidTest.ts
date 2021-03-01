@@ -17,7 +17,7 @@ function makeRock() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection })
+    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
 }
 
 function makeBallon() {
@@ -25,7 +25,7 @@ function makeBallon() {
     let x = 50 + Math.floor(Math.random() * 900)
     let y = 50 + Math.floor(Math.random() * 400)
     let size = 50 + Math.floor(Math.random() * 20)
-    let density = .5
+    let density = .9
     let elasticity = .75
     let headingFollowsDirection = true
     let color = 'red'
@@ -36,7 +36,7 @@ function makeBallon() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection })
+    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
 }
 
 function makeRocksAndBallons(amount: number) {
@@ -46,15 +46,34 @@ function makeRocksAndBallons(amount: number) {
     return things
 }
 
+const ballonBelowSurface = makeBallon()
+ballonBelowSurface.data.y = 1800
+
 const water = new Fluid({
-    volume: 1200000,
+    volume: 800000,
     color: 'blue',
     density: 1
 })
 
+const oil = new Fluid({
+    volume: 200000,
+    color: 'yellow',
+    density: .75
+})
+
+const mercury = new Fluid({
+    volume: 200000,
+    color: 'white',
+    density: 5
+})
+
+
 const fluidTest = new World([
     water,
+    mercury,
+    oil,
     ...makeRocksAndBallons(3),
+    ballonBelowSurface
 ], {
     globalGravityForce: new Force(1, 0),
     height: 2000,

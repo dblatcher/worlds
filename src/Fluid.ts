@@ -20,14 +20,33 @@ class Fluid {
     get isThing() { return false }
     get typeId() { return 'Fluid' }
 
-    get baselevel() {
+
+    get depth() {
         if (!this.world) { return 0 }
-        return this.world.height - (this.data.volume / this.world.width)
+        return this.data.volume / this.world.width
     }
 
-    get level() {
+    get surfaceLevel() {
+        if (!this.world) { return 0 }
+        return this.bottomLevel - (this.depth)
         // to do - raise y volume of submerged things
-        return this.baselevel
+    }
+
+    get bottomLevel() {
+        if (!this.world) { return 0 }
+        const {fluids} = this.world
+
+        // don't have fluids of same density..?
+        const sortedFluidsBelowThis = fluids
+        .filter(fluid => fluid !== this && fluid.data.density >= this.data.density)
+        .sort((fluidA, fluidB) => fluidB.data.density - fluidA.data.density)
+
+
+        const depthOfFluidsBelow = sortedFluidsBelowThis.reduce(
+            (accumulator, fluid) => accumulator += fluid.depth,0
+        )
+
+        return this.world.height - depthOfFluidsBelow
     }
 
     /**
@@ -41,10 +60,10 @@ class Fluid {
         if (!this.world) { return [] }
 
         const points: Point[] = [
-            { x: 0, y: this.world.height },
-            { x: 0, y: this.level },
-            { x: this.world.width, y: this.level },
-            { x: this.world.width, y: this.world.height },
+            { x: 0, y: this.bottomLevel },
+            { x: 0, y: this.surfaceLevel },
+            { x: this.world.width, y: this.surfaceLevel },
+            { x: this.world.width, y: this.bottomLevel },
         ]
         return points
     }

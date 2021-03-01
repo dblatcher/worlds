@@ -11,14 +11,19 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
     if (!globalGravityForce) { return Force.none }
 
     const { shapeValues } = thing
-    const distanceAboveFluidSurface = fluid.level - shapeValues.top
+    const distanceAboveFluidSurface = fluid.surfaceLevel - shapeValues.top
 
     // https://en.wikipedia.org/wiki/Spherical_cap
     const volumeAboveSurface = distanceAboveFluidSurface < 0
     ? 0
     : ((Math.PI * distanceAboveFluidSurface**2) / 3) * ((3*shapeValues.radius) - distanceAboveFluidSurface )
 
-    const volumeOfFluidDisplaced = thing.volume - volumeAboveSurface
+    const distanceBelowFluidBottom = shapeValues.bottom - fluid.bottomLevel
+    const volumeBelowBottom= distanceBelowFluidBottom < 0
+    ? 0
+    : ((Math.PI * distanceBelowFluidBottom**2) / 3) * ((3*shapeValues.radius) - distanceBelowFluidBottom )
+
+    const volumeOfFluidDisplaced = thing.volume - volumeAboveSurface - volumeBelowBottom
 
     // boyancy = fluid.density * [volume of fluid displaced] * g
     const bouyancy = gravitationalConstant * globalGravityForce.magnitude * fluid.data.density * volumeOfFluidDisplaced
