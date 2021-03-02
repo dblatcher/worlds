@@ -6,6 +6,7 @@ interface FluidData {
     volume: number
     density: number
     color: string
+    drainRate?: number
 }
 
 class Fluid {
@@ -14,6 +15,7 @@ class Fluid {
 
     constructor(config: FluidData) {
         this.data = config
+        this.data.drainRate = config.drainRate || 0
     }
 
     get isFluid() { return true }
@@ -80,6 +82,11 @@ class Fluid {
             this.world.fluids.splice(this.world.fluids.indexOf(this), 1)
         }
         this.world = null
+    }
+
+    drain() {
+        this.data.volume = this.data.volume - this.data.drainRate
+        if (this.data.volume < 0 ) {this.data.volume = 0}
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D) {

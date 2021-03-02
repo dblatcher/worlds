@@ -58,7 +58,6 @@ class World extends WorldConfig {
     }
 
     tick() {
-        this.emitter.emit('tick')
         this.thingsLeavingAtNextTick.forEach(thing => {
             if (this.things.indexOf(thing) !== -1) {
                 this.things.splice(this.things.indexOf(thing), 1)
@@ -66,6 +65,8 @@ class World extends WorldConfig {
             }
         })
         this.thingsLeavingAtNextTick = []
+
+        this.fluids.forEach(fluid => fluid.drain())
 
         const mobileThings = this.things.filter(thing => !thing.data.immobile)
 
@@ -88,6 +89,7 @@ class World extends WorldConfig {
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
         this.renderOnCanvas()
+        this.emitter.emit('tick')
     }
 
     set ticksPerSecond(speed: number) {

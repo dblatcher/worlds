@@ -52,19 +52,21 @@ ballonBelowSurface.data.y = 1800
 const water = new Fluid({
     volume: 800000,
     color: 'blue',
-    density: 1
+    density: 1,
+    drainRate: 500,
 })
 
 const oil = new Fluid({
-    volume: 200000,
+    volume: 50000,
     color: 'yellow',
-    density: .75
+    density: .9
 })
 
 const mercury = new Fluid({
     volume: 200000,
     color: 'white',
-    density: 5
+    density: 13.5,
+    drainRate: -100,
 })
 
 
