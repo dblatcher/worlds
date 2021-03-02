@@ -24,8 +24,8 @@ function makeBallon() {
     let x = 50 + Math.floor(Math.random() * 500)
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
-    let density = 0.1
-    let elasticity = .90
+    let density = 1
+    let elasticity = .8
     let headingFollowsDirection = true
     let color = 'red'
     let direction = Math.random() > .25

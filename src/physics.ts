@@ -123,13 +123,13 @@ function findBounceOfImmobileThingForce(collisionReport: CollisionReport) {
 }
 
 /**
- * calculate the vectors at which two colliding bodies will bounce off each other
+ * calculate the vectors at which two round colliding bodies will bounce off each other
  * with an elastic collision
  *
  * @param collision the collision report
  * @returns the vectors they will bounce off at
  */
-function findElasticCollisionVectors(collision: CollisionReport) {
+function findRoundBounceCollisionVectorsMethod2(collision: CollisionReport) {
     const { item1, item2 } = collision
     //step 1 - normal unit vector and tangent unit vector
     var n = { x: item2.shapeValues.x - item1.shapeValues.x, y: item2.shapeValues.y - item1.shapeValues.y, mag: 0 };
@@ -167,6 +167,13 @@ function findElasticCollisionVectors(collision: CollisionReport) {
     // step 7 - add component vectors
     var newVector1 = { x: V_1n.x + V_1t.x, y: V_1n.y + V_1t.y } as Vector;
     var newVector2 = { x: V_2n.x + V_2t.x, y: V_2n.y + V_2t.y } as Vector;
+
+    const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity) / 2)
+
+    newVector1.x = newVector1.x * coefficientOfRestitution
+    newVector1.y = newVector1.y * coefficientOfRestitution
+    newVector2.x = newVector2.x * coefficientOfRestitution
+    newVector2.y = newVector2.y * coefficientOfRestitution
 
     return {
         vector1: newVector1,
@@ -214,13 +221,14 @@ function separateCollidingBodies(collision: CollisionReport) {
 
 
 /**
+ * NOT USING - LOOK WRONG IN PRACTISE
  * calculate the vectors at which two colliding bodies will bounce off each other
  * taking account of energy lost to inelasticity
  *
  * @param collision the collision report
  * @returns the vectors they will bounce off at
  */
-function findInelasticCollisionVectors(collision: CollisionReport) {
+function findRoundBounceCollisionVectorsMethod1(collision: CollisionReport) {
     //step 1 - normal unit vector and tangent unit vector
     const { item1, item2 } = collision
     const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity) / 2)
@@ -266,9 +274,9 @@ function bounceCircleOffCircle(collision: CollisionReport) {
     if (collision.item2.data.immobile) {
         collision.item1.momentum = findBounceOfImmobileThingForce(collision)
     } else {
-        const bounce = findInelasticCollisionVectors(collision)
+        const bounce = findRoundBounceCollisionVectorsMethod2(collision)
         collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
-        collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+        collision.item2.momentum = Force.combine([Force.fromVector(bounce.vector2.x, bounce.vector2.y), collision.item2.momentum])
     }
 };
 

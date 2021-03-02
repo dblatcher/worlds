@@ -34,6 +34,17 @@ const redPlanet = new Thing({
     renderHeadingIndicator: true,
 }, new Force(15, Math.PI * 1))
 
+const greenPlanet = new Thing({
+    x: 400,
+    y: 300,
+    size: 50,
+    density: 1,
+    color: 'green',
+    elasticity: .5,
+    headingFollowsDirection: true,
+    renderHeadingIndicator: true,
+}, new Force(1, Math.PI * 1.5))
+
 const blueMatter = {
     density: 1,
     color: 'blue',
@@ -63,6 +74,7 @@ const squareTestWorld = new World([
     litteWhiteSquare,
     ...bluePlanets,
     redPlanet,
+    greenPlanet,
 ], {
     height: 800,
     width: 800,
