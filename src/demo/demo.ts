@@ -45,4 +45,4 @@ frame.classList.add('frame')
 frame.appendChild(canvasElement);
 document.body.appendChild(frame);
 
-window.panel = panel
+(window as any).panel = panel
