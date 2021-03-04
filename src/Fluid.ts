@@ -1,6 +1,6 @@
 import { Point } from "./geometry"
 import { renderPolygon } from "./renderFunctions"
-import { World } from "./World"
+import { ViewPort, World } from "./World"
 
 interface FluidData {
     volume: number
@@ -89,8 +89,8 @@ class Fluid {
         if (this.data.volume < 0 ) {this.data.volume = 0}
     }
 
-    renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        renderPolygon.onCanvas(ctx, this.polygonPoints, { fillColor: this.data.color })
+    renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort:ViewPort) {
+        renderPolygon.onCanvas(ctx, this.polygonPoints, { fillColor: this.data.color }, viewPort)
     }
 
 }

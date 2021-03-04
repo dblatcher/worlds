@@ -1,4 +1,5 @@
-import { World, shapes, Thing, Force, Fluid } from '../index'
+import { World, shapes, Thing, Force, Fluid, ViewPort } from '../index'
+
 
 
 function makeRock() {
@@ -51,7 +52,7 @@ ballonBelowSurface.data.y = 1800
 
 const water = new Fluid({
     volume: 800000,
-    color: 'blue',
+    color: 'rgba(0,50,250,.5)',
     density: 1,
     drainRate: 500,
 })
@@ -69,6 +70,9 @@ const mercury = new Fluid({
     drainRate: -100,
 })
 
+const worldHeight = 3000
+const worldWidth = 1000
+const viewPortHeight = 2000
 
 const fluidTest = new World([
     water,
@@ -78,11 +82,19 @@ const fluidTest = new World([
     ballonBelowSurface
 ], {
     globalGravityForce: new Force(1, 0),
-    height: 2000,
+    width: worldWidth,
+    height: worldHeight,
     hasHardEdges: true,
     gravitationalConstant: 1,
     name: "fluidTest",
     airDensity: .1,
+    viewPort: new ViewPort({
+        x: worldWidth / 2,
+        y: worldHeight - viewPortHeight/2,
+        width: worldWidth,
+        height: viewPortHeight,
+        magnify: 1,
+    }),
 })
 
 export { fluidTest }

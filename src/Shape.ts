@@ -2,6 +2,7 @@ import { Fluid } from "./Fluid"
 import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, isPointInsidePolygon, Point, _90deg } from "./geometry"
 import { renderCircle, renderPolygon } from "./renderFunctions"
 import { Thing } from "./Thing"
+import { ViewPort } from "./World"
 
 
 
@@ -22,7 +23,7 @@ interface PolygonPointsFunction {
 }
 
 interface CanvasRenderFunction {
-    (ctx: CanvasRenderingContext2D, thisThing: Thing): void
+    (ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort): void
 }
 
 class ShapeConfig {
@@ -98,9 +99,9 @@ const circle = new Shape({
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort) {
         const { color = 'white', fillColor } = thisThing.data
-        renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor })
+        renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor }, viewPort)
     }
 })
 
@@ -165,10 +166,10 @@ const square = new Shape({
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort) {
         const { color = 'white', fillColor } = thisThing.data
         const { polygonPoints } = thisThing
-        renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor })
+        renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor }, viewPort)
     }
 })
 

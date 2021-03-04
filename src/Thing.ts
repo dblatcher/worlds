@@ -1,4 +1,4 @@
-import { World } from './World'
+import { World, ViewPort } from './World'
 import { Force } from './Force'
 import { getVectorX, getVectorY, Point, reverseHeading, _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
@@ -6,7 +6,6 @@ import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport
 import { Shape, shapes, ShapeValues } from './Shape'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
 import { Fluid } from './Fluid'
-
 
 
 
@@ -212,15 +211,15 @@ class Thing {
         if (report) { bounceOffWorldEdge(report) }
     }
 
-    renderOnCanvas(ctx: CanvasRenderingContext2D) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         if (this.data.renderPathAhead) {
-            renderPathAhead.onCanvas(ctx, this);
+            renderPathAhead.onCanvas(ctx, this, viewPort);
         }
 
-        this.data.shape.renderOnCanvas(ctx, this);
+        this.data.shape.renderOnCanvas(ctx, this, viewPort);
 
         if (this.data.renderHeadingIndicator) {
-            renderHeadingIndicator.onCanvas(ctx, this)
+            renderHeadingIndicator.onCanvas(ctx, this, viewPort)
         }
     }
 
@@ -235,20 +234,22 @@ class Thing {
 
 
 class LinedThing extends Thing {
-    renderOnCanvas(ctx: CanvasRenderingContext2D) {
-        this.data.shape.renderOnCanvas(ctx, this);
+    renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort:ViewPort) {
+        this.data.shape.renderOnCanvas(ctx, this, viewPort);
         const { x, y, size, heading } = this.data
 
-        let midPoint = {
+        const center = viewPort.mapPoint(this.shapeValues)
+
+        let midPoint = viewPort.mapPoint({
             x: x + getVectorX(size / 2, heading),
             y: y + getVectorY(size / 2, heading)
-        }
+        })
 
         ctx.beginPath()
         ctx.moveTo(midPoint.x, midPoint.y)
-        ctx.lineTo(midPoint.x, y)
+        ctx.lineTo(midPoint.x, center.y)
         ctx.moveTo(midPoint.x, midPoint.y)
-        ctx.lineTo(x, midPoint.y)
+        ctx.lineTo(center.x, midPoint.y)
         ctx.stroke()
     }
 }

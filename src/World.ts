@@ -2,6 +2,9 @@ import { Force } from './Force'
 import { Thing } from './Thing'
 import { Fluid } from './Fluid'
 import { TinyEmitter } from 'tiny-emitter'
+import { ViewPort } from './ViewPort'
+
+
 
 class WorldConfig {
     name?: string
@@ -13,6 +16,7 @@ class WorldConfig {
     hasHardEdges?: boolean
     minimumMassToExertGravity?: number
     airDensity?: number
+    viewPort?: ViewPort
 }
 
 class World extends WorldConfig {
@@ -23,8 +27,9 @@ class World extends WorldConfig {
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
+    viewPort: ViewPort
 
-    constructor(contents: (Thing|Fluid)[], config: WorldConfig = {}) {
+    constructor(contents: (Thing | Fluid)[], config: WorldConfig = {}) {
         super()
         this.timerSpeed = 0
 
@@ -50,6 +55,8 @@ class World extends WorldConfig {
 
         this.thingsLeavingAtNextTick = []
 
+        this.viewPort = config.viewPort || ViewPort.full(this)
+        this.viewPort.world = this
         this.emitter = new TinyEmitter
     }
 
@@ -117,8 +124,9 @@ class World extends WorldConfig {
 
     setCanvas(canvasElement: HTMLCanvasElement) {
         this.canvas = canvasElement
-        canvasElement.setAttribute('height', this.height.toString());
-        canvasElement.setAttribute('width', this.width.toString());
+        console.log()
+        canvasElement.setAttribute('height', this.viewPort.height.toString());
+        canvasElement.setAttribute('width', this.viewPort.width.toString());
         this.renderOnCanvas()
     }
 
@@ -126,18 +134,34 @@ class World extends WorldConfig {
         if (!this.canvas) { return false }
         const ctx = this.canvas.getContext("2d");
 
-        ctx.fillStyle = "black";
+        ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+        ctx.fillStyle = "black";
+        ctx.fillRect(...this.viewPort.mapWorldCoords());
+
         this.fluids.forEach(fluid => {
-            fluid.renderOnCanvas(ctx)
+            fluid.renderOnCanvas(ctx, this.viewPort)
         })
 
         this.things.forEach(thing => {
-            thing.renderOnCanvas(ctx)
+            thing.renderOnCanvas(ctx, this.viewPort)
         })
 
     }
+
+    makeBackgroundGradient(ctx: CanvasRenderingContext2D) {
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.viewPort.height);
+
+        let i;
+        for (i = 0; i < 10; i++) {
+            gradient.addColorStop(i * .1, 'red');
+            gradient.addColorStop((i + .5) * .1, 'green');
+        }
+
+        return gradient
+    }
 }
 
-export { World, WorldConfig }
+export { World, WorldConfig, ViewPort }
