@@ -20,7 +20,6 @@ class WorldConfig {
 }
 
 class World extends WorldConfig {
-    canvas?: HTMLCanvasElement
     timerSpeed: number
     things: Thing[]
     fluids: Fluid[]
@@ -95,7 +94,7 @@ class World extends WorldConfig {
         }
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
-        this.renderOnCanvas()
+        this.viewPort.renderCanvas()
         this.emitter.emit('tick')
     }
 
@@ -120,47 +119,6 @@ class World extends WorldConfig {
         clearInterval(this.timer)
         this.timerSpeed = 0
         return this
-    }
-
-    setCanvas(canvasElement: HTMLCanvasElement) {
-        this.canvas = canvasElement
-        console.log()
-        canvasElement.setAttribute('height', this.viewPort.height.toString());
-        canvasElement.setAttribute('width', this.viewPort.width.toString());
-        this.renderOnCanvas()
-    }
-
-    renderOnCanvas() {
-        if (!this.canvas) { return false }
-        const ctx = this.canvas.getContext("2d");
-
-        ctx.fillStyle = this.makeBackgroundGradient(ctx);
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        ctx.fillStyle = "black";
-        ctx.fillRect(...this.viewPort.mapWorldCoords());
-
-        this.fluids.forEach(fluid => {
-            fluid.renderOnCanvas(ctx, this.viewPort)
-        })
-
-        this.things.forEach(thing => {
-            thing.renderOnCanvas(ctx, this.viewPort)
-        })
-
-    }
-
-    makeBackgroundGradient(ctx: CanvasRenderingContext2D) {
-
-        const gradient = ctx.createLinearGradient(0, 0, 0, this.viewPort.height);
-
-        let i;
-        for (i = 0; i < 10; i++) {
-            gradient.addColorStop(i * .1, 'red');
-            gradient.addColorStop((i + .5) * .1, 'green');
-        }
-
-        return gradient
     }
 }
 

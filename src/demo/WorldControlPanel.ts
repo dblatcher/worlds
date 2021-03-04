@@ -20,11 +20,11 @@ class WorldControlPanel {
 
     changeWorld(world: World) {
         if (this.world == world) { return }
-        const canvasElement = this.world.canvas;
+        const canvasElement = this.world.viewPort.canvas;
         this.world.stopTime()
-        this.world.canvas = null
+        this.world.viewPort.canvas = null
 
-        world.setCanvas(canvasElement)
+        world.viewPort.setCanvas(canvasElement)
         this.world = world
         this.updateReport()
     }

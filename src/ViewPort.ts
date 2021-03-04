@@ -17,6 +17,7 @@ class ViewPort {
     width: number
     height: number
     magnify: number
+    canvas?: HTMLCanvasElement
 
     constructor(config: ViewPortConfig,) {
         this.x = config.x
@@ -63,6 +64,46 @@ class ViewPort {
             this.height / this.world.height,
         )
         return this
+    }
+
+    setCanvas(canvasElement: HTMLCanvasElement) {
+        this.canvas = canvasElement
+        canvasElement.setAttribute('height', this.height.toString());
+        canvasElement.setAttribute('width', this.width.toString());
+        this.renderCanvas()
+    }
+
+    renderCanvas() {
+        const {world} = this
+
+        const ctx = this.canvas.getContext("2d");
+
+        ctx.fillStyle = this.makeBackgroundGradient(ctx);
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(...this.mapWorldCoords());
+
+        world.fluids.forEach(fluid => {
+            fluid.renderOnCanvas(ctx, this)
+        })
+
+        world.things.forEach(thing => {
+            thing.renderOnCanvas(ctx, this)
+        })
+    }
+
+    makeBackgroundGradient(ctx: CanvasRenderingContext2D) {
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+
+        let i;
+        for (i = 0; i < 10; i++) {
+            gradient.addColorStop(i * .1, 'red');
+            gradient.addColorStop((i + .5) * .1, 'green');
+        }
+
+        return gradient
     }
 
     static full(world: World) {

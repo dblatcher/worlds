@@ -34,7 +34,7 @@ canvas {
 
 const panel = new WorldControlPanel(fluidTest, { worldOptions: [fluidTest,squareTestWorld,balance, galaxy, rocksAndBallons] })
 
-panel.world.setCanvas(canvasElement)
+panel.world.viewPort.setCanvas(canvasElement)
 
 document.head.appendChild(styleSheet)
 document.body.appendChild(panel.makeElement())
