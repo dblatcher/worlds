@@ -88,13 +88,6 @@ const fluidTest = new World([
     gravitationalConstant: 1,
     name: "fluidTest",
     airDensity: .1,
-    viewPort: new ViewPort({
-        x: worldWidth / 2,
-        y: worldHeight - viewPortHeight/2,
-        width: worldWidth,
-        height: viewPortHeight,
-        magnify: 1,
-    }),
 })
 
 export { fluidTest }

@@ -16,7 +16,7 @@ class WorldConfig {
     hasHardEdges?: boolean
     minimumMassToExertGravity?: number
     airDensity?: number
-    viewPort?: ViewPort
+    // viewPort?: ViewPort
 }
 
 class World extends WorldConfig {
@@ -26,7 +26,7 @@ class World extends WorldConfig {
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
-    viewPort: ViewPort
+    // viewPort: ViewPort
 
     constructor(contents: (Thing | Fluid)[], config: WorldConfig = {}) {
         super()
@@ -54,8 +54,6 @@ class World extends WorldConfig {
 
         this.thingsLeavingAtNextTick = []
 
-        this.viewPort = config.viewPort || ViewPort.full(this)
-        this.viewPort.world = this
         this.emitter = new TinyEmitter
     }
 
@@ -94,7 +92,7 @@ class World extends WorldConfig {
         }
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
-        this.viewPort.renderCanvas()
+        // this.viewPort.renderCanvas()
         this.emitter.emit('tick')
     }
 

@@ -1,31 +1,34 @@
 import { World } from '../World'
+import { ViewPort} from '../ViewPort'
 
-interface WorldControlPanelConfig {
+interface ViewPortControlPanelConfig {
     worldOptions?: World[]
+    viewPort: ViewPort
 }
 
-class WorldControlPanel {
-    world: World
+class ViewPortControlPanel {
+    
     worldOptions: World[]
     reportElement: HTMLElement
-    constructor(world: World, config: WorldControlPanelConfig = {}) {
-        this.world = world
-        this.worldOptions = config.worldOptions || [world]
+    viewPort: ViewPort
+    constructor( config: ViewPortControlPanelConfig) {
+        
+        this.viewPort = config.viewPort
+        this.worldOptions = config.worldOptions || [this.viewPort.world]
     }
 
     updateReport() {
         if (!this.reportElement) { return }
-        this.reportElement.innerText = (this.world.name || `World`)+ ":  " + this.world.report
+        this.reportElement.innerText = (this.viewPort.world.name || `World`)+ ":  " + this.viewPort.world.report
     }
 
     changeWorld(world: World) {
-        if (this.world == world) { return }
-        const canvasElement = this.world.viewPort.canvas;
-        this.world.stopTime()
-        this.world.viewPort.canvas = null
+        if (this.viewPort.world == world) { return }
+        
+        this.viewPort.world.stopTime()
 
-        world.viewPort.setCanvas(canvasElement)
-        this.world = world
+        this.viewPort.setWorld(world)
+        this.viewPort.reset()
         this.updateReport()
     }
 
@@ -40,17 +43,17 @@ class WorldControlPanel {
         slowButton.innerText = "slow"
 
         startButton.addEventListener('click', () => {
-            this.world.ticksPerSecond = 20
+            this.viewPort.world.ticksPerSecond = 20
             this.updateReport()
         })
 
         slowButton.addEventListener('click', () => {
-            this.world.ticksPerSecond = 1
+            this.viewPort.world.ticksPerSecond = 1
             this.updateReport()
         })
 
         stopButton.addEventListener('click', () => {
-            this.world.ticksPerSecond = 0
+            this.viewPort.world.ticksPerSecond = 0
             this.updateReport()
         })
 
@@ -73,12 +76,12 @@ class WorldControlPanel {
         gravitySection.appendChild(gravityUpButton)
 
         gravityDownButton.addEventListener('click', () => {
-            this.world.gravitationalConstant -= .1
+            this.viewPort.world.gravitationalConstant -= .1
             this.updateReport()
         })
 
         gravityUpButton.addEventListener('click', () => {
-            this.world.gravitationalConstant += .1
+            this.viewPort.world.gravitationalConstant += .1
             this.updateReport()
         })
 
@@ -106,7 +109,7 @@ class WorldControlPanel {
         const container = document.createElement('article')
 
         const reportLine = document.createElement('p')
-        reportLine.innerText = this.world.report
+        reportLine.innerText = this.viewPort.world.report
         this.reportElement = reportLine
         this.updateReport()
 
@@ -127,4 +130,4 @@ class WorldControlPanel {
     }
 }
 
-export { WorldControlPanel }
+export { ViewPortControlPanel }

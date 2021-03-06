@@ -8,6 +8,7 @@ interface ViewPortConfig {
     width: number
     height: number
     magnify: number
+    canvas: HTMLCanvasElement
 }
 
 class ViewPort {
@@ -17,17 +18,33 @@ class ViewPort {
     width: number
     height: number
     magnify: number
-    canvas?: HTMLCanvasElement
+    canvas: HTMLCanvasElement
 
-    constructor(config: ViewPortConfig,) {
+    constructor(config: ViewPortConfig) {
         this.x = config.x
         this.y = config.y
         this.width = config.width
         this.height = config.height
         this.magnify = config.magnify
-        this.world = config.world || null
+
+        this.setCanvas (config.canvas)
+        this.renderCanvas = this.renderCanvas.bind(this)
+
+        if (config.world) {this.setWorld(config.world)}
     }
 
+
+    setWorld(world:World) {
+        if (this.world) {this.unsetWorld()}
+        this.world = world
+        this.world.emitter.on('tick', this.renderCanvas)
+        this.renderCanvas()
+    }
+
+    unsetWorld() {
+        this.world.emitter.off('tick', this.renderCanvas)
+        this.world = null
+    }
 
     mapPoint(point: Point): Point {
         const { x, y, magnify, width, height } = this
@@ -58,26 +75,29 @@ class ViewPort {
         if (!this.world) { return }
         this.x = this.world.width / 2
         this.y = this.world.height / 2
-        this.magnify = Math.min(
-            1,
-            this.width / this.world.width,
-            this.height / this.world.height,
-        )
+        this.height = this.world.height
+        this.width = this.world.width
+        this.magnify = 1
+
+        this.renderCanvas()
         return this
     }
 
     setCanvas(canvasElement: HTMLCanvasElement) {
         this.canvas = canvasElement
-        canvasElement.setAttribute('height', this.height.toString());
-        canvasElement.setAttribute('width', this.width.toString());
         this.renderCanvas()
     }
 
     renderCanvas() {
-        const {world} = this
+        const {world, canvas} = this
 
-        const ctx = this.canvas.getContext("2d");
+        if (!canvas) {return}
+        canvas.setAttribute('height', this.height.toString());
+        canvas.setAttribute('width', this.width.toString());
 
+        if (!world ) {return}
+        
+        const ctx = canvas.getContext("2d");
         ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -106,15 +126,18 @@ class ViewPort {
         return gradient
     }
 
-    static full(world: World) {
-        return new ViewPort({
+    static full(world: World, canvas:HTMLCanvasElement) {
+
+        const viewPort = new ViewPort({
             world,
+            canvas,
             x: world.width / 2,
             y: world.height / 2,
             magnify: 1,
             width: world.width,
             height: world.height,
         })
+        return viewPort
     }
 }
 
