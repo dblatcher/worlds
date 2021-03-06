@@ -1,4 +1,5 @@
 import { Point } from "./geometry"
+import { Thing } from "./Thing"
 import { World } from "./World"
 
 interface ViewPortConfig {
@@ -19,6 +20,7 @@ class ViewPort {
     height: number
     magnify: number
     canvas: HTMLCanvasElement
+    focus?: Thing
 
     constructor(config: ViewPortConfig) {
         this.x = config.x
@@ -64,10 +66,20 @@ class ViewPort {
         ]
     }
 
-    focusOn(point: Point, magnify?: number) {
+    focusOn(point: Point, staywithinWorldEdge: boolean = false, magnify?: number) {
+        if (magnify) { this.magnify = magnify }
+
         this.x = point.x
         this.y = point.y
-        if (magnify) { this.magnify = magnify }
+
+
+        if (staywithinWorldEdge) {
+            const verticalSpace = this.height / (this.magnify * 2)
+            const horizontalSpace = this.width / (this.magnify * 2)
+            this.y = Math.max(Math.min(point.y, this.world.height - verticalSpace), verticalSpace)
+            this.x = Math.max(Math.min(point.x, this.world.width - horizontalSpace), horizontalSpace)
+        }
+
         return this
     }
 
@@ -89,13 +101,17 @@ class ViewPort {
     }
 
     renderCanvas() {
-        const { world, canvas } = this
+        const { world, canvas, focus } = this
+
 
         if (!canvas) { return }
         canvas.setAttribute('height', this.height.toString());
         canvas.setAttribute('width', this.width.toString());
 
         if (!world) { return }
+
+        if (focus && this.world.things.includes(this.focus)) { this.focusOn(focus.data, true) }
+
         const ctx = canvas.getContext("2d");
         ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

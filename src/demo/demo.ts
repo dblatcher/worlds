@@ -1,4 +1,3 @@
-
 import { rocksAndBallons } from './rocksAndBallons'
 import { galaxy } from './galaxy'
 import { balance } from './balance';
@@ -7,10 +6,6 @@ import { fluidTest } from './fluidTest';
 
 import { ViewPortControlPanel } from './ViewPortControlPanel';
 import { ViewPort } from '../ViewPort';
-
-
-
-console.log("DEMO FILE")
 
 
 const styleSheet = document.createElement('style')
@@ -34,36 +29,36 @@ canvas {
 `
 
 const canvasElement = document.createElement('canvas')
-const viewPort = ViewPort.full(squareTestWorld, canvasElement)
-viewPort.setWorld(squareTestWorld)
-const panel = new ViewPortControlPanel({viewPort, worldOptions: [fluidTest,squareTestWorld,balance, galaxy]} )
-
-
 const canvasElement2 = document.createElement('canvas')
-const viewPort2 = new ViewPort ({
-    canvas:canvasElement2,
-    x:0,
-    y:500,
-    magnify:.5,
-    height: rocksAndBallons.height,
-    width: rocksAndBallons.width,
-    world: rocksAndBallons
+
+const panelWorlds = [fluidTest, squareTestWorld, balance, galaxy, rocksAndBallons]
+const viewPort2World = rocksAndBallons
+
+const viewPort = ViewPort.full(panelWorlds[0], canvasElement)
+const panel = new ViewPortControlPanel({ viewPort, worldOptions: panelWorlds })
+
+
+const viewPort2 = new ViewPort({
+    canvas: canvasElement2,
+    x: 0,
+    y: 500,
+    magnify: 3,
+    height: viewPort2World.height,
+    width: viewPort2World.width,
+    world: viewPort2World
 })
 
-rocksAndBallons.ticksPerSecond = 10
+viewPort2World.ticksPerSecond = 10
+viewPort2.focus = viewPort2World.things[1]
 
 document.head.appendChild(styleSheet)
 document.body.appendChild(panel.makeElement())
 
 const frame = document.createElement('div')
 frame.classList.add('frame')
+frame.appendChild(canvasElement2);
 frame.appendChild(canvasElement);
 document.body.appendChild(frame);
-
-const frame2 = document.createElement('div')
-frame2.classList.add('frame')
-frame.appendChild(canvasElement2);
-document.body.appendChild(frame2);
 
 (window as any).panel = panel;
 (window as any).viewPort2 = viewPort2;
