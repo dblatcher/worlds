@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
-    "build": "webpack --mode=development"
+    "build": "webpack --mode=development",
+    "demo": "webpack --mode=development --config webpack.demo.config.js"
   },
   "keywords": [],
   "author": "",

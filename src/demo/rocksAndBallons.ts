@@ -48,7 +48,7 @@ const slope = new Thing({shape:shapes.square, x:-100, y:900, size:400, heading:-
 
 const rocksAndBallons = new World([
     slope,
-    ...makeRocksAndBallons(10),
+    ...makeRocksAndBallons(9),
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
