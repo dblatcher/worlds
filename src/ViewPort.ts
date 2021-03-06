@@ -27,15 +27,15 @@ class ViewPort {
         this.height = config.height
         this.magnify = config.magnify
 
-        this.setCanvas (config.canvas)
+        this.setCanvas(config.canvas)
         this.renderCanvas = this.renderCanvas.bind(this)
 
-        if (config.world) {this.setWorld(config.world)}
+        if (config.world) { this.setWorld(config.world) }
     }
 
 
-    setWorld(world:World) {
-        if (this.world) {this.unsetWorld()}
+    setWorld(world: World) {
+        if (this.world) { this.unsetWorld() }
         this.world = world
         this.world.emitter.on('tick', this.renderCanvas)
         this.renderCanvas()
@@ -89,14 +89,13 @@ class ViewPort {
     }
 
     renderCanvas() {
-        const {world, canvas} = this
+        const { world, canvas } = this
 
-        if (!canvas) {return}
+        if (!canvas) { return }
         canvas.setAttribute('height', this.height.toString());
         canvas.setAttribute('width', this.width.toString());
 
-        if (!world ) {return}
-        
+        if (!world) { return }
         const ctx = canvas.getContext("2d");
         ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -114,7 +113,6 @@ class ViewPort {
     }
 
     makeBackgroundGradient(ctx: CanvasRenderingContext2D) {
-
         const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
 
         let i;
@@ -126,18 +124,28 @@ class ViewPort {
         return gradient
     }
 
-    static full(world: World, canvas:HTMLCanvasElement) {
-
-        const viewPort = new ViewPort({
+    static full(world: World, canvas: HTMLCanvasElement, magnify: number = 1) {
+        return new ViewPort({
             world,
             canvas,
             x: world.width / 2,
             y: world.height / 2,
-            magnify: 1,
-            width: world.width,
-            height: world.height,
+            magnify,
+            width: world.width * magnify,
+            height: world.height * magnify,
         })
-        return viewPort
+    }
+
+    static fitToSize(world: World, canvas: HTMLCanvasElement, width: number, height: number) {
+        return new ViewPort({
+            world,
+            canvas,
+            height,
+            width,
+            x: world.width / 2,
+            y: world.height / 2,
+            magnify: Math.min(width / world.width, height / world.height),
+        })
     }
 }
 
