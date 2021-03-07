@@ -85,10 +85,12 @@ const renderHeadingIndicator = {
         })
 
         ctx.beginPath()
-        ctx.strokeStyle = 'black';
+        ctx.lineWidth=viewPort.visibleLineWidth
+        ctx.strokeStyle = 'yellow';
         ctx.moveTo(centerPoint.x, centerPoint.y)
         ctx.lineTo(frontPoint.x, frontPoint.y)
         ctx.stroke()
+        ctx.lineWidth=1
 
     }
 }

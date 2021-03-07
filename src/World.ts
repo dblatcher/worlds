@@ -110,8 +110,7 @@ class World extends WorldConfig {
         }
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
-
-        this.effects.forEach(effect => effect.tick())
+        effects.forEach(effect => effect.tick())
 
         this.emitter.emit('tick')
     }

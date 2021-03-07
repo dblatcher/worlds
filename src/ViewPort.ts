@@ -35,6 +35,9 @@ class ViewPort {
         if (config.world) { this.setWorld(config.world) }
     }
 
+    get visibleLineWidth() {
+        return Math.max(1, this.width/100)
+    }
 
     setWorld(world: World) {
         if (this.world) { this.unsetWorld() }
