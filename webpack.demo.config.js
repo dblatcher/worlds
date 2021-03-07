@@ -1,10 +1,12 @@
 const path = require('path');
 
+const demoEntryPoint = 'demo/demo2.ts'
+
 module.exports = {
   watch: true,
   entry: [
     './src/index.ts',
-    './src//demo/demo.ts',
+    './src/' + demoEntryPoint,
   ],
   module: {
     rules: [
