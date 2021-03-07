@@ -126,6 +126,10 @@ class ViewPort {
         world.things.forEach(thing => {
             thing.renderOnCanvas(ctx, this)
         })
+
+        world.effects.forEach(effect => {
+            effect.renderOnCanvas(ctx, this)
+        })
     }
 
     makeBackgroundGradient(ctx: CanvasRenderingContext2D) {

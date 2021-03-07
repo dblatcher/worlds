@@ -1,8 +1,9 @@
 import { Force } from './Force'
 import { Thing } from './Thing'
 import { Fluid } from './Fluid'
-import { TinyEmitter } from 'tiny-emitter'
 import { ViewPort } from './ViewPort'
+import { Effect } from './Effect'
+import { TinyEmitter } from 'tiny-emitter'
 
 
 
@@ -16,17 +17,26 @@ class WorldConfig {
     hasHardEdges?: boolean
     minimumMassToExertGravity?: number
     airDensity?: number
-    // viewPort?: ViewPort
+    effects?: Effect[]
 }
 
 class World extends WorldConfig {
+    name: string
+    width: number
+    height: number
+    gravitationalConstant: number
+    globalGravityForce: Force
+    thingsExertGravity: boolean
+    hasHardEdges: boolean
+    minimumMassToExertGravity: number
+    airDensity: number
     timerSpeed: number
     things: Thing[]
     fluids: Fluid[]
+    effects: Effect[]
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
-    // viewPort: ViewPort
 
     constructor(contents: (Thing | Fluid)[], config: WorldConfig = {}) {
         super()
@@ -49,6 +59,11 @@ class World extends WorldConfig {
         this.things = []
         things.forEach(thing => { thing.enterWorld(this) })
 
+        this.effects = []
+        if (config.effects) {
+            config.effects.forEach(effect => { effect.enterWorld(this) })
+        }
+
         this.fluids = []
         fluids.forEach(fluid => fluid.enterWorld(this))
 
@@ -62,6 +77,9 @@ class World extends WorldConfig {
     }
 
     tick() {
+
+        const {fluids, effects, things} =this
+ 
         this.thingsLeavingAtNextTick.forEach(thing => {
             if (this.things.indexOf(thing) !== -1) {
                 this.things.splice(this.things.indexOf(thing), 1)
@@ -70,9 +88,9 @@ class World extends WorldConfig {
         })
         this.thingsLeavingAtNextTick = []
 
-        this.fluids.forEach(fluid => fluid.drain())
+        fluids.forEach(fluid => fluid.drain())
 
-        const mobileThings = this.things.filter(thing => !thing.data.immobile)
+        const mobileThings = things.filter(thing => !thing.data.immobile)
 
         // filter at each stage in case any Things have left the world during the previous stage
         mobileThings.forEach(thing => { thing.updateMomentum() })
@@ -92,7 +110,9 @@ class World extends WorldConfig {
         }
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
-        // this.viewPort.renderCanvas()
+
+        this.effects.forEach(effect => effect.tick())
+
         this.emitter.emit('tick')
     }
 
