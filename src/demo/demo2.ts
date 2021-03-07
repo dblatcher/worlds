@@ -38,7 +38,8 @@ const viewPort2 = new ViewPort({
     magnify: 2,
     height: demoWorld.height,
     width: demoWorld.width,
-    world: demoWorld
+    world: demoWorld,
+    rotate: 3
 })
 
 demoWorld.ticksPerSecond = 10

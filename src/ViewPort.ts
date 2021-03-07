@@ -1,4 +1,6 @@
+import { Force } from "./Force"
 import { Point } from "./geometry"
+import { renderPolygon } from "./renderFunctions"
 import { Thing } from "./Thing"
 import { World } from "./World"
 
@@ -8,7 +10,8 @@ interface ViewPortConfig {
     y: number
     width: number
     height: number
-    magnify: number
+    magnify?: number
+    rotate?: number
     canvas: HTMLCanvasElement
 }
 
@@ -19,6 +22,7 @@ class ViewPort {
     width: number
     height: number
     magnify: number
+    rotate: number
     canvas: HTMLCanvasElement
     focus?: Thing
 
@@ -27,7 +31,8 @@ class ViewPort {
         this.y = config.y
         this.width = config.width
         this.height = config.height
-        this.magnify = config.magnify
+        this.magnify = config.magnify || 1
+        this.rotate = config.rotate || 0
 
         this.setCanvas(config.canvas)
         this.renderCanvas = this.renderCanvas.bind(this)
@@ -36,7 +41,7 @@ class ViewPort {
     }
 
     get visibleLineWidth() {
-        return Math.max(1, this.width/100)
+        return Math.max(1, this.width / 100)
     }
 
     setWorld(world: World) {
@@ -52,21 +57,21 @@ class ViewPort {
     }
 
     mapPoint(point: Point): Point {
-        const { x, y, magnify, width, height } = this
-
+        const { x, y, magnify, width, height, rotate } = this
+        const vectorFromCenter = Force.fromVector(magnify * (x - point.x), magnify * (y - point.y))
+        vectorFromCenter.direction += rotate
         return {
-            x: (width / 2) - magnify * (x - point.x),
-            y: (height / 2) - magnify * (y - point.y)
+            x: (width / 2) - vectorFromCenter.vectorX,
+            y: (height / 2) - vectorFromCenter.vectorY
         }
     }
 
-    mapWorldCoords(): [number, number, number, number] {
-        const topLeft = this.mapPoint({ x: 0, y: 0 })
-        const bottomRight = this.mapPoint({ x: this.world.width, y: this.world.height })
-
-        return [
-            topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y
-        ]
+    get worldCorners(): [Point, Point, Point, Point] {
+        const topLeft = { x: 0, y: 0 }
+        const topRight = { x: this.world.width, y: 0 }
+        const bottomRight = { x: this.world.width, y: this.world.height }
+        const bottomleft = { x: 0, y: this.world.height }
+        return [topLeft, topRight, bottomRight, bottomleft]
     }
 
     focusOn(point: Point, staywithinWorldEdge: boolean = false, magnify?: number) {
@@ -74,15 +79,12 @@ class ViewPort {
 
         this.x = point.x
         this.y = point.y
-
-
         if (staywithinWorldEdge) {
             const verticalSpace = this.height / (this.magnify * 2)
             const horizontalSpace = this.width / (this.magnify * 2)
             this.y = Math.max(Math.min(point.y, this.world.height - verticalSpace), verticalSpace)
             this.x = Math.max(Math.min(point.x, this.world.width - horizontalSpace), horizontalSpace)
         }
-
         return this
     }
 
@@ -113,14 +115,13 @@ class ViewPort {
 
         if (!world) { return }
 
-        if (focus && this.world.things.includes(this.focus)) { this.focusOn(focus.data, true) }
+        if (focus && this.world.things.includes(this.focus)) { this.focusOn(focus.data, false) }
 
         const ctx = canvas.getContext("2d");
         ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        ctx.fillStyle = "black";
-        ctx.fillRect(...this.mapWorldCoords());
+        renderPolygon.onCanvas(ctx,this.worldCorners,{fillColor:'black'}, this)
 
         world.fluids.forEach(fluid => {
             fluid.renderOnCanvas(ctx, this)
