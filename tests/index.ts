@@ -1,3 +1,4 @@
+import headingTest from './headingTest'
 import intersectionTest from './intersection'
 import propotypeTest from './prototypeIdentify'
 
@@ -10,7 +11,9 @@ console.log('TESTS')
 // console.log('\n\n')
 
 console.log('********\n')
+//propotypeTest()
 
-propotypeTest()
+console.log('********\n')
+headingTest()
 
 console.log('\n\n')
