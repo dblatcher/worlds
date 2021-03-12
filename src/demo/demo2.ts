@@ -32,7 +32,8 @@ const canvasElement2 = document.createElement('canvas')
 
 const demoWorld = bigWorld
 
-const viewPort1 = ViewPort.fitToSize(demoWorld, canvasElement1, 150,150)
+const viewPort1 = ViewPort.fitToSize(demoWorld, canvasElement1, 150, 150)
+viewPort1.dontRenderBackground = true
 
 const viewPort2 = new ViewPort({
     canvas: canvasElement2,
@@ -42,21 +43,21 @@ const viewPort2 = new ViewPort({
     height: demoWorld.height,
     width: demoWorld.width,
     world: demoWorld,
-    rotate: 3
+    rotate: 3,
 })
 
 viewPort2.cameraInstruction = new CameraFollowInstruction({
-    thing:redPlanet, 
-    followHeading:true, 
-    magnify:1.5, 
-    leadDistance:4000
+    thing: redPlanet,
+    followHeading: false,
+    magnify: 1.5,
+    leadDistance: 0
 })
 
-demoWorld.emitter.on('tick',()=> {
-    redPlanet.data.heading += _360deg * (1/100)
+demoWorld.emitter.on('tick', () => {
+    redPlanet.data.heading += _360deg * (1 / 500)
 })
 
-redPlanet.momentum = new Force(50,2)
+redPlanet.momentum = new Force(50, 2)
 // redPlanet.data.heading = _90deg/3
 
 demoWorld.ticksPerSecond = 20

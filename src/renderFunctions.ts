@@ -5,20 +5,38 @@ import { ViewPort } from "./World"
 interface CanvasRenderStyle {
     fillColor?: string
     strokeColor?: string
+    parallax?: number
 }
 
 const renderCircle = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort:ViewPort): void {
-        const { fillColor, strokeColor } = style
-        const { x, y, radius } = circle
+    onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort: ViewPort): void {
+        const { fillColor, strokeColor, parallax = 1 } = style
+        const { radius } = circle
 
         ctx.beginPath();
         ctx.fillStyle = fillColor;
         ctx.strokeStyle = strokeColor;
 
-        const mappedCenter = viewPort.mapPoint(circle);
+        const mappedCenter = viewPort.mapPoint(circle, parallax);
 
-        ctx.arc(mappedCenter.x, mappedCenter.y, radius*viewPort.magnify, 0, Math.PI * 2)
+        ctx.arc(mappedCenter.x, mappedCenter.y, (radius * viewPort.magnify / parallax), 0, Math.PI * 2)
+
+        if (fillColor) { ctx.fill() }
+        if (strokeColor) { ctx.stroke() }
+    }
+}
+
+const renderPoint = {
+    onCanvas: function (ctx: CanvasRenderingContext2D, point: Point, style: CanvasRenderStyle, viewPort: ViewPort): void {
+        const { fillColor, strokeColor, parallax = 1 } = style
+
+        ctx.beginPath();
+        ctx.fillStyle = fillColor;
+        ctx.strokeStyle = strokeColor;
+
+        const mappedCenter = viewPort.mapPoint(point, parallax);
+
+        ctx.arc(mappedCenter.x, mappedCenter.y, viewPort.pointRadius, 0, Math.PI * 2)
 
         if (fillColor) { ctx.fill() }
         if (strokeColor) { ctx.stroke() }
@@ -27,14 +45,14 @@ const renderCircle = {
 
 
 const renderPolygon = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort:ViewPort): void {
-        const { fillColor, strokeColor } = style
+    onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort: ViewPort): void {
+        const { fillColor, strokeColor, parallax = 1 } = style
 
         ctx.beginPath();
         ctx.fillStyle = fillColor;
         ctx.strokeStyle = strokeColor;
 
-        let mappedPolygon = polygon.map(point => viewPort.mapPoint(point))
+        let mappedPolygon = polygon.map(point => viewPort.mapPoint(point, parallax))
 
         ctx.moveTo(mappedPolygon[0].x, mappedPolygon[0].y)
         for (let i = 1; i < polygon.length; i++) {
@@ -49,7 +67,7 @@ const renderPolygon = {
 }
 
 const renderPathAhead = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort:ViewPort): void {
+    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort: ViewPort): void {
         const rightX = getVectorX(body.data.size, body.momentum.direction + _90deg)
         const rightY = getVectorY(body.data.size, body.momentum.direction + _90deg)
 
@@ -72,7 +90,7 @@ const renderPathAhead = {
 }
 
 const renderHeadingIndicator = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort:ViewPort): void {
+    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort: ViewPort): void {
 
         const { size, heading } = body.data
         const { x, y } = body.shapeValues
@@ -85,17 +103,17 @@ const renderHeadingIndicator = {
         })
 
         ctx.beginPath()
-        ctx.lineWidth=viewPort.visibleLineWidth
+        ctx.lineWidth = viewPort.visibleLineWidth
         ctx.strokeStyle = 'yellow';
         ctx.moveTo(centerPoint.x, centerPoint.y)
         ctx.lineTo(frontPoint.x, frontPoint.y)
         ctx.stroke()
-        ctx.lineWidth=1
+        ctx.lineWidth = 1
 
     }
 }
 
 
 export {
-    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon
+    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon, renderPoint,
 }

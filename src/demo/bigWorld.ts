@@ -1,4 +1,5 @@
 
+import { StarField } from '../BackGround'
 import { World, LinedThing, Thing, Force, shapes } from '../index'
 
 
@@ -51,6 +52,10 @@ const bigWorld = new World([
     hasHardEdges: true,
     name: "Galaxy",
     airDensity: 20,
+    backGrounds: [
+        new StarField( { numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 5 }),
+        new StarField( { numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 10 }),
+    ]
 });
 
 export { bigWorld, redPlanet }

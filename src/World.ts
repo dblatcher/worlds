@@ -4,6 +4,7 @@ import { Fluid } from './Fluid'
 import { ViewPort } from './ViewPort'
 import { Effect } from './Effect'
 import { TinyEmitter } from 'tiny-emitter'
+import { BackGround } from './BackGround'
 
 
 
@@ -18,6 +19,7 @@ class WorldConfig {
     minimumMassToExertGravity?: number
     airDensity?: number
     effects?: Effect[]
+    backGrounds?: BackGround[]
 }
 
 class World extends WorldConfig {
@@ -34,6 +36,7 @@ class World extends WorldConfig {
     things: Thing[]
     fluids: Fluid[]
     effects: Effect[]
+    backGrounds: BackGround[]
     thingsLeavingAtNextTick: Thing[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
@@ -63,6 +66,8 @@ class World extends WorldConfig {
         if (config.effects) {
             config.effects.forEach(effect => { effect.enterWorld(this) })
         }
+
+        this.backGrounds = config.backGrounds || []
 
         this.fluids = []
         fluids.forEach(fluid => fluid.enterWorld(this))
@@ -110,6 +115,7 @@ class World extends WorldConfig {
         }
         mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
 
+        this.backGrounds.forEach(backGround => backGround.tick())
         effects.forEach(effect => effect.tick())
 
         this.emitter.emit('tick')

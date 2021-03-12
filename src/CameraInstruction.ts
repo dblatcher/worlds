@@ -28,7 +28,7 @@ class CameraFollowInstruction extends CameraInstruction {
     }) {
         super (config)
         this.thing = config.thing
-        this.followHeading = config.followHeading || true
+        this.followHeading = config.followHeading || false
         this.magnify = config.magnify || 1
         this.leadDistance = config.leadDistance || 0
     }

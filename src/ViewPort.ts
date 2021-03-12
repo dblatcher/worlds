@@ -1,3 +1,4 @@
+import { BackGround } from "./BackGround"
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
 import { Point, _90deg } from "./geometry"
@@ -14,6 +15,9 @@ interface ViewPortConfig {
     magnify?: number
     rotate?: number
     canvas: HTMLCanvasElement
+
+    dontRenderBackground?: boolean
+    dontRenderEffects?: boolean
 }
 
 class ViewPort {
@@ -27,6 +31,9 @@ class ViewPort {
     canvas: HTMLCanvasElement
     cameraInstruction?: CameraInstruction
 
+    dontRenderBackground: boolean
+    dontRenderEffects: boolean
+
     constructor(config: ViewPortConfig) {
         this.x = config.x
         this.y = config.y
@@ -35,21 +42,28 @@ class ViewPort {
         this.magnify = config.magnify || 1
         this.rotate = config.rotate || 0
 
-        this.setCanvas(config.canvas)
+        this.dontRenderBackground = config.dontRenderBackground || false
+        this.dontRenderEffects = config.dontRenderEffects || false
+
+        this.canvas = config.canvas
         this.renderCanvas = this.renderCanvas.bind(this)
 
         if (config.world) { this.setWorld(config.world) }
     }
 
     get visibleLineWidth() {
-        return Math.max(1, this.width / 100)
+        return this.pointRadius * 3;
     }
 
-    setWorld(world: World) {
+    get pointRadius() {
+        return Math.ceil (this.canvas.width / this.canvas.offsetWidth)
+    }
+
+    setWorld(world: World, renderAfterSetting:boolean = false) {
         if (this.world) { this.unsetWorld() }
         this.world = world
         this.world.emitter.on('tick', this.renderCanvas)
-        this.renderCanvas()
+        if (renderAfterSetting) { this.renderCanvas()}
     }
 
     unsetWorld() {
@@ -57,9 +71,9 @@ class ViewPort {
         this.world = null
     }
 
-    mapPoint(point: Point): Point {
+    mapPoint(point: Point, parallax = 1): Point {
         const { x, y, magnify, width, height, rotate } = this
-        const vectorFromCenter = Force.fromVector(magnify * (x - point.x), magnify * (y - point.y))
+        const vectorFromCenter = Force.fromVector((magnify / parallax) * (x - point.x), (magnify / parallax) * (y - point.y))
         vectorFromCenter.direction += rotate
         return {
             x: (width / 2) - vectorFromCenter.vectorX,
@@ -101,14 +115,8 @@ class ViewPort {
         return this
     }
 
-    setCanvas(canvasElement: HTMLCanvasElement) {
-        this.canvas = canvasElement
-        this.renderCanvas()
-    }
-
     renderCanvas() {
         const { world, canvas, cameraInstruction } = this
-
 
         if (!canvas) { return }
         canvas.setAttribute('height', this.height.toString());
@@ -124,17 +132,17 @@ class ViewPort {
 
         renderPolygon.onCanvas(ctx, this.worldCorners, { fillColor: 'black' }, this)
 
-        world.fluids.forEach(fluid => {
-            fluid.renderOnCanvas(ctx, this)
-        })
+        if (!this.dontRenderBackground) {
+            world.backGrounds.forEach(backGround => backGround.renderOnCanvas(ctx, this))
+        }
 
-        world.things.forEach(thing => {
-            thing.renderOnCanvas(ctx, this)
-        })
+        world.fluids.forEach(fluid => { fluid.renderOnCanvas(ctx, this) })
 
-        world.effects.forEach(effect => {
-            effect.renderOnCanvas(ctx, this)
-        })
+        world.things.forEach(thing => { thing.renderOnCanvas(ctx, this) })
+
+        if (!this.dontRenderEffects) {
+            world.effects.forEach(effect => { effect.renderOnCanvas(ctx, this) })
+        }
     }
 
     makeBackgroundGradient(ctx: CanvasRenderingContext2D) {

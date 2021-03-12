@@ -27,7 +27,7 @@ class ViewPortControlPanel {
         
         this.viewPort.world.stopTime()
 
-        this.viewPort.setWorld(world)
+        this.viewPort.setWorld(world, true)
         this.viewPort.reset()
         this.updateReport()
     }
