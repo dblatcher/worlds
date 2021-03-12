@@ -1,8 +1,9 @@
 
+import { RenderFunctions } from '..';
 import { CameraFollowInstruction } from '../CameraInstruction';
 import { Force } from '../Force';
 import { _360deg, _90deg } from '../geometry';
-import { ViewPort } from '../ViewPort';
+import { RenderTransformationRule, ViewPort } from '../ViewPort';
 import { bigWorld, redPlanet } from './bigWorld';
 
 
@@ -34,6 +35,16 @@ const demoWorld = bigWorld
 
 const viewPort1 = ViewPort.fitToSize(demoWorld, canvasElement1, 150, 150)
 viewPort1.dontRenderBackground = true
+viewPort1.transformRules.push(new RenderTransformationRule(
+    thing => thing === redPlanet,
+    (thing, ctx, viewPort) => {
+        let circle1 = thing.shapeValues
+        let circle2 = thing.shapeValues
+        circle2.radius = circle2.radius*2
+        RenderFunctions.renderCircle.onCanvas(ctx, circle2, { fillColor: 'blue' }, viewPort)
+        RenderFunctions.renderCircle.onCanvas(ctx, circle1, { fillColor: 'yellow' }, viewPort)
+    }
+))
 
 const viewPort2 = new ViewPort({
     canvas: canvasElement2,

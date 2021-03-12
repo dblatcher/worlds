@@ -1,3 +1,4 @@
+import { Thing } from "."
 import { BackGround } from "./BackGround"
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
@@ -5,6 +6,18 @@ import { Point, _90deg } from "./geometry"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
 
+
+interface TransformTestFunction { (thing: Thing): boolean }
+interface TransformRenderFuncion { (thing: Thing, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
+
+class RenderTransformationRule {
+    test: TransformTestFunction
+    renderOnCanvas: TransformRenderFuncion
+    constructor(test: TransformTestFunction, renderOnCanvas: TransformRenderFuncion) {
+        this.test = test
+        this.renderOnCanvas = renderOnCanvas
+    }
+}
 
 interface ViewPortConfig {
     world?: World
@@ -18,7 +31,10 @@ interface ViewPortConfig {
 
     dontRenderBackground?: boolean
     dontRenderEffects?: boolean
+    transformRules?: RenderTransformationRule[]
 }
+
+
 
 class ViewPort {
     world?: World
@@ -33,6 +49,8 @@ class ViewPort {
 
     dontRenderBackground: boolean
     dontRenderEffects: boolean
+    transformRules: RenderTransformationRule[]
+
 
     constructor(config: ViewPortConfig) {
         this.x = config.x
@@ -44,6 +62,7 @@ class ViewPort {
 
         this.dontRenderBackground = config.dontRenderBackground || false
         this.dontRenderEffects = config.dontRenderEffects || false
+        this.transformRules = config.transformRules || []
 
         this.canvas = config.canvas
         this.renderCanvas = this.renderCanvas.bind(this)
@@ -56,14 +75,14 @@ class ViewPort {
     }
 
     get pointRadius() {
-        return Math.ceil (this.canvas.width / this.canvas.offsetWidth)
+        return Math.ceil(this.canvas.width / this.canvas.offsetWidth)
     }
 
-    setWorld(world: World, renderAfterSetting:boolean = false) {
+    setWorld(world: World, renderAfterSetting: boolean = false) {
         if (this.world) { this.unsetWorld() }
         this.world = world
         this.world.emitter.on('tick', this.renderCanvas)
-        if (renderAfterSetting) { this.renderCanvas()}
+        if (renderAfterSetting) { this.renderCanvas() }
     }
 
     unsetWorld() {
@@ -116,7 +135,7 @@ class ViewPort {
     }
 
     renderCanvas() {
-        const { world, canvas, cameraInstruction } = this
+        const { world, canvas, cameraInstruction, transformRules } = this
 
         if (!canvas) { return }
         canvas.setAttribute('height', this.height.toString());
@@ -138,7 +157,14 @@ class ViewPort {
 
         world.fluids.forEach(fluid => { fluid.renderOnCanvas(ctx, this) })
 
-        world.things.forEach(thing => { thing.renderOnCanvas(ctx, this) })
+        world.things.forEach(thing => {
+            let applicableRule = transformRules.filter(rule => rule.test(thing))[0]
+            if (applicableRule) {
+                applicableRule.renderOnCanvas(thing, ctx, this)
+            } else {
+                thing.renderOnCanvas(ctx, this)
+            }
+        })
 
         if (!this.dontRenderEffects) {
             world.effects.forEach(effect => { effect.renderOnCanvas(ctx, this) })
@@ -182,4 +208,4 @@ class ViewPort {
     }
 }
 
-export { ViewPort }
+export { ViewPort, RenderTransformationRule }
