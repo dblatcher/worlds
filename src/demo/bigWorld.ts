@@ -29,15 +29,14 @@ const redPlanet = new Thing({
     fillColor: 'crimson',
     elasticity: .8,
     renderHeadingIndicator: true,
-    headingFollowsDirection: true,
-}, new Force(24, Math.PI * 0.5))
+})
 
 
 const bigWorld = new World([
+    redPlanet,
     whiteStar,
     blueStar,
     redStar,
-    redPlanet,
 
     makeSquare(.1, .4),
     makeSquare(.4, .45, 1),

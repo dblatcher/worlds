@@ -1,4 +1,7 @@
 
+import { CameraFollowInstruction } from '../CameraInstruction';
+import { Force } from '../Force';
+import { _360deg, _90deg } from '../geometry';
 import { ViewPort } from '../ViewPort';
 import { bigWorld, redPlanet } from './bigWorld';
 
@@ -42,15 +45,28 @@ const viewPort2 = new ViewPort({
     rotate: 3
 })
 
-demoWorld.ticksPerSecond = 10
-viewPort2.focus = redPlanet
+viewPort2.cameraInstruction = new CameraFollowInstruction({
+    thing:redPlanet, 
+    followHeading:true, 
+    magnify:1.5, 
+    leadDistance:4000
+})
 
-document.head.appendChild(styleSheet)
+demoWorld.emitter.on('tick',()=> {
+    redPlanet.data.heading += _360deg * (1/100)
+})
+
+redPlanet.momentum = new Force(50,2)
+// redPlanet.data.heading = _90deg/3
+
+demoWorld.ticksPerSecond = 20
 
 const frame = document.createElement('div')
 frame.classList.add('frame')
 frame.appendChild(canvasElement1);
 frame.appendChild(canvasElement2);
+
+document.head.appendChild(styleSheet)
 document.body.appendChild(frame);
 
 (window as any).viewPort1 = viewPort1;

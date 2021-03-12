@@ -4,6 +4,7 @@ import { Force } from './Force'
 import { Shape, shapes } from './Shape'
 import { Fluid, FluidData } from './Fluid'
 import { Effect, EffectData, ExpandingRing } from './Effect'
+import { CameraFollowInstruction, CameraInstruction } from "./CameraInstruction";
 
 import * as Physics from './physics'
 import * as Geometry from './geometry'
@@ -16,6 +17,7 @@ export {
     WorldConfig, ThingData, FluidData,
     LinedThing,
     Effect, EffectData, ExpandingRing,
+    CameraFollowInstruction, CameraInstruction,
     Physics, Geometry, CollisionDetection, RenderFunctions,
     shapes,
 }

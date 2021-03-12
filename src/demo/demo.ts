@@ -49,7 +49,6 @@ const viewPort2 = new ViewPort({
 })
 
 viewPort2World.ticksPerSecond = 10
-viewPort2.focus = viewPort2World.things[1]
 
 document.head.appendChild(styleSheet)
 document.body.appendChild(panel.makeElement())

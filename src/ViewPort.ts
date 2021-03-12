@@ -1,8 +1,9 @@
+import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
-import { Point } from "./geometry"
+import { Point, _90deg } from "./geometry"
 import { renderPolygon } from "./renderFunctions"
-import { Thing } from "./Thing"
 import { World } from "./World"
+
 
 interface ViewPortConfig {
     world?: World
@@ -24,7 +25,7 @@ class ViewPort {
     magnify: number
     rotate: number
     canvas: HTMLCanvasElement
-    focus?: Thing
+    cameraInstruction?: CameraInstruction
 
     constructor(config: ViewPortConfig) {
         this.x = config.x
@@ -106,7 +107,7 @@ class ViewPort {
     }
 
     renderCanvas() {
-        const { world, canvas, focus } = this
+        const { world, canvas, cameraInstruction } = this
 
 
         if (!canvas) { return }
@@ -115,13 +116,13 @@ class ViewPort {
 
         if (!world) { return }
 
-        if (focus && this.world.things.includes(this.focus)) { this.focusOn(focus.data, false) }
+        if (cameraInstruction) { cameraInstruction.focusViewPort(this) }
 
         const ctx = canvas.getContext("2d");
         ctx.fillStyle = this.makeBackgroundGradient(ctx);
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        renderPolygon.onCanvas(ctx,this.worldCorners,{fillColor:'black'}, this)
+        renderPolygon.onCanvas(ctx, this.worldCorners, { fillColor: 'black' }, this)
 
         world.fluids.forEach(fluid => {
             fluid.renderOnCanvas(ctx, this)
