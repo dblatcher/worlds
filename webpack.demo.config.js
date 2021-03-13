@@ -1,13 +1,11 @@
 const path = require('path');
 
-const demoEntryPoint = 'demo/demo2.ts'
-
 module.exports = {
   watch: true,
-  entry: [
-    './src/index.ts',
-    './src/' + demoEntryPoint,
-  ],
+  entry: {
+    demo: './src/demo/demo.ts',
+    demo2: './src/demo/demo2.ts',
+  },
   module: {
     rules: [
       {
@@ -21,7 +19,7 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   output: {
-    filename: 'demo-bundle.js',
+    filename: '[name]-bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
 };

@@ -1,32 +1,14 @@
-import { rocksAndBallons } from './rocksAndBallons'
-import { galaxy } from './galaxy'
-import { balance } from './balance';
-import { squareTestWorld } from './squareTest';
-import { fluidTest } from './fluidTest';
+import { rocksAndBallons } from './worlds/rocksAndBallons'
+import { galaxy } from './worlds/galaxy'
+import { balance } from './worlds/balance';
+import { squareTestWorld } from './worlds/squareTest';
+import { fluidTest } from './worlds/fluidTest';
 
 import { ViewPortControlPanel } from './ViewPortControlPanel';
 import { ViewPort } from '../ViewPort';
 
+import './addStyleSheetAndFrame'
 
-const styleSheet = document.createElement('style')
-styleSheet.textContent = `
-.frame {
-    width: 100%;
-    height: 100%;
-    max-height: 95vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    z-index: -1;
-}
-
-canvas {
-    border: 20px outset gray;
-    box-sizing: border-box;
-    max-height: inherit;
-}
-`
 
 const canvasElement = document.createElement('canvas')
 const canvasElement2 = document.createElement('canvas')
@@ -50,14 +32,10 @@ const viewPort2 = new ViewPort({
 
 viewPort2World.ticksPerSecond = 10
 
-document.head.appendChild(styleSheet)
-document.body.appendChild(panel.makeElement())
-
-const frame = document.createElement('div')
-frame.classList.add('frame')
+const frame = document.querySelector('.frame')
+document.body.prepend(panel.makeElement())
 frame.appendChild(canvasElement2);
 frame.appendChild(canvasElement);
-document.body.appendChild(frame);
 
 (window as any).panel = panel;
 (window as any).viewPort2 = viewPort2;

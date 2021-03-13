@@ -1,4 +1,4 @@
-import { World, Thing, Force, LinedThing, shapes } from '../index'
+import { World, Thing, Force, LinedThing, shapes } from '../../index'
 
 
 const bigWhiteSquare = new LinedThing({

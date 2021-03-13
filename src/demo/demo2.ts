@@ -4,28 +4,10 @@ import { CameraFollowInstruction } from '../CameraInstruction';
 import { Force } from '../Force';
 import { _360deg, _90deg } from '../geometry';
 import { RenderTransformationRule, ViewPort } from '../ViewPort';
-import { bigWorld, redPlanet } from './bigWorld';
+import { bigWorld, redPlanet } from './worlds/bigWorld';
 
 
-const styleSheet = document.createElement('style')
-styleSheet.textContent = `
-.frame {
-    width: 100%;
-    height: 100%;
-    max-height: 95vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    z-index: -1;
-}
-
-canvas {
-    border: 20px outset gray;
-    box-sizing: border-box;
-    max-height: inherit;
-}
-`
+import './addStyleSheetAndFrame'
 
 const canvasElement1 = document.createElement('canvas')
 const canvasElement2 = document.createElement('canvas')
@@ -69,17 +51,14 @@ demoWorld.emitter.on('tick', () => {
 })
 
 redPlanet.momentum = new Force(50, 2)
-// redPlanet.data.heading = _90deg/3
 
 demoWorld.ticksPerSecond = 20
 
-const frame = document.createElement('div')
-frame.classList.add('frame')
+const frame = document.querySelector('.frame')
 frame.appendChild(canvasElement1);
 frame.appendChild(canvasElement2);
 
-document.head.appendChild(styleSheet)
-document.body.appendChild(frame);
+
 
 (window as any).viewPort1 = viewPort1;
 (window as any).viewPort2 = viewPort2;

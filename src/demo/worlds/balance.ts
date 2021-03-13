@@ -1,4 +1,4 @@
-import { World, LinedThing, Thing, Force } from '../index'
+import { World, LinedThing, Thing, Force } from '../../index'
 
 const whiteStar1 = new LinedThing({ x: -250, y: 500, size: 500, density: 1, immobile:true, color: 'ghostwhite' })
 const whiteStar2 = new LinedThing({ x: 1250, y: 500, size: 500, density: 1, immobile:true, color: 'antiquewhite' })

@@ -1,4 +1,4 @@
-import { World, LinedThing, Thing, Force } from '../index'
+import { World, LinedThing, Thing, Force } from '../../index'
 
 
 const worldHeight = 10000
