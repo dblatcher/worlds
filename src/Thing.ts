@@ -49,7 +49,8 @@ class Thing {
     get typeId() { return 'Thing' }
 
     duplicate() {
-        return new Thing(Object.assign({}, this.data), new Force(this.momentum.magnitude, this.momentum.direction))
+        const myPrototype = Object.getPrototypeOf(this)
+        return new myPrototype.constructor(Object.assign({}, this.data), new Force(this.momentum.magnitude, this.momentum.direction))
     }
 
     // TO DO - delegate mass + volume to Shape
