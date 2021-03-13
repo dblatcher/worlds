@@ -15,13 +15,13 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
 
     // https://en.wikipedia.org/wiki/Spherical_cap
     const volumeAboveSurface = distanceAboveFluidSurface < 0
-    ? 0
-    : ((Math.PI * distanceAboveFluidSurface**2) / 3) * ((3*shapeValues.radius) - distanceAboveFluidSurface )
+        ? 0
+        : ((Math.PI * distanceAboveFluidSurface ** 2) / 3) * ((3 * shapeValues.radius) - distanceAboveFluidSurface)
 
     const distanceBelowFluidBottom = shapeValues.bottom - fluid.bottomLevel
-    const volumeBelowBottom= distanceBelowFluidBottom < 0
-    ? 0
-    : ((Math.PI * distanceBelowFluidBottom**2) / 3) * ((3*shapeValues.radius) - distanceBelowFluidBottom )
+    const volumeBelowBottom = distanceBelowFluidBottom < 0
+        ? 0
+        : ((Math.PI * distanceBelowFluidBottom ** 2) / 3) * ((3 * shapeValues.radius) - distanceBelowFluidBottom)
 
     const volumeOfFluidDisplaced = thing.volume - volumeAboveSurface - volumeBelowBottom
 
@@ -31,9 +31,10 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
 }
 
 
-function calculateDragForce(body:Thing, currentForce:Force):Force {
+function calculateDragForce(body: Thing, currentForce: Force): Force {
     if (!body.world) { return Force.none }
     const { fluids, airDensity } = body.world
+    if (fluids.length == 0 && airDensity == 0) { return Force.none }
 
     const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
     let velocity = currentForce.magnitude
