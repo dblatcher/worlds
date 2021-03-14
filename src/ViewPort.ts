@@ -113,10 +113,12 @@ class ViewPort {
     /**
      * Locate the point int the world the user clicked on.
      * @param event a pointer event
+     * @param locationClicksOutsideCanvas a whether to return a point if the user clicks outside
+     * the content box of the canvas element 
      * @returns the world co-ordinates of the point clicked, or null
      * if the click is outside the content box of the canvas element 
      */
-    locateClick(event: PointerEvent) {
+    locateClick(event: PointerEvent, allowClicksOutsideCanvasElement=false) {
         const { canvas } = this
         const rect = canvas.getBoundingClientRect()
 
@@ -125,7 +127,8 @@ class ViewPort {
         const viewPortX = elementX * (this.width / canvas.width)
         const viewPortY = elementY * (this.height / canvas.height)
 
-        if (viewPortX < 0 || viewPortY < 0 || viewPortX > this.width || viewPortY > this.height) { return null }
+        if (!allowClicksOutsideCanvasElement && (viewPortX < 0 || viewPortY < 0 || viewPortX > this.width || viewPortY > this.height)) { return null }
+        
         return this.unMapPoint({ x: viewPortX, y: viewPortY })
     }
 
