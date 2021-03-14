@@ -5,7 +5,7 @@ module.exports = {
   entry: {
     demo: './src/demo/demo.ts',
     demo2: './src/demo/demo2.ts',
-    splash: './src/demo/splash.ts',
+    demo3: './src/demo/demo3.ts',
   },
   module: {
     rules: [
