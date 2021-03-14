@@ -122,8 +122,10 @@ class ViewPortControlPanel {
         }
 
         container.style.position = 'fixed'
-        container.style.backgroundColor = 'red'
+        container.style.backgroundColor = 'rgba(250,100,100,.75)'
         container.style.right = '0'
+        container.style.zIndex = '5'
+        container.style.padding = ".5em"
 
 
         return container
