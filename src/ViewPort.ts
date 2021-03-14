@@ -100,6 +100,35 @@ class ViewPort {
         }
     }
 
+    unMapPoint(pointOnViewport: Point, parallax = 1): Point {
+        const { x, y, magnify, width, height, rotate } = this
+        const vectorFromCenter = Force.fromVector((width / 2) - pointOnViewport.x, (height / 2) - pointOnViewport.y)
+        vectorFromCenter.direction -= rotate
+        return {
+            x: x - (vectorFromCenter.vectorX / (magnify / parallax)),
+            y: y - (vectorFromCenter.vectorY / (magnify / parallax))
+        }
+    }
+
+    /**
+     * Locate the point int the world the user clicked on.
+     * @param event a pointer event
+     * @returns the world co-ordinates of the point clicked, or null
+     * if the click is outside the content box of the canvas element 
+     */
+    locateClick(event: PointerEvent) {
+        const { canvas } = this
+        const rect = canvas.getBoundingClientRect()
+
+        const elementX = event.clientX - rect.left - canvas.clientLeft
+        const elementY = event.clientY - rect.top - canvas.clientTop
+        const viewPortX = elementX * (this.width / canvas.width)
+        const viewPortY = elementY * (this.height / canvas.height)
+
+        if (viewPortX < 0 || viewPortY < 0 || viewPortX > this.width || viewPortY > this.height) { return null }
+        return this.unMapPoint({ x: viewPortX, y: viewPortY })
+    }
+
     get worldCorners(): [Point, Point, Point, Point] {
         const topLeft = { x: 0, y: 0 }
         const topRight = { x: this.world.width, y: 0 }
