@@ -11,16 +11,20 @@ const water = new Fluid({
     density: 1,
 })
 
-const thing = new Thing({
+const thingInAir = new Thing({
     size: 300,
     x: 10, y: 50,
-    density: 2,
+    density: 5,
     elasticity: .5,
-}, new Force(15, _90deg))
+}, new Force(100, _90deg))
+
+const thingInWater = thingInAir.duplicate()
+thingInWater.data.y = 3500
 
 const world = new World([
     water,
-    thing,
+    thingInAir,
+    thingInWater,
 ], {
     width: 6000,
     height: 5000,

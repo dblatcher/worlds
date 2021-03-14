@@ -8,7 +8,6 @@ styleSheet.textContent = `
     justify-content: center;
     align-items: center;
     position: relative;
-    z-index: -1;
 }
 
 canvas {
