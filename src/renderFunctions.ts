@@ -36,8 +36,22 @@ const renderPoint = {
         beginPathAndStyle(ctx, style);
 
         const mappedCenter = viewPort.mapPoint(point, style.parallax);
-        ctx.arc(mappedCenter.x, mappedCenter.y, viewPort.pointRadius, 0, Math.PI * 2)
+        ctx.arc(mappedCenter.x, mappedCenter.y, Math.round(viewPort.pointRadius/2), 0, Math.PI * 2)
+ 
         if (style.fillColor) { ctx.fill() }
+        if (style.strokeColor) { ctx.stroke() }
+    }
+}
+
+const renderLine = {
+    onCanvas: function (ctx: CanvasRenderingContext2D, line: [Point, Point], style: CanvasRenderStyle, viewPort: ViewPort): void {
+        beginPathAndStyle(ctx, style);
+        const { parallax = 1 } = style
+
+        let mappedLine = line.map(point => viewPort.mapPoint(point, parallax))
+        ctx.moveTo(mappedLine[0].x, mappedLine[0].y)
+        ctx.lineTo(mappedLine[1].x, mappedLine[1].y)
+
         if (style.strokeColor) { ctx.stroke() }
     }
 }
@@ -58,7 +72,6 @@ const renderPolygon = {
         if (style.fillColor) { ctx.fill() }
         if (style.strokeColor) { ctx.stroke() }
     }
-
 }
 
 const renderPathAhead = {
@@ -110,5 +123,5 @@ const renderHeadingIndicator = {
 
 
 export {
-    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon, renderPoint,
+    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon, renderPoint, renderLine
 }
