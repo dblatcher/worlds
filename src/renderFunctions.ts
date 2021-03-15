@@ -6,62 +6,57 @@ interface CanvasRenderStyle {
     fillColor?: string
     strokeColor?: string
     parallax?: number
+    lineDash?: number[]
+}
+
+function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderStyle) {
+    const { fillColor, strokeColor, lineDash = [] } = style
+    ctx.beginPath();
+    ctx.setLineDash(lineDash);
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = strokeColor;
 }
 
 const renderCircle = {
     onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort: ViewPort): void {
-        const { fillColor, strokeColor, parallax = 1 } = style
+        beginPathAndStyle(ctx, style);
+        const { parallax = 1 } = style
         const { radius } = circle
 
-        ctx.beginPath();
-        ctx.fillStyle = fillColor;
-        ctx.strokeStyle = strokeColor;
-
         const mappedCenter = viewPort.mapPoint(circle, parallax);
-
         ctx.arc(mappedCenter.x, mappedCenter.y, (radius * viewPort.magnify / parallax), 0, Math.PI * 2)
 
-        if (fillColor) { ctx.fill() }
-        if (strokeColor) { ctx.stroke() }
+        if (style.fillColor) { ctx.fill() }
+        if (style.strokeColor) { ctx.stroke() }
     }
 }
 
 const renderPoint = {
     onCanvas: function (ctx: CanvasRenderingContext2D, point: Point, style: CanvasRenderStyle, viewPort: ViewPort): void {
-        const { fillColor, strokeColor, parallax = 1 } = style
+        beginPathAndStyle(ctx, style);
 
-        ctx.beginPath();
-        ctx.fillStyle = fillColor;
-        ctx.strokeStyle = strokeColor;
-
-        const mappedCenter = viewPort.mapPoint(point, parallax);
-
+        const mappedCenter = viewPort.mapPoint(point, style.parallax);
         ctx.arc(mappedCenter.x, mappedCenter.y, viewPort.pointRadius, 0, Math.PI * 2)
-
-        if (fillColor) { ctx.fill() }
-        if (strokeColor) { ctx.stroke() }
+        if (style.fillColor) { ctx.fill() }
+        if (style.strokeColor) { ctx.stroke() }
     }
 }
 
 
 const renderPolygon = {
     onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort: ViewPort): void {
-        const { fillColor, strokeColor, parallax = 1 } = style
-
-        ctx.beginPath();
-        ctx.fillStyle = fillColor;
-        ctx.strokeStyle = strokeColor;
+        beginPathAndStyle(ctx, style);
+        const { parallax = 1 } = style
 
         let mappedPolygon = polygon.map(point => viewPort.mapPoint(point, parallax))
-
         ctx.moveTo(mappedPolygon[0].x, mappedPolygon[0].y)
         for (let i = 1; i < polygon.length; i++) {
             ctx.lineTo(mappedPolygon[i].x, mappedPolygon[i].y)
         }
         ctx.lineTo(mappedPolygon[0].x, mappedPolygon[0].y)
 
-        if (fillColor) { ctx.fill() }
-        if (strokeColor) { ctx.stroke() }
+        if (style.fillColor) { ctx.fill() }
+        if (style.strokeColor) { ctx.stroke() }
     }
 
 }

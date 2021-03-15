@@ -39,7 +39,14 @@ viewPort.transformRules.push(
         (thing, ctx, viewPort) => {
             thing.renderOnCanvas(ctx, viewPort)
 
-            RenderFunctions.renderCircle.onCanvas(ctx, { x: thing.data.x, y: thing.data.y, radius: thing.data.size + 5 }, { strokeColor: "white" }, viewPort)
+            RenderFunctions.renderCircle.onCanvas(ctx, { 
+                x: thing.data.x, 
+                y: thing.data.y, 
+                radius: thing.data.size + 5 
+            }, { 
+                strokeColor: "white", 
+                lineDash:[2,3] 
+            }, viewPort)
         }
     )
 )
