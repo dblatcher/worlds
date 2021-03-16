@@ -1,9 +1,10 @@
 import { Thing } from "./Thing"
 import { getVectorX, getVectorY, Point, _90deg, Circle } from './geometry'
 import { ViewPort } from "./World"
+import { AbstractGradientFill } from "./GradientFill"
 
 interface CanvasRenderStyle {
-    fillColor?: string
+    fillColor?: string | AbstractGradientFill
     strokeColor?: string
     parallax?: number
     lineDash?: number[]
@@ -11,15 +12,23 @@ interface CanvasRenderStyle {
 
 function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderStyle) {
     const { fillColor, strokeColor, lineDash = [] } = style
+
+    const fillStyle = typeof fillColor === 'object'
+        ? (fillColor as AbstractGradientFill).fallbackColor
+        : fillColor
+
     ctx.beginPath();
     ctx.setLineDash(lineDash);
-    ctx.fillStyle = fillColor;
+    ctx.fillStyle = fillStyle;
     ctx.strokeStyle = strokeColor;
 }
 
 const renderCircle = {
     onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
+        if (typeof style.fillColor == 'object') {
+            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(circle, ctx, viewPort)
+        }
         const { parallax = 1 } = style
         const { radius } = circle
 
@@ -36,8 +45,8 @@ const renderPoint = {
         beginPathAndStyle(ctx, style);
 
         const mappedCenter = viewPort.mapPoint(point, style.parallax);
-        ctx.arc(mappedCenter.x, mappedCenter.y, Math.round(viewPort.pointRadius/2), 0, Math.PI * 2)
- 
+        ctx.arc(mappedCenter.x, mappedCenter.y, Math.round(viewPort.pointRadius / 2), 0, Math.PI * 2)
+
         if (style.fillColor) { ctx.fill() }
         if (style.strokeColor) { ctx.stroke() }
     }
@@ -60,6 +69,9 @@ const renderLine = {
 const renderPolygon = {
     onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
+        if (typeof style.fillColor == 'object') {
+            (style.fillColor as AbstractGradientFill).setFillStyleForPolygon(polygon, ctx, viewPort)
+        }
         const { parallax = 1 } = style
 
         let mappedPolygon = polygon.map(point => viewPort.mapPoint(point, parallax))

@@ -1,3 +1,5 @@
+import { Point } from '../../geometry'
+import { LinearGradientFill } from '../../GradientFill'
 import { World, Thing, Force, LinedThing, shapes } from '../../index'
 
 
@@ -19,6 +21,18 @@ const litteWhiteSquare = new Thing({
     density: .1,
     immobile: true,
     color: 'antiquewhite',
+    fillColor: new LinearGradientFill({
+        fallbackColor:'red',
+        canvasFunction: (ctx: CanvasRenderingContext2D, line: [Point, Point]) => {
+            const gradient = ctx.createLinearGradient(line[0].x, line[0].y, line[1].x, line[1].y);
+            let i;
+            for (i = 0; i < 10; i++) {
+                gradient.addColorStop(i * .1, 'red');
+                gradient.addColorStop((i + .5) * .1, 'blue');
+            }
+            return gradient
+        }
+    }),
     shape: shapes.square,
     headingFollowsDirection: true,
 })

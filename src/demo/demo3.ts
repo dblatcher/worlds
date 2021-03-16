@@ -8,8 +8,8 @@ import './addStyleSheetAndFrame'
 
 let thingInFocus: Thing = null
 
-const maxPushForce = 15
-const pushForceDistanceMultipler = 1.5 * 10 ** 4
+const maxPushForce = 30
+const pushForceDistanceMultipler = 4 * 10 ** 4
 
 let cursorPoint:Point = { x: 0, y: 0 }
 
