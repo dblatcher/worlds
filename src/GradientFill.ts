@@ -1,12 +1,12 @@
-import { Circle, Point } from "./geometry"
+import { Circle, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector } from "./geometry"
 import { ViewPort } from "./ViewPort"
 
 
 class AbstractGradientFill {
     makeCanvasFill: Function
     fallbackColor: string
-    setFillStyleForCircle(circle: Circle, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {ctx.fillStyle = this.fallbackColor}
-    setFillStyleForPolygon(polygon: Point[], ctx: CanvasRenderingContext2D, viewPort: ViewPort) {ctx.fillStyle = this.fallbackColor}
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { ctx.fillStyle = this.fallbackColor }
+    setFillStyleForPolygon(polygon: Point[], ctx: CanvasRenderingContext2D, viewPort: ViewPort) { ctx.fillStyle = this.fallbackColor }
 }
 
 
@@ -29,12 +29,35 @@ class LinearGradientFill extends AbstractGradientFill {
     get isFillColorObject() { return true }
 
 
-    setFillStyleForCircle(circle: Circle, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        const toFront: Vector = {
+            x: getVectorX(circle.radius, heading), y: getVectorY(circle.radius, heading)
+        }
+
         const line = [
-            { x: circle.x - circle.radius, y: circle.y - circle.radius },
-            { x: circle.x + circle.radius, y: circle.y + circle.radius }
+            { x: circle.x + toFront.x, y: circle.y + toFront.y },
+            { x: circle.x - toFront.x, y: circle.y - toFront.y }
         ].map(point => viewPort.mapPoint(point)) as [Point, Point]
 
+        ctx.fillStyle = this.makeCanvasFill(ctx, line)
+    }
+
+    setFillStyleForPolygon(polygon: Point[], ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        const edges = getPolygonLineSegments(polygon)
+        const point1 = {
+            x: (edges[0][0].x + edges[0][1].x) / 2,
+            y: (edges[0][0].y + edges[0][1].y) / 2
+        }
+
+        const oppositeIndex = Math.floor(edges.length / 2)
+
+        const point2 = {
+            x: (edges[oppositeIndex][0].x + edges[oppositeIndex][1].x) / 2,
+            y: (edges[oppositeIndex][0].y + edges[oppositeIndex][1].y) / 2
+        }
+
+        const line = [point1, point2]
+            .map(point => viewPort.mapPoint(point)) as [Point, Point]
         ctx.fillStyle = this.makeCanvasFill(ctx, line)
     }
 

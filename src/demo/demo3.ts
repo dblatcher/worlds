@@ -51,7 +51,8 @@ viewPort.transformRules.push(
 
             const style = {
                 strokeColor: "white",
-                lineDash: [2, 3]
+                lineDash: [2, 3],
+                heading: thing.data.heading
             }
 
             RenderFunctions.renderCircle.onCanvas(ctx, {

@@ -22,9 +22,9 @@ viewPort1.transformRules.push(new RenderTransformationRule(
     (thing, ctx, viewPort) => {
         let circle1 = thing.shapeValues
         let circle2 = thing.shapeValues
-        circle2.radius = circle2.radius*2
-        RenderFunctions.renderCircle.onCanvas(ctx, circle2, { fillColor: 'blue' }, viewPort)
-        RenderFunctions.renderCircle.onCanvas(ctx, circle1, { fillColor: 'yellow' }, viewPort)
+        circle2.radius = circle2.radius * 2
+        RenderFunctions.renderCircle.onCanvas(ctx, circle2, { fillColor: 'blue', heading: thing.data.heading }, viewPort)
+        RenderFunctions.renderCircle.onCanvas(ctx, circle1, { fillColor: 'yellow', heading: thing.data.heading }, viewPort)
     }
 ))
 

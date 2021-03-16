@@ -100,8 +100,8 @@ const circle = new Shape({
         }
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort) {
-        const { color = 'white', fillColor } = thisThing.data
-        renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor }, viewPort)
+        const { color = 'white', fillColor, heading } = thisThing.data
+        renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor, heading }, viewPort)
     }
 })
 

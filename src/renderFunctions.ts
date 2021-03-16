@@ -8,6 +8,7 @@ interface CanvasRenderStyle {
     strokeColor?: string
     parallax?: number
     lineDash?: number[]
+    heading?: number
 }
 
 function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderStyle) {
@@ -27,7 +28,7 @@ const renderCircle = {
     onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
         if (typeof style.fillColor == 'object') {
-            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(circle, ctx, viewPort)
+            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(circle, style.heading || 0, ctx, viewPort)
         }
         const { parallax = 1 } = style
         const { radius } = circle

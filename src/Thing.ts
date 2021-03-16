@@ -4,8 +4,9 @@ import { getVectorX, getVectorY, Point, reverseHeading, _90deg } from './geometr
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
-import { FillColor, renderHeadingIndicator, renderPathAhead } from './renderFunctions'
+import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
 import { Fluid } from './Fluid'
+import { AbstractGradientFill } from './GradientFill'
 
 
 
@@ -17,7 +18,7 @@ interface ThingData {
     headingFollowsDirection?: boolean
     shape?: Shape
     color?: string
-    fillColor?: string | FillColor
+    fillColor?: string | AbstractGradientFill
     density?: number
     elasticity?: number
     immobile?: boolean

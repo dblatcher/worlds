@@ -28,7 +28,7 @@ const greenStripes = new LinearGradientFill({
 })
 
 const greenBall = new Thing(Object.assign({
-    x: 10, y: 10, fillColor: greenStripes, shape:shapes.circle
+    x: 10, y: 10, fillColor: greenStripes, headingFollowsDirection: true
 }, ball))
 
 const redBall = new Thing(Object.assign({
