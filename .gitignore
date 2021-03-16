@@ -88,3 +88,6 @@ dist/
 
 # built tests folder
 tests/built/
+
+# the todo file
+todo
