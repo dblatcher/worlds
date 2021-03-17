@@ -1,4 +1,4 @@
-import { world as world } from './worlds/billiards'
+import { world as world, greenStripes, redCircles } from './worlds/billiards'
 import { ViewPort } from '../ViewPort';
 import { CameraFollowInstruction } from '../CameraInstruction';
 import { Force, RenderFunctions, RenderTransformationRule, Thing } from '..';
@@ -43,6 +43,8 @@ function handleHover(event:PointerEvent) {
 
 const canvasElement = document.createElement('canvas')
 const viewPort = ViewPort.fitToSize(world, canvasElement, 700, 500)
+
+viewPort.framefill = redCircles
 
 viewPort.transformRules.push(
     new RenderTransformationRule(thing => thing === thingInFocus,

@@ -3,6 +3,7 @@ import { BackGround } from "./BackGround"
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
 import { Point, _90deg } from "./geometry"
+import { AbstractGradientFill } from "./GradientFill"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
 
@@ -32,6 +33,7 @@ interface ViewPortConfig {
     dontRenderBackground?: boolean
     dontRenderEffects?: boolean
     transformRules?: RenderTransformationRule[]
+    framefill?: string | AbstractGradientFill
 }
 
 
@@ -50,7 +52,7 @@ class ViewPort {
     dontRenderBackground: boolean
     dontRenderEffects: boolean
     transformRules: RenderTransformationRule[]
-
+    framefill: string | AbstractGradientFill
 
     constructor(config: ViewPortConfig) {
         this.x = config.x
@@ -63,6 +65,7 @@ class ViewPort {
         this.dontRenderBackground = config.dontRenderBackground || false
         this.dontRenderEffects = config.dontRenderEffects || false
         this.transformRules = config.transformRules || []
+        this.framefill = config.framefill || "transparent"
 
         this.canvas = config.canvas
         this.renderCanvas = this.renderCanvas.bind(this)
@@ -118,7 +121,7 @@ class ViewPort {
      * @returns the world co-ordinates of the point clicked, or null
      * if the click is outside the content box of the canvas element 
      */
-    locateClick(event: PointerEvent, allowClicksOutsideCanvasElement=false) {
+    locateClick(event: PointerEvent, allowClicksOutsideCanvasElement = false) {
         const { canvas } = this
         const rect = canvas.getBoundingClientRect()
 
@@ -128,7 +131,7 @@ class ViewPort {
         const viewPortY = elementY * (this.height / canvas.height)
 
         if (!allowClicksOutsideCanvasElement && (viewPortX < 0 || viewPortY < 0 || viewPortX > this.width || viewPortY > this.height)) { return null }
-        
+
         return this.unMapPoint({ x: viewPortX, y: viewPortY })
     }
 
@@ -174,11 +177,13 @@ class ViewPort {
         canvas.setAttribute('width', this.width.toString());
 
         if (!world) { return }
-
         if (cameraInstruction) { cameraInstruction.focusViewPort(this) }
-
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = this.makeBackgroundGradient(ctx);
+
+
+        if (typeof this.framefill === 'string') { ctx.fillStyle = this.framefill }
+        else { this.framefill.setFillStyleForViewPort(ctx, this) }
+
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         renderPolygon.onCanvas(ctx, this.worldCorners, { fillColor: 'black' }, this)
@@ -203,17 +208,7 @@ class ViewPort {
         }
     }
 
-    makeBackgroundGradient(ctx: CanvasRenderingContext2D) {
-        const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
 
-        let i;
-        for (i = 0; i < 10; i++) {
-            gradient.addColorStop(i * .1, 'red');
-            gradient.addColorStop((i + .5) * .1, 'green');
-        }
-
-        return gradient
-    }
 
     static full(world: World, canvas: HTMLCanvasElement, magnify: number = 1) {
         return new ViewPort({

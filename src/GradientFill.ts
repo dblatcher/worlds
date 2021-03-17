@@ -5,11 +5,14 @@ import { ViewPort } from "./ViewPort"
 class AbstractGradientFill {
     makeCanvasFill: Function
     fallbackColor: string
-    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
-        ctx.fillStyle = this.fallbackColor 
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        ctx.fillStyle = this.fallbackColor
     }
-    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
-        ctx.fillStyle = this.fallbackColor 
+    setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        ctx.fillStyle = this.fallbackColor
+    }
+    setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        ctx.fillStyle = this.fallbackColor
     }
 
     constructor(config: {
@@ -43,7 +46,7 @@ class LinearGradientFill extends AbstractGradientFill {
         ctx.fillStyle = this.makeCanvasFill(ctx, line)
     }
 
-    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
+    setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         const edges = getPolygonLineSegments(polygon)
         const point1 = {
             x: (edges[0][0].x + edges[0][1].x) / 2,
@@ -62,6 +65,12 @@ class LinearGradientFill extends AbstractGradientFill {
         ctx.fillStyle = this.makeCanvasFill(ctx, line)
     }
 
+    setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        ctx.fillStyle = this.makeCanvasFill(ctx, [
+            { x: viewPort.width / 2, y: 0 },
+            { x: viewPort.width / 2, y: viewPort.height }
+        ]);
+    }
 }
 
 interface CanvasRadialGradientFunction {
@@ -81,7 +90,7 @@ class RadialGradientFill extends AbstractGradientFill {
         ctx.fillStyle = this.makeCanvasFill(ctx, mappedCircle, heading)
     }
 
-    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
+    setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         const x = polygon.reduce((previousvalue, vertex) => vertex.x + previousvalue, 0) / polygon.length
         const y = polygon.reduce((previousvalue, vertex) => vertex.y + previousvalue, 0) / polygon.length
         const polygonCenter: Point = { x, y }
@@ -97,6 +106,15 @@ class RadialGradientFill extends AbstractGradientFill {
             radius: furtherestDistanceFromCenter * viewPort.magnify
         }
         ctx.fillStyle = this.makeCanvasFill(ctx, mappedCircle, heading)
+    }
+
+    setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        const circle: Circle = {
+            x: viewPort.width / 2,
+            y: viewPort.height / 2,
+            radius: Math.max(viewPort.width/2, viewPort.height/2)
+        }
+        ctx.fillStyle = this.makeCanvasFill(ctx, circle, 0);
     }
 
 }

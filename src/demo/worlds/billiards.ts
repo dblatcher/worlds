@@ -19,7 +19,7 @@ const greenStripes = new LinearGradientFill({
         const gradient = ctx.createLinearGradient(line[0].x, line[0].y, line[1].x, line[1].y);
         let i;
         for (i = 0; i < 10; i++) {
-            gradient.addColorStop(i * .1, 'red');
+            gradient.addColorStop(i * .1, 'lime');
             gradient.addColorStop((i + .5) * .1, 'green');
         }
         return gradient
@@ -86,4 +86,4 @@ const world = new World([
     hasHardEdges: true,
 })
 
-export { world }
+export { world, greenStripes, redCircles }
