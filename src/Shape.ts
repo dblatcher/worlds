@@ -23,7 +23,7 @@ interface PolygonPointsFunction {
 }
 
 interface CanvasRenderFunction {
-    (ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort): void
+    (ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort): void
 }
 
 class ShapeConfig {
@@ -99,7 +99,7 @@ const circle = new Shape({
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading } = thisThing.data
         renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor, heading }, viewPort)
     }
@@ -166,10 +166,10 @@ const square = new Shape({
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort:ViewPort) {
-        const { color = 'white', fillColor } = thisThing.data
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort) {
+        const { color = 'white', fillColor, heading = 0 } = thisThing.data
         const { polygonPoints } = thisThing
-        renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor }, viewPort)
+        renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor, heading }, viewPort)
     }
 })
 

@@ -71,7 +71,7 @@ const renderPolygon = {
     onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
         if (typeof style.fillColor == 'object') {
-            (style.fillColor as AbstractGradientFill).setFillStyleForPolygon(polygon, ctx, viewPort)
+            (style.fillColor as AbstractGradientFill).setFillStyleForPolygon(polygon, style.heading || 0, ctx, viewPort)
         }
         const { parallax = 1 } = style
 

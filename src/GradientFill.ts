@@ -1,12 +1,25 @@
-import { Circle, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector } from "./geometry"
+import { Circle, getDistanceBetweenPoints, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector } from "./geometry"
 import { ViewPort } from "./ViewPort"
 
 
 class AbstractGradientFill {
     makeCanvasFill: Function
     fallbackColor: string
-    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { ctx.fillStyle = this.fallbackColor }
-    setFillStyleForPolygon(polygon: Point[], ctx: CanvasRenderingContext2D, viewPort: ViewPort) { ctx.fillStyle = this.fallbackColor }
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
+        ctx.fillStyle = this.fallbackColor 
+    }
+    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
+        ctx.fillStyle = this.fallbackColor 
+    }
+
+    constructor(config: {
+        fallbackColor: string,
+        canvasFunction: Function
+    }) {
+        this.fallbackColor = config.fallbackColor
+        this.makeCanvasFill = config.canvasFunction
+    }
+    get isFillColorObject() { return true }
 }
 
 
@@ -16,18 +29,6 @@ interface CanvasLinearGradientFunction {
 
 class LinearGradientFill extends AbstractGradientFill {
     makeCanvasFill: CanvasLinearGradientFunction
-    fallbackColor: string
-    constructor(config: {
-        fallbackColor: string,
-        canvasFunction: CanvasLinearGradientFunction
-    }) {
-        super()
-        this.fallbackColor = config.fallbackColor
-        this.makeCanvasFill = config.canvasFunction
-    }
-
-    get isFillColorObject() { return true }
-
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         const toFront: Vector = {
@@ -42,7 +43,7 @@ class LinearGradientFill extends AbstractGradientFill {
         ctx.fillStyle = this.makeCanvasFill(ctx, line)
     }
 
-    setFillStyleForPolygon(polygon: Point[], ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
         const edges = getPolygonLineSegments(polygon)
         const point1 = {
             x: (edges[0][0].x + edges[0][1].x) / 2,
@@ -63,4 +64,41 @@ class LinearGradientFill extends AbstractGradientFill {
 
 }
 
-export { AbstractGradientFill, LinearGradientFill }
+interface CanvasRadialGradientFunction {
+    (ctx: CanvasRenderingContext2D, circle: Circle, heading: number): CanvasGradient
+}
+
+class RadialGradientFill extends AbstractGradientFill {
+    makeCanvasFill: CanvasRadialGradientFunction
+
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+        const mappedCircleCenter = viewPort.mapPoint(circle)
+        const mappedCircle = {
+            x: mappedCircleCenter.x,
+            y: mappedCircleCenter.y,
+            radius: circle.radius * viewPort.magnify
+        }
+        ctx.fillStyle = this.makeCanvasFill(ctx, mappedCircle, heading)
+    }
+
+    setFillStyleForPolygon(polygon: Point[],heading:number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) { 
+        const x = polygon.reduce((previousvalue, vertex) => vertex.x + previousvalue, 0) / polygon.length
+        const y = polygon.reduce((previousvalue, vertex) => vertex.y + previousvalue, 0) / polygon.length
+        const polygonCenter: Point = { x, y }
+
+        const furtherestDistanceFromCenter = polygon
+            .map(vertex => getDistanceBetweenPoints(vertex, polygonCenter))
+            .sort().reverse()[0]
+
+        const mappedCircleCenter = viewPort.mapPoint(polygonCenter)
+        const mappedCircle = {
+            x: mappedCircleCenter.x,
+            y: mappedCircleCenter.y,
+            radius: furtherestDistanceFromCenter * viewPort.magnify
+        }
+        ctx.fillStyle = this.makeCanvasFill(ctx, mappedCircle, heading)
+    }
+
+}
+
+export { AbstractGradientFill, LinearGradientFill, RadialGradientFill }

@@ -1,6 +1,6 @@
 import { Fluid, Force } from "../..";
-import { Point, _360deg, _90deg } from "../../geometry";
-import { LinearGradientFill } from "../../GradientFill"
+import { Circle, getVectorX, getVectorY, Point, Vector, _360deg, _90deg } from "../../geometry";
+import { LinearGradientFill, RadialGradientFill } from "../../GradientFill"
 import { shapes } from "../../Shape";
 import { Thing } from "../../Thing";
 import { World } from "../../World";
@@ -27,12 +27,44 @@ const greenStripes = new LinearGradientFill({
 
 })
 
+const redCircles = new RadialGradientFill({
+    fallbackColor: "pink",
+    canvasFunction: (ctx: CanvasRenderingContext2D, circle: Circle, heading: number) => {
+        
+        const offCenter:Vector = {
+            x: getVectorX(circle.radius * .25, heading),
+            y: getVectorY(circle.radius * .25, heading)
+        }
+
+        const innerCircle: Circle = {
+            x: circle.x + offCenter.x,
+            y: circle.y + offCenter.y,
+            radius: circle.radius * (1 / 2)
+        }
+
+        const gradient = ctx.createRadialGradient(innerCircle.x, innerCircle.y, innerCircle.radius, circle.x, circle.y, circle.radius);
+        gradient.addColorStop(0, 'red');
+        gradient.addColorStop(.1, 'pink');
+        gradient.addColorStop(.2, 'red');
+        gradient.addColorStop(.3, 'pink');
+        gradient.addColorStop(.4, 'red');
+        gradient.addColorStop(.5, 'pink');
+        gradient.addColorStop(.6, 'red');
+        gradient.addColorStop(.7, 'pink');
+        gradient.addColorStop(.8, 'red');
+        gradient.addColorStop(.9, 'pink');
+        gradient.addColorStop(1, 'red');
+
+        return gradient;
+    }
+})
+
 const greenBall = new Thing(Object.assign({
-    x: 10, y: 10, fillColor: greenStripes, headingFollowsDirection: true
+    x: 10, y: 10, fillColor: greenStripes
 }, ball))
 
 const redBall = new Thing(Object.assign({
-    x: 40, y: 150, fillColor: 'red'
+    x: 40, y: 150, fillColor: redCircles, shape:shapes.circle
 }, ball))
 
 const blueBall = new Thing(Object.assign({
