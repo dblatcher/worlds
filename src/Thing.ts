@@ -1,6 +1,6 @@
 import { World, ViewPort } from './World'
 import { Force } from './Force'
-import { getVectorX, getVectorY, Point, reverseHeading, _90deg } from './geometry'
+import { Point, _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape, shapes, ShapeValues } from './Shape'
@@ -235,35 +235,5 @@ class Thing {
 }
 
 
-class LinedThing extends Thing {
-    renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort:ViewPort) {
-        this.data.shape.renderOnCanvas(ctx, this, viewPort);
-        const { x, y, size, heading } = this.data
 
-        const center = viewPort.mapPoint(this.shapeValues)
-
-        let midPoint = viewPort.mapPoint({
-            x: x + getVectorX(size / 2, heading),
-            y: y + getVectorY(size / 2, heading)
-        })
-
-        ctx.beginPath()
-        ctx.moveTo(midPoint.x, midPoint.y)
-        ctx.lineTo(midPoint.x, center.y)
-        ctx.moveTo(midPoint.x, midPoint.y)
-        ctx.lineTo(center.x, midPoint.y)
-        ctx.stroke()
-    }
-}
-
-class KillerThing extends LinedThing {
-    handleCollision(report: CollisionReport) {
-        if (report) {
-            console.log('DIE!', report)
-            if (report.item1 === this) { report.item2.leaveWorld() }
-            else { report.item1.leaveWorld() }
-        }
-    }
-}
-
-export { Thing, ThingData, LinedThing, KillerThing }
+export { Thing, ThingData }

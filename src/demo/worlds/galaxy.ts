@@ -1,10 +1,10 @@
-import { World, LinedThing, Thing, Force } from '../../index'
+import { World, Thing, Force } from '../../index'
 
 
 const worldHeight = 10000
 const worldWidth = 9000
 
-const whiteStar = new LinedThing({ x: worldWidth / 2, y: worldHeight / 2, fillColor:'ghostwhite', size: 400, density: 5, immobile: true })
+const whiteStar = new Thing({ x: worldWidth / 2, y: worldHeight / 2, fillColor:'ghostwhite', size: 400, density: 5, immobile: true })
 const redPlanet = new Thing({
     x: 300, y: 600, size: 50, density: 2, color: 'red', fillColor:'crimson', elasticity: .8
 }, new Force(24, Math.PI * 0.5))

@@ -1,9 +1,9 @@
 import { Point } from '../../geometry'
 import { LinearGradientFill } from '../../GradientFill'
-import { World, Thing, Force, LinedThing, shapes } from '../../index'
+import { World, Thing, Force, shapes } from '../../index'
 
 
-const bigWhiteSquare = new LinedThing({
+const bigWhiteSquare = new Thing({
     heading: .7,
     x: 200, y: 200,
     size: 100, density: 1,
@@ -11,6 +11,7 @@ const bigWhiteSquare = new LinedThing({
     color: 'antiquewhite',
     shape: shapes.square,
     headingFollowsDirection: true,
+    renderHeadingIndicator: true,
 })
 
 const litteWhiteSquare = new Thing({

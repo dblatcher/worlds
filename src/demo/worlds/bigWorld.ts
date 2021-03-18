@@ -1,6 +1,6 @@
 
 import { StarField } from '../../BackGround'
-import { World, LinedThing, Thing, Force, shapes } from '../../index'
+import { World, Thing, Force, shapes } from '../../index'
 
 
 const worldHeight = 10000
