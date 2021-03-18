@@ -10,7 +10,7 @@ import { AbstractGradientFill } from './GradientFill'
 
 
 
-interface ThingData {
+interface BodyData {
     x: number
     y: number
     heading?: number
@@ -27,11 +27,11 @@ interface ThingData {
 }
 
 
-class Thing {
+class Body {
     world: World
-    data: ThingData
+    data: BodyData
     momentum: Force
-    constructor(config: ThingData, momentum: Force = Force.none) {
+    constructor(config: BodyData, momentum: Force = Force.none) {
         this.data = config
         this.data.heading = this.data.heading || 0
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
@@ -45,9 +45,9 @@ class Thing {
         this.momentum = momentum || Force.none
     }
 
-    get isThing() { return true }
+    get isBody() { return true }
     get isFluid() { return false }
-    get typeId() { return 'Thing' }
+    get typeId() { return 'Body' }
 
     duplicate() {
         const myPrototype = Object.getPrototypeOf(this)
@@ -76,17 +76,17 @@ class Thing {
 
     get gravitationalForces(): Force {
         if (!this.world) { return Force.none }
-        const { globalGravityForce, gravitationalConstant, things, thingsExertGravity, minimumMassToExertGravity } = this.world
+        const { globalGravityForce, gravitationalConstant, bodies, bodiesExertGravity, minimumMassToExertGravity } = this.world
 
         let forces = []
 
-        if (thingsExertGravity) {
-            let otherThings = minimumMassToExertGravity
-                ? things.filter(thing => thing !== this && thing.mass >= minimumMassToExertGravity)
-                : things.filter(thing => thing !== this)
+        if (bodiesExertGravity) {
+            let otherBodies = minimumMassToExertGravity
+                ? bodies.filter(body => body !== this && body.mass >= minimumMassToExertGravity)
+                : bodies.filter(body => body !== this)
 
-            let forcesFromOtherThings = otherThings.map(otherthing => getGravitationalForce(gravitationalConstant, this, otherthing))
-            forces.push(...forcesFromOtherThings)
+            let forcesFromOtherBodies = otherBodies.map(otherBody => getGravitationalForce(gravitationalConstant, this, otherBody))
+            forces.push(...forcesFromOtherBodies)
         }
 
         if (globalGravityForce) {
@@ -113,13 +113,13 @@ class Thing {
 
     enterWorld(world: World) {
         if (this.world) { this.leaveWorld() }
-        world.things.push(this)
+        world.bodies.push(this)
         this.world = world
     }
 
     leaveWorld() {
         if (!this.world) { return }
-        this.world.thingsLeavingAtNextTick.push(this)
+        this.world.bodiesLeavingAtNextTick.push(this)
     }
 
     updateMomentum() {
@@ -147,19 +147,21 @@ class Thing {
             copyOfThis.data.x += copyOfThis.momentum.vectorX
         }
 
-        const immobileThings = this.world.things.filter(thing => thing.data.immobile && thing !== this)
+        const immobileBodies = this.world.bodies.filter(body => body.data.immobile && body !== this)
 
-        //undo any moves that would put this inside an immobile thing
-        // problem - this won't undo moves made by the physics module to separate collising things or put a thing at its stop point
+        //undo any moves that would put this inside an immobile body
+        // problem - this won't undo moves made by the physics module to separate collising bodies or put a body at its stop point
+        
 
         let i = 0;
-        for (i = 0; i < immobileThings.length; i++) {
-            if (copyOfThis.isIntersectingWith(immobileThings[i])) {
+        for (i = 0; i < immobileBodies.length; i++) {
+            if (copyOfThis.isIntersectingWith(immobileBodies[i])) {
                 copyOfThis.data.x = this.data.x
                 copyOfThis.data.y = this.data.y
             }
         }
 
+        // problem - BODIES GET STUCK - need to 'shake loose' by moving them to radius +1 or  h|w - (radius +1) ?
         if (this.world.hasHardEdges && !this.data.immobile) {
             copyOfThis.data.y = top < 0 ? radius : copyOfThis.data.y
             copyOfThis.data.y = bottom > this.world.height ? this.world.height - radius : copyOfThis.data.y
@@ -178,17 +180,17 @@ class Thing {
         this.data.heading = copyOfThis.data.heading
     }
 
-    detectCollisions(withMobileThings: boolean = true, withImmobileThings: boolean = true) {
-        const otherThings = this.world.things.filter(otherThing =>
-            otherThing !== this && (withMobileThings || otherThing.data.immobile) && (withImmobileThings || !otherThing.data.immobile)
+    detectCollisions(withMobileBodies: boolean = true, withImmobileBodies: boolean = true) {
+        const otherBodies = this.world.bodies.filter(otherBody =>
+            otherBody !== this && (withMobileBodies || otherBody.data.immobile) && (withImmobileBodies || !otherBody.data.immobile)
         )
 
 
         const reports: CollisionReport[] = []
 
-        otherThings.forEach(otherThing => {
-            const collisionDetectionFunction = getCollisionDetectionFunction(this.data.shape, otherThing.data.shape)
-            let report = collisionDetectionFunction(this, otherThing)
+        otherBodies.forEach(otherBody => {
+            const collisionDetectionFunction = getCollisionDetectionFunction(this.data.shape, otherBody.data.shape)
+            let report = collisionDetectionFunction(this, otherBody)
             reports.push(report)
         })
 
@@ -229,11 +231,11 @@ class Thing {
         return this.data.shape.containsPoint.apply(this, [point]) as boolean
     }
 
-    isIntersectingWith(otherThing: Thing | Fluid) {
+    isIntersectingWith(otherThing: Body | Fluid) {
         return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
     }
 }
 
 
 
-export { Thing, ThingData }
+export { Body, BodyData }

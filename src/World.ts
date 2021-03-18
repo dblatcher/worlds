@@ -1,5 +1,5 @@
 import { Force } from './Force'
-import { Thing } from './Thing'
+import { Body } from './Body'
 import { Fluid } from './Fluid'
 import { ViewPort } from './ViewPort'
 import { Effect } from './Effect'
@@ -14,7 +14,7 @@ class WorldConfig {
     height?: number
     gravitationalConstant?: number
     globalGravityForce?: Force
-    thingsExertGravity?: boolean
+    bodiesExertGravity?: boolean
     hasHardEdges?: boolean
     minimumMassToExertGravity?: number
     airDensity?: number
@@ -28,20 +28,20 @@ class World extends WorldConfig {
     height: number
     gravitationalConstant: number
     globalGravityForce: Force
-    thingsExertGravity: boolean
+    bodiesExertGravity: boolean
     hasHardEdges: boolean
     minimumMassToExertGravity: number
     airDensity: number
     timerSpeed: number
-    things: Thing[]
+    bodies: Body[]
     fluids: Fluid[]
     effects: Effect[]
     backGrounds: BackGround[]
-    thingsLeavingAtNextTick: Thing[]
+    bodiesLeavingAtNextTick: Body[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
 
-    constructor(contents: (Thing | Fluid)[], config: WorldConfig = {}) {
+    constructor(contents: (Body | Fluid)[], config: WorldConfig = {}) {
         super()
         this.timerSpeed = 0
 
@@ -53,14 +53,14 @@ class World extends WorldConfig {
         this.minimumMassToExertGravity = config.minimumMassToExertGravity || 0
         this.airDensity = config.airDensity || 0
         this.globalGravityForce = config.globalGravityForce || null
-        this.thingsExertGravity = config.thingsExertGravity || false
+        this.bodiesExertGravity = config.bodiesExertGravity || false
         this.hasHardEdges = config.hasHardEdges || false
 
-        const things = contents.filter(content => content.isThing) as Thing[]
+        const bodies = contents.filter(content => content.isBody) as Body[]
         const fluids = contents.filter(content => content.isFluid) as Fluid[]
 
-        this.things = []
-        things.forEach(thing => { thing.enterWorld(this) })
+        this.bodies = []
+        bodies.forEach(body => { body.enterWorld(this) })
 
         this.effects = []
         if (config.effects) {
@@ -72,48 +72,50 @@ class World extends WorldConfig {
         this.fluids = []
         fluids.forEach(fluid => fluid.enterWorld(this))
 
-        this.thingsLeavingAtNextTick = []
+        this.bodiesLeavingAtNextTick = []
 
         this.emitter = new TinyEmitter
     }
 
     get report() {
-        return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.things.length} things.`
+        return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.bodies.length} bodies.`
     }
 
     tick() {
 
-        const {fluids, effects, things} =this
+        const {fluids, effects, bodies} =this
  
-        this.thingsLeavingAtNextTick.forEach(thing => {
-            if (this.things.indexOf(thing) !== -1) {
-                this.things.splice(this.things.indexOf(thing), 1)
-                thing.world = null
+        this.bodiesLeavingAtNextTick.forEach(body => {
+            if (this.bodies.indexOf(body) !== -1) {
+                this.bodies.splice(this.bodies.indexOf(body), 1)
+                body.world = null
             }
         })
-        this.thingsLeavingAtNextTick = []
+        this.bodiesLeavingAtNextTick = []
 
         fluids.forEach(fluid => fluid.drain())
 
-        const mobileThings = things.filter(thing => !thing.data.immobile)
+        const mobileBodies = bodies.filter(body => !body.data.immobile)
 
-        // filter at each stage in case any Things have left the world during the previous stage
-        mobileThings.forEach(thing => { thing.updateMomentum() })
-        mobileThings.filter(thing => thing.world == this).forEach(thing => {
-            const reports = thing.detectCollisions(false, true)
-            reports.forEach(report => thing.handleCollision(report))
+        // filter at each stage in case any Bodies have left the world during the previous stage
+        // MAYBE nolonger necessary because body.leave now uses  bodiesLeavingAtNextTick 
+        // best for safety - devs might remove bodies manually
+        mobileBodies.forEach(body => { body.updateMomentum() })
+        mobileBodies.filter(body => body.world == this).forEach(body => {
+            const reports = body.detectCollisions(false, true)
+            reports.forEach(report => body.handleCollision(report))
         })
-        mobileThings.filter(thing => thing.world == this).forEach(thing => {
-            const reports = thing.detectCollisions(true, false)
-            reports.forEach(report => thing.handleCollision(report))
+        mobileBodies.filter(body => body.world == this).forEach(body => {
+            const reports = body.detectCollisions(true, false)
+            reports.forEach(report => body.handleCollision(report))
         })
         if (this.hasHardEdges) {
-            mobileThings.filter(thing => thing.world == this).forEach(thing => {
-                const reports = thing.detectWorldEdgeCollisions()
-                reports.forEach(report => thing.handleWorldEdgeCollision(report))
+            mobileBodies.filter(body => body.world == this).forEach(body => {
+                const reports = body.detectWorldEdgeCollisions()
+                reports.forEach(report => body.handleWorldEdgeCollision(report))
             })
         }
-        mobileThings.filter(thing => thing.world == this).forEach(thing => { thing.move() })
+        mobileBodies.filter(body => body.world == this).forEach(body => { body.move() })
 
         this.backGrounds.forEach(backGround => backGround.tick())
         effects.forEach(effect => effect.tick())

@@ -1,4 +1,4 @@
-import { Thing } from './Thing'
+import { Body } from './Body'
 import { Force } from './Force'
 
 import * as Geometry from './geometry'
@@ -7,10 +7,10 @@ import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 import { Fluid } from './Fluid'
 
 
-function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, thing: Thing, fluid: Fluid): Force {
+function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, body: Body, fluid: Fluid): Force {
     if (!globalGravityForce) { return Force.none }
 
-    const { shapeValues } = thing
+    const { shapeValues } = body
     const distanceAboveFluidSurface = fluid.surfaceLevel - shapeValues.top
 
     // https://en.wikipedia.org/wiki/Spherical_cap
@@ -23,7 +23,7 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
         ? 0
         : ((Math.PI * distanceBelowFluidBottom ** 2) / 3) * ((3 * shapeValues.radius) - distanceBelowFluidBottom)
 
-    const volumeOfFluidDisplaced = thing.volume - volumeAboveSurface - volumeBelowBottom
+    const volumeOfFluidDisplaced = body.volume - volumeAboveSurface - volumeBelowBottom
 
     // boyancy = fluid.density * [volume of fluid displaced] * g
     const bouyancy = gravitationalConstant * globalGravityForce.magnitude * fluid.data.density * volumeOfFluidDisplaced
@@ -31,7 +31,7 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
 }
 
 
-function calculateDragForce(body: Thing, currentForce: Force): Force {
+function calculateDragForce(body: Body, currentForce: Force): Force {
     if (!body.world) { return Force.none }
     const { fluids, airDensity } = body.world
     if (fluids.length == 0 && airDensity == 0) { return Force.none }
@@ -47,14 +47,14 @@ function calculateDragForce(body: Thing, currentForce: Force): Force {
 
     // to do after that - calculat effect of REFRACTION at medium boundary....
 
-    let fluidThingStartsIn: Fluid = null
+    let fluidBodyStartsIn: Fluid = null
     fluids.forEach(fluid => {
         if (Geometry.isPointInsidePolygon(body.shapeValues, fluid.polygonPoints)) {
-            fluidThingStartsIn = fluid
+            fluidBodyStartsIn = fluid
         }
     })
 
-    const drag = calculateDragThroughMedium(fluidThingStartsIn ? fluidThingStartsIn.data.density : airDensity, body.mass, velocity, crossSectionalArea)
+    const drag = calculateDragThroughMedium(fluidBodyStartsIn ? fluidBodyStartsIn.data.density : airDensity, body.mass, velocity, crossSectionalArea)
 
     return new Force(
         Math.min(drag, velocity),
@@ -69,22 +69,22 @@ function calculateDragForce(body: Thing, currentForce: Force): Force {
 }
 
 /**
- * Calculation the gravitational effect of one Thing on another
+ * Calculation the gravitational effect of one Body on another
  *
- * @param gravitationalConstant The gravitational constant of the world the things are in
- * @param affectedThing The Thing being pulled towards the gravity source
- * @param thing2 The gravity source
+ * @param gravitationalConstant The gravitational constant of the world the bodies are in
+ * @param affectedBody The Body being pulled towards the gravity source
+ * @param gravitySource The body exherting gravity
  *
- * @return the Force exerted on the affectedThing
+ * @return the Force exerted on the affectedBody
  */
-function getGravitationalForce(gravitationalConstant: number, affectedThing: Thing, thing2: Thing) {
-    if (affectedThing === thing2) { return Force.none }
+function getGravitationalForce(gravitationalConstant: number, affectedBody: Body, gravitySource: Body) {
+    if (affectedBody === gravitySource) { return Force.none }
 
-    if (affectedThing.isIntersectingWith(thing2)) { return Force.none }
+    if (affectedBody.isIntersectingWith(gravitySource)) { return Force.none }
 
-    const r = Geometry.getDistanceBetweenPoints(affectedThing.data, thing2.data);
-    const magnitude = gravitationalConstant * ((affectedThing.mass * thing2.mass / Math.pow(r, 2)));
-    const direction = Geometry.getHeadingFromPointToPoint(thing2.data, affectedThing.data)
+    const r = Geometry.getDistanceBetweenPoints(affectedBody.data, gravitySource.data);
+    const magnitude = gravitationalConstant * ((affectedBody.mass * gravitySource.mass / Math.pow(r, 2)));
+    const direction = Geometry.getHeadingFromPointToPoint(gravitySource.data, affectedBody.data)
     return new Force(magnitude, direction)
 }
 
@@ -103,12 +103,11 @@ function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
 }
 
 /**
- * Find the vector resulting from a round body bouncing off an immobile thing
- * assumes the immobile thing is circular
+ * Find the vector resulting from a round body bouncing off an immobile body
  * 
  * @param collisionReport the collision report
  */
-function findBounceOfImmobileThingForce(collisionReport: CollisionReport) {
+function findBounceOfImmobileBodyForce(collisionReport: CollisionReport) {
     const { item1, item2, impactPoint } = collisionReport
 
     const angleToReflectOff = typeof collisionReport.wallAngle === 'number'
@@ -236,7 +235,7 @@ function findRoundBounceCollisionVectorsMethod1(collision: CollisionReport) {
 
     // is the coefficient of restitution; if it is 1 we have an elastic collision; if it is 0 we have a perfectly inelastic collision, see below.
 
-    function getVectorComponent(item: Thing, property: "vectorX" | "vectorY") {
+    function getVectorComponent(item: Body, property: "vectorX" | "vectorY") {
         const otherItem = item === item1 ? item2 : item1
         return (
             coefficientOfRestitution * otherItem.mass * (otherItem.momentum[property] - item.momentum[property]) +
@@ -269,11 +268,11 @@ function bounceCircleOffCircle(collision: CollisionReport) {
 
     separateCollidingBodies(collision)
 
-    // problem - after a collision, the only force acting to form the momentum used by Thing.move()
+    // problem - after a collision, the only force acting to form the momentum used by Body.move()
     // is the reflected force - for gravity from other bodies, thrust etc are ignored
     // need to recalculate withouth them 'applying double'
     if (collision.item2.data.immobile) {
-        collision.item1.momentum = findBounceOfImmobileThingForce(collision)
+        collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
     } else {
         const bounce = findRoundBounceCollisionVectorsMethod2(collision)
         collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
@@ -293,7 +292,7 @@ function bounceCircleOffSquare(collision: CollisionReport) {
         const wouldIntersectAtStopPoint = copyOfCircle.isIntersectingWith(collision.item2)
 
         if (wouldIntersectAtStopPoint && collision.type != 'start inside') {
-            // const indexNumber = collision.item1.world.things.indexOf(collision.item1)
+            // const indexNumber = collision.item1.world.bodies.indexOf(collision.item1)
             // console.log(`#${indexNumber}: ${collision.type}: [${collision.item1.data.x}, ${collision.item1.data.y}] -> [${copyOfCircle.data.x}, ${copyOfCircle.data.y}]`)
         } else {
             collision.item1.data.x = collision.stopPoint.x
@@ -301,7 +300,7 @@ function bounceCircleOffSquare(collision: CollisionReport) {
         }
 
         if (collision.type != 'start inside') {
-            collision.item1.momentum = findBounceOfImmobileThingForce(collision)
+            collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
         }
 
     } else {

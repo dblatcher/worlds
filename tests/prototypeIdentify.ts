@@ -1,17 +1,17 @@
-import { Thing } from "../src";
+import { Body } from "../src";
 
 
 export default function propotypeTest() {
 
-    const testThing = new Thing({x:100,y:100})
+    const testThing = new Body({x:100,y:100})
     
     const proto = Object.getPrototypeOf(testThing)
     
     console.log ({
         testThing,
         proto,
-        Thing,
+        Body,
     })
 
-    console.log( proto.constructor == Thing)
+    console.log( proto.constructor == Body)
 }

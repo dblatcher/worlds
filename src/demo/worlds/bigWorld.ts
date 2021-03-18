@@ -1,18 +1,18 @@
 
 import { StarField } from '../../BackGround'
-import { World, Thing, Force, shapes } from '../../index'
+import { World, Body, Force, shapes } from '../../index'
 
 
 const worldHeight = 10000
 const worldWidth = 9000
 
 
-const whiteStar = new Thing({ x: worldWidth * .5, y: worldHeight * .5, fillColor: 'ghostwhite', size: 400, density: 2, immobile: true })
-const blueStar = new Thing({ x: worldWidth * .25, y: worldHeight * .8, fillColor: 'skyblue', size: 300, density: 2, immobile: true })
-const redStar = new Thing({ x: worldWidth * .65, y: worldHeight * .2, fillColor: 'darkred', size: 600, density: 2, immobile: true })
+const whiteStar = new Body({ x: worldWidth * .5, y: worldHeight * .5, fillColor: 'ghostwhite', size: 400, density: 2, immobile: true })
+const blueStar = new Body({ x: worldWidth * .25, y: worldHeight * .8, fillColor: 'skyblue', size: 300, density: 2, immobile: true })
+const redStar = new Body({ x: worldWidth * .65, y: worldHeight * .2, fillColor: 'darkred', size: 600, density: 2, immobile: true })
 
 function makeSquare(x: number, y: number, heading = .5) {
-    return new Thing({
+    return new Body({
         x: worldWidth * x, y: worldHeight * y,
         fillColor: 'gray', color: 'white', renderHeadingIndicator: true,
         size: 200, density: .1, immobile: true, heading,
@@ -21,7 +21,7 @@ function makeSquare(x: number, y: number, heading = .5) {
 }
 
 
-const redPlanet = new Thing({
+const redPlanet = new Body({
     x: 300,
     y: 600,
     size: 150,
@@ -48,7 +48,7 @@ const bigWorld = new World([
     gravitationalConstant: .1,
     width: worldWidth,
     height: worldHeight,
-    thingsExertGravity: true,
+    bodiesExertGravity: true,
     hasHardEdges: true,
     name: "Galaxy",
     airDensity: 20,

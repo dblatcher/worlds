@@ -19,7 +19,7 @@ class Fluid {
     }
 
     get isFluid() { return true }
-    get isThing() { return false }
+    get isBody() { return false }
     get typeId() { return 'Fluid' }
 
 
@@ -31,7 +31,7 @@ class Fluid {
     get surfaceLevel() {
         if (!this.world) { return 0 }
         return this.bottomLevel - (this.depth)
-        // to do - raise y volume of submerged things
+        // to do - raise y volume of submerged bodies
     }
 
     get bottomLevel() {

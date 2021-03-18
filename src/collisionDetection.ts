@@ -1,4 +1,4 @@
-import { Thing } from './Thing'
+import { Body } from './Body'
 import { Force } from './Force'
 import * as Geometry from './geometry'
 import { Vector, Point, Circle, areCircleAndPolygonIntersecting, _90deg } from './geometry'
@@ -8,8 +8,8 @@ class CollisionReport {
     type: "end inside" | "passed through" | "start inside" | "edge"
     impactPoint: Point
     stopPoint: Point
-    item1: Thing
-    item2: Thing
+    item1: Body
+    item2: Body
     force: number
     force2: number
     wallAngle?: number
@@ -22,12 +22,12 @@ class EdgeCollisionReport extends CollisionReport {
 }
 
 /**
- * detect collision of one a moving circular thing with an edge of its World
+ * detect collision of one a moving circular body with an edge of its World
  * 
- * @param item a circular thing
+ * @param item a circular body
  * @return a collision report describing how item will hit the fixed edge, or null if it won't
  */
-function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
+function detectCircleCollidingWithEdge(item: Body): EdgeCollisionReport {
 
     const { height, width } = item.world
     const body = item.shapeValues
@@ -92,14 +92,14 @@ function detectCircleCollidingWithEdge(item: Thing): EdgeCollisionReport {
 
 
 /**
- * detect collision of one a moving circular thing with another circular thing
+ * detect collision of one a moving circular body with another circular body
  * 
- * @param item1 a circular thing
- * @param item2 another circular thing
+ * @param item1 a circular body
+ * @param item2 another circular body
  * @returns a collision report describing how item1 will intersect with item2 on item1's path
  * or null if no collision will occur
  */
-function detectCircleCollidingWithCircle(item1: Thing, item2: Thing): CollisionReport {
+function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionReport {
     // can't collide with self!
     if (item1 === item2) { return null };
 
@@ -266,7 +266,7 @@ function detectCircleCollidingWithCircle(item1: Thing, item2: Thing): CollisionR
 }
 
 
-function detectSquareCollidingWithCircle(item1: Thing, item2: Thing): CollisionReport {
+function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionReport {
 
     if (item1 === item2) { return null };
 

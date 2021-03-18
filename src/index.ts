@@ -1,6 +1,6 @@
 import { World, WorldConfig, } from './World'
 import { ViewPort, RenderTransformationRule } from './ViewPort'
-import { Thing, ThingData } from './Thing'
+import { Body, BodyData } from './Body'
 import { Force } from './Force'
 import { Shape, shapes } from './Shape'
 import { Fluid, FluidData } from './Fluid'
@@ -17,9 +17,9 @@ import * as RenderFunctions from './renderFunctions'
 
 
 export {
-    Thing, World, Force, Shape, Fluid,
+    Body, World, Force, Shape, Fluid,
     ViewPort, RenderTransformationRule,
-    WorldConfig, ThingData, FluidData,
+    WorldConfig, BodyData, FluidData,
     Effect, EffectData, ExpandingRing,
     CameraFollowInstruction, CameraInstruction,
     BackGround, StarField, StarFieldData,

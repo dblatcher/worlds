@@ -1,17 +1,17 @@
-import { World, Thing, Force } from '../../index'
+import { World, Body, Force } from '../../index'
 
-const whiteStar1 = new Thing({ x: -250, y: 500, size: 500, density: 1, immobile:true, color: 'ghostwhite' })
-const whiteStar2 = new Thing({ x: 1250, y: 500, size: 500, density: 1, immobile:true, color: 'antiquewhite' })
+const whiteStar1 = new Body({ x: -250, y: 500, size: 500, density: 1, immobile:true, color: 'ghostwhite' })
+const whiteStar2 = new Body({ x: 1250, y: 500, size: 500, density: 1, immobile:true, color: 'antiquewhite' })
 
-const redPlanet = new Thing({ 
+const redPlanet = new Body({ 
     x: 500, y: 500, size: 10, density: 5, color: 'red', elasticity: .7 
 }, new Force(0, Math.PI * 0.5))
 
-const bluePlanet= new Thing({ 
+const bluePlanet= new Body({ 
     x: 400, y: 400, size: 10, density: 5, color: 'blue', elasticity: .7 
 }, new Force(0, Math.PI * 0.5))
 
-const pinkPlanet = new Thing({ 
+const pinkPlanet = new Body({ 
     x: 400, y: 500, size: 15, density: 3, color: 'pink', elasticity: .7 
 }, new Force(10, Math.PI * 0.5))
 
@@ -25,12 +25,12 @@ const balance = new World([
 ], {
     gravitationalConstant: .005,
     height:1200,
-    thingsExertGravity: true,
+    bodiesExertGravity: true,
     minimumMassToExertGravity: 100000,
     hasHardEdges: true,
     name: "balance",
 });
 
-console.log(balance.things.map(thing => thing.mass))
+console.log(balance.bodies.map(body => body.mass))
 
 export { balance }

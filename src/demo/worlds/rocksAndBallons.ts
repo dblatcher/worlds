@@ -1,4 +1,4 @@
-import { World, shapes, Thing, Force } from '../../index'
+import { World, shapes, Body, Force } from '../../index'
 
 
 function makeRock() {
@@ -16,7 +16,7 @@ function makeRock() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, elasticity, headingFollowsDirection })
+    return new Body({ x, y, size, density, color, elasticity, headingFollowsDirection })
 }
 
 function makeBallon() {
@@ -34,17 +34,17 @@ function makeBallon() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, elasticity, headingFollowsDirection })
+    return new Body({ x, y, size, density, color, elasticity, headingFollowsDirection })
 }
 
 function makeRocksAndBallons(amount: number) {
-    let things: Thing[] = []
-    for (let i = 0; i < amount; i++) { things.push(makeRock()) }
-    for (let i = 0; i < amount; i++) { things.push(makeBallon()) }
-    return things
+    let bodies: Body[] = []
+    for (let i = 0; i < amount; i++) { bodies.push(makeRock()) }
+    for (let i = 0; i < amount; i++) { bodies.push(makeBallon()) }
+    return bodies
 }
 
-const slope = new Thing({shape:shapes.square, x:-100, y:900, size:400, heading:-2.1,immobile:true})
+const slope = new Body({shape:shapes.square, x:-100, y:900, size:400, heading:-2.1,immobile:true})
 
 const rocksAndBallons = new World([
     slope,

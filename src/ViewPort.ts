@@ -1,5 +1,4 @@
-import { Thing } from "."
-import { BackGround } from "./BackGround"
+import { Body } from "."
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
 import { Point, _90deg } from "./geometry"
@@ -8,8 +7,8 @@ import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
 
 
-interface TransformTestFunction { (thing: Thing): boolean }
-interface TransformRenderFuncion { (thing: Thing, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
+interface TransformTestFunction { (body: Body): boolean }
+interface TransformRenderFuncion { (body: Body, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
 
 class RenderTransformationRule {
     test: TransformTestFunction
@@ -194,12 +193,12 @@ class ViewPort {
 
         world.fluids.forEach(fluid => { fluid.renderOnCanvas(ctx, this) })
 
-        world.things.forEach(thing => {
-            let applicableRule = transformRules.filter(rule => rule.test(thing))[0]
+        world.bodies.forEach(body => {
+            let applicableRule = transformRules.filter(rule => rule.test(body))[0]
             if (applicableRule) {
-                applicableRule.renderOnCanvas(thing, ctx, this)
+                applicableRule.renderOnCanvas(body, ctx, this)
             } else {
-                thing.renderOnCanvas(ctx, this)
+                body.renderOnCanvas(ctx, this)
             }
         })
 

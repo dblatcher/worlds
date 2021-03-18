@@ -2,7 +2,7 @@ import { Fluid, Force } from "../..";
 import { Circle, getVectorX, getVectorY, Point, Vector, _360deg, _90deg } from "../../geometry";
 import { LinearGradientFill, RadialGradientFill } from "../../GradientFill"
 import { shapes } from "../../Shape";
-import { Thing } from "../../Thing";
+import { Body } from "../../Body";
 import { World } from "../../World";
 
 
@@ -59,19 +59,19 @@ const redCircles = new RadialGradientFill({
     }
 })
 
-const greenBall = new Thing(Object.assign({
+const greenBall = new Body(Object.assign({
     x: 10, y: 10, fillColor: greenStripes
 }, ball))
 
-const redBall = new Thing(Object.assign({
+const redBall = new Body(Object.assign({
     x: 40, y: 150, fillColor: redCircles, shape:shapes.circle
 }, ball))
 
-const blueBall = new Thing(Object.assign({
+const blueBall = new Body(Object.assign({
     x: 120, y: 130, fillColor: 'blue'
 }, ball))
 
-const yellowBall = new Thing(Object.assign({
+const yellowBall = new Body(Object.assign({
     x: 420, y: 230, fillColor: 'yellow'
 }, ball, { size: 20, density: 50 }))
 

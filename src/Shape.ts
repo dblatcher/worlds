@@ -1,7 +1,7 @@
 import { Fluid } from "./Fluid"
 import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, isPointInsidePolygon, Point, _90deg } from "./geometry"
 import { renderCircle, renderPolygon } from "./renderFunctions"
-import { Thing } from "./Thing"
+import { Body } from "./Body"
 import { ViewPort } from "./World"
 
 
@@ -11,7 +11,7 @@ interface ContainsPointFunction {
 }
 
 interface AreIntersectingFunction {
-    (otherThingOrFluid: Thing | Fluid): boolean
+    (otherThingOrFluid: Body | Fluid): boolean
 }
 
 interface ShapeValuesFunction {
@@ -23,7 +23,7 @@ interface PolygonPointsFunction {
 }
 
 interface CanvasRenderFunction {
-    (ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort): void
+    (ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort): void
 }
 
 class ShapeConfig {
@@ -60,7 +60,7 @@ class Shape extends ShapeConfig {
 const circle = new Shape({
     id: 'circle',
     getShapeValues() {
-        const thisThing = this as Thing
+        const thisThing = this as Body
         return {
             radius: thisThing.data.size,
             x: thisThing.data.x,
@@ -73,33 +73,33 @@ const circle = new Shape({
 
     },
     getPolygonPoints() {
-        const thisThing = this as Thing
+        const thisThing = this as Body
         return []
     },
     containsPoint(point) {
-        const thisThing = this as Thing
+        const thisThing = this as Body
         return getDistanceBetweenPoints(thisThing.data, point) <= thisThing.data.size
     },
-    intersectingWithShape(otherThingOrFluid: Thing | Fluid) {
-        const thisThing = this as Thing
+    intersectingWithShape(otherThingOrFluid: Body | Fluid) {
+        const thisThing = this as Body
 
         if (otherThingOrFluid.isFluid) {
             return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThingOrFluid.polygonPoints)
         }
 
-        if (otherThingOrFluid.isThing) {
-            switch ((otherThingOrFluid as Thing).data.shape.id) {
+        if (otherThingOrFluid.isBody) {
+            switch ((otherThingOrFluid as Body).data.shape.id) {
 
                 case 'circle':
-                    return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as Thing).shapeValues)
+                    return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).shapeValues)
                 case 'square':
-                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Thing).polygonPoints)
+                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).polygonPoints)
                 default:
                     return false
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading } = thisThing.data
         renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor, heading }, viewPort)
     }
@@ -108,7 +108,7 @@ const circle = new Shape({
 const square = new Shape({
     id: "square",
     getShapeValues() {
-        const thisThing = this as Thing
+        const thisThing = this as Body
         return {
             radius: thisThing.data.size,
             x: thisThing.data.x,
@@ -120,7 +120,7 @@ const square = new Shape({
         }
     },
     getPolygonPoints() {
-        const thisThing = this as Thing
+        const thisThing = this as Body
 
         const { size, heading } = thisThing.data
         const { x, y } = thisThing.shapeValues
@@ -145,28 +145,28 @@ const square = new Shape({
         return [frontLeft, frontRight, backRight, backLeft]
     },
     containsPoint(point: Point) {
-        const thisThing = this as Thing
+        const thisThing = this as Body
         return isPointInsidePolygon(point, thisThing.polygonPoints)
     },
-    intersectingWithShape(otherThingOrFluid: Thing | Fluid) {
-        const thisThing = this as Thing
+    intersectingWithShape(otherThingOrFluid: Body | Fluid) {
+        const thisThing = this as Body
 
         if (otherThingOrFluid.isFluid) {
             return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThingOrFluid.polygonPoints)
         }
 
-        if (otherThingOrFluid.isThing) {
-            switch ((otherThingOrFluid as Thing).data.shape.id) {
+        if (otherThingOrFluid.isBody) {
+            switch ((otherThingOrFluid as Body).data.shape.id) {
                 case 'square':
-                    arePolygonsIntersecting((otherThingOrFluid as Thing).polygonPoints, thisThing.polygonPoints)
+                    arePolygonsIntersecting((otherThingOrFluid as Body).polygonPoints, thisThing.polygonPoints)
                 case 'circle':
-                    return areCircleAndPolygonIntersecting((otherThingOrFluid as Thing).shapeValues, thisThing.polygonPoints)
+                    return areCircleAndPolygonIntersecting((otherThingOrFluid as Body).shapeValues, thisThing.polygonPoints)
                 default:
                     return false
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Thing, viewPort: ViewPort) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading = 0 } = thisThing.data
         const { polygonPoints } = thisThing
         renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor, heading }, viewPort)

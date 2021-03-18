@@ -18,13 +18,13 @@ const demoWorld = bigWorld
 const viewPort1 = ViewPort.fitToSize(demoWorld, canvasElement1, 150, 150)
 viewPort1.dontRenderBackground = true
 viewPort1.transformRules.push(new RenderTransformationRule(
-    thing => thing === redPlanet,
-    (thing, ctx, viewPort) => {
-        let circle1 = thing.shapeValues
-        let circle2 = thing.shapeValues
+    body => body === redPlanet,
+    (body, ctx, viewPort) => {
+        let circle1 = body.shapeValues
+        let circle2 = body.shapeValues
         circle2.radius = circle2.radius * 2
-        RenderFunctions.renderCircle.onCanvas(ctx, circle2, { fillColor: 'blue', heading: thing.data.heading }, viewPort)
-        RenderFunctions.renderCircle.onCanvas(ctx, circle1, { fillColor: 'yellow', heading: thing.data.heading }, viewPort)
+        RenderFunctions.renderCircle.onCanvas(ctx, circle2, { fillColor: 'blue', heading: body.data.heading }, viewPort)
+        RenderFunctions.renderCircle.onCanvas(ctx, circle1, { fillColor: 'yellow', heading: body.data.heading }, viewPort)
     }
 ))
 
@@ -40,7 +40,7 @@ const viewPort2 = new ViewPort({
 })
 
 viewPort2.cameraInstruction = new CameraFollowInstruction({
-    thing: redPlanet,
+    body: redPlanet,
     followHeading: false,
     magnify: 1.5,
     leadDistance: 0

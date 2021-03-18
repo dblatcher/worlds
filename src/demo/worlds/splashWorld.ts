@@ -1,6 +1,6 @@
 import { Fluid, Force } from "../..";
 import { _360deg, _90deg } from "../../geometry";
-import { Thing } from "../../Thing";
+import { Body } from "../../Body";
 import { World } from "../../World";
 
 
@@ -11,7 +11,7 @@ const water = new Fluid({
     density: 1,
 })
 
-const thingInAir = new Thing({
+const thingInAir = new Body({
     size: 300,
     x: 10, y: 50,
     density: 5,

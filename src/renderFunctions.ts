@@ -1,4 +1,4 @@
-import { Thing } from "./Thing"
+import { Body } from "./Body"
 import { getVectorX, getVectorY, Point, _90deg, Circle } from './geometry'
 import { ViewPort } from "./World"
 import { AbstractGradientFill } from "./GradientFill"
@@ -88,7 +88,7 @@ const renderPolygon = {
 }
 
 const renderPathAhead = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort: ViewPort): void {
+    onCanvas: function (ctx: CanvasRenderingContext2D, body: Body, viewPort: ViewPort): void {
         const rightX = getVectorX(body.data.size, body.momentum.direction + _90deg)
         const rightY = getVectorY(body.data.size, body.momentum.direction + _90deg)
 
@@ -111,7 +111,7 @@ const renderPathAhead = {
 }
 
 const renderHeadingIndicator = {
-    onCanvas: function (ctx: CanvasRenderingContext2D, body: Thing, viewPort: ViewPort): void {
+    onCanvas: function (ctx: CanvasRenderingContext2D, body: Body, viewPort: ViewPort): void {
 
         const { size, heading } = body.data
         const { x, y } = body.shapeValues

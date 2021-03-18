@@ -1,12 +1,12 @@
 import { world as world, greenStripes, redCircles } from './worlds/billiards'
 import { ViewPort } from '../ViewPort';
 import { CameraFollowInstruction } from '../CameraInstruction';
-import { Force, RenderFunctions, RenderTransformationRule, Thing } from '..';
+import { Force, RenderFunctions, RenderTransformationRule, Body } from '..';
 import { getDistanceBetweenPoints, getHeadingFromPointToPoint, Point, _90deg } from '../geometry';
 import './addStyleSheetAndFrame'
 
 
-let thingInFocus: Thing = null
+let thingInFocus: Body = null
 
 const maxPushForce = 30
 const pushForceDistanceMultipler = 4 * 10 ** 4
@@ -17,7 +17,7 @@ let cursorPoint:Point = { x: 0, y: 0 }
 function handleClick(event: PointerEvent) {
     const worldPoint = viewPort.locateClick(event, true)
     if (!worldPoint) { return }
-    const clickedThing = world.things.find(thing => thing.checkIfContainsPoint(worldPoint)) || null
+    const clickedThing = world.bodies.find(body => body.checkIfContainsPoint(worldPoint)) || null
 
 
     if (thingInFocus && !clickedThing) {
@@ -47,31 +47,26 @@ const viewPort = ViewPort.fitToSize(world, canvasElement, 700, 500)
 viewPort.framefill = redCircles
 
 viewPort.transformRules.push(
-    new RenderTransformationRule(thing => thing === thingInFocus,
-        (thing, ctx, viewPort) => {
-            thing.renderOnCanvas(ctx, viewPort)
+    new RenderTransformationRule(body => body === thingInFocus,
+        (body, ctx, viewPort) => {
+            body.renderOnCanvas(ctx, viewPort)
 
             const style = {
                 strokeColor: "white",
                 lineDash: [2, 3],
-                heading: thing.data.heading
+                heading: body.data.heading
             }
 
             RenderFunctions.renderCircle.onCanvas(ctx, {
-                x: thing.data.x,
-                y: thing.data.y,
-                radius: thing.data.size + 5
+                x: body.data.x,
+                y: body.data.y,
+                radius: body.data.size + 5
             }, style, viewPort)
 
-            RenderFunctions.renderLine.onCanvas(ctx, [thing.data, cursorPoint], style, viewPort)
+            RenderFunctions.renderLine.onCanvas(ctx, [body.data, cursorPoint], style, viewPort)
         }
     )
 )
-
-// viewPort.cameraInstruction = new CameraFollowInstruction({
-//     thing: world.things[0],
-//     magnify: .1
-// })
 
 
 

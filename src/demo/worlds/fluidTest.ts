@@ -1,4 +1,4 @@
-import { World, shapes, Thing, Force, Fluid, ViewPort } from '../../index'
+import { World, shapes, Body, Force, Fluid, ViewPort } from '../../index'
 
 
 
@@ -18,7 +18,7 @@ function makeRock() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
+    return new Body({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
 }
 
 function makeBallon() {
@@ -37,14 +37,14 @@ function makeBallon() {
             : 1.75
         : 0
 
-    return new Thing({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
+    return new Body({ x, y, size, density, color, fillColor, elasticity, headingFollowsDirection }, new Force(direction ? 4 : 0, direction))
 }
 
 function makeRocksAndBallons(amount: number) {
-    let things: Thing[] = []
-    for (let i = 0; i < amount; i++) { things.push(makeRock()) }
-    for (let i = 0; i < amount; i++) { things.push(makeBallon()) }
-    return things
+    let bodies: Body[] = []
+    for (let i = 0; i < amount; i++) { bodies.push(makeRock()) }
+    for (let i = 0; i < amount; i++) { bodies.push(makeBallon()) }
+    return bodies
 }
 
 const ballonBelowSurface = makeBallon()
