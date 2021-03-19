@@ -9,10 +9,11 @@ interface CanvasRenderStyle {
     parallax?: number
     lineDash?: number[]
     heading?: number
+    lineWidth?: number
 }
 
 function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderStyle) {
-    const { fillColor, strokeColor, lineDash = [] } = style
+    const { fillColor, strokeColor, lineDash = [], lineWidth } = style
 
     const fillStyle = typeof fillColor === 'object'
         ? (fillColor as AbstractGradientFill).fallbackColor
@@ -22,6 +23,7 @@ function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderSty
     ctx.setLineDash(lineDash);
     ctx.fillStyle = fillStyle;
     ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = lineWidth || 1
 }
 
 const renderCircle = {

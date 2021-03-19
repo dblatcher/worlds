@@ -12,7 +12,7 @@ const bigWhiteSquare = new Body({
     shape: shapes.square,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
-}, new Force(10,0))
+}, new Force(10,0.1))
 
 
 const redPlanet = new Body({
@@ -20,6 +20,7 @@ const redPlanet = new Body({
     y: 500,
     size: 50,
     density: 1,
+    immobile: true,
     color: 'red',
     elasticity: 1,
     headingFollowsDirection: true,
@@ -31,6 +32,7 @@ const greenPlanet = new Body({
     y: 300,
     size: 50,
     density: 1,
+    immobile: true,
     color: 'green',
     elasticity: .5,
     headingFollowsDirection: true,
