@@ -6,6 +6,7 @@ interface EffectData {
     x: number
     y: number
     heading?: number
+    color?: string
     frame?: number
     duration: number
 }
@@ -14,6 +15,7 @@ class Effect {
     x: number
     y: number
     heading?: number
+    color?: string
     frame: number
     duration: number
     world?: World
@@ -22,6 +24,7 @@ class Effect {
         this.x = config.x
         this.y = config.y
         this.heading = config.heading
+        this.color = config.color
         this.frame = config.frame || 0
         this.duration = config.duration || 100
     }
@@ -43,8 +46,8 @@ class Effect {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
-        const { x, y } = this
-        renderCircle.onCanvas(ctx, { x, y, radius: 10 }, { fillColor: 'red' }, viewPort)
+        const { x, y, color='red' } = this
+        renderCircle.onCanvas(ctx, { x, y, radius: 10 }, { fillColor: color }, viewPort)
     }
 }
 
