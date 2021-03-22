@@ -97,7 +97,15 @@ function getVectorX(magnitude: number, direction: number) { return magnitude * M
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
 
+function getXYVector(magnitude: number, direction: number) { return { x: getVectorX(magnitude, direction), y: getVectorY(magnitude, direction) } }
 
+function translatePoint(start: Point, vector: Vector, reverse = false) {
+    const multiplier = reverse ? -1 : 1;
+    return {
+        x: start.x + (multiplier* vector.x),
+        y: start.y + (multiplier* vector.y),
+    }
+}
 
 function closestPointOnLineSegment(segmentPoint1: Point, segmentPoint2: Point, p0: Point) {
     const v: Vector = { x: segmentPoint2.x - segmentPoint1.x, y: segmentPoint2.y - segmentPoint1.y }
@@ -226,10 +234,10 @@ function isPointInsidePolygon(point: Point, polygon: Point[]) {
  * change a number representing a heading to a value between 0 an 2PI
  * @param heading 
  */
-function normaliseHeading(heading:number) {
-    if (heading > _360deg) {return heading % _360deg}
-    if (heading < _360deg) {heading = heading % _360deg}
-    if (heading < 0) {heading = heading + _360deg}
+function normaliseHeading(heading: number) {
+    if (heading > _360deg) { return heading % _360deg }
+    if (heading < _360deg) { heading = heading % _360deg }
+    if (heading < 0) { heading = heading + _360deg }
     return heading
 }
 
@@ -312,13 +320,13 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
     const gradient2 = (segment2[0].y - segment2[1].y) / (segment2[0].x - segment2[1].x)
 
     if (gradient1 == gradient2) {
-        const pointsInOrder  = isFinite(gradient1) 
-            ? [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.x-pointB.x)
-            : [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.y-pointB.y)
+        const pointsInOrder = isFinite(gradient1)
+            ? [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.x - pointB.x)
+            : [segment1[0], segment1[1], segment2[0], segment2[1]].sort((pointA, pointB) => pointA.y - pointB.y)
 
         return {
-            x: (pointsInOrder[1].x + pointsInOrder[2].x)/2,
-            y: (pointsInOrder[1].y + pointsInOrder[2].y)/2,
+            x: (pointsInOrder[1].x + pointsInOrder[2].x) / 2,
+            y: (pointsInOrder[1].y + pointsInOrder[2].y) / 2,
         }
     }
 
@@ -341,13 +349,13 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
 
     return null
 
-    function getIntersectionWithAVertical(nonVerticalSegment:[Point, Point], verticalSegment:[Point, Point]):Point {
+    function getIntersectionWithAVertical(nonVerticalSegment: [Point, Point], verticalSegment: [Point, Point]): Point {
 
         const verticalConstant = verticalSegment[0].x
         const nonVerticalGradient = (nonVerticalSegment[0].y - nonVerticalSegment[1].y) / (nonVerticalSegment[0].x - nonVerticalSegment[1].x)
         const nonVerticalConstant = nonVerticalSegment[0].y - (nonVerticalGradient * nonVerticalSegment[0].x)
 
-        return ({ 
+        return ({
             x: verticalConstant,
             y: (nonVerticalGradient * verticalConstant) + nonVerticalConstant
         })
@@ -358,10 +366,10 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
 export {
     Point, Circle, Vector,
     _90deg, _360deg,
-    getDirection, getMagnitude, getVectorX, getVectorY, normaliseHeading,
+    getDirection, getMagnitude, getVectorX, getVectorY, getXYVector, normaliseHeading,
     doLineSegmentsIntersect, findIntersectionPointOfLineSegments,
     arePolygonsIntersecting, getPolygonLineSegments,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
-    areCircleAndPolygonIntersecting, isPointInsidePolygon,
+    areCircleAndPolygonIntersecting, isPointInsidePolygon,translatePoint,
 }
