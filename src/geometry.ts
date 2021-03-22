@@ -99,7 +99,7 @@ function getVectorY(magnitude: number, direction: number) { return magnitude * M
 
 function getXYVector(magnitude: number, direction: number) { return { x: getVectorX(magnitude, direction), y: getVectorY(magnitude, direction) } }
 
-function translatePoint(start: Point, vector: Vector, reverse = false) {
+function translatePoint(start: Point, vector: Vector, reverse = false):Point {
     const multiplier = reverse ? -1 : 1;
     return {
         x: start.x + (multiplier* vector.x),

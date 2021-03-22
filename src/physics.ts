@@ -309,6 +309,40 @@ function bounceCircleOffSquare(collision: CollisionReport) {
 
 }
 
+
+/**
+ * DOES NOT WORK PROPERLY YET
+ * @param collision 
+ */
+function bounceSquareOffCircle(collision: CollisionReport) {
+
+    if (collision.item2.data.immobile) {
+        console.warn(` square -> immobile-square collision(not handled right)`, collision)
+
+        const copyOfCircle = collision.item1.duplicate()
+        copyOfCircle.data.x = collision.stopPoint.x
+        copyOfCircle.data.y = collision.stopPoint.y
+
+        const wouldIntersectAtStopPoint = copyOfCircle.isIntersectingWith(collision.item2)
+
+        if (wouldIntersectAtStopPoint && collision.type != 'start inside') {
+            // const indexNumber = collision.item1.world.bodies.indexOf(collision.item1)
+            // console.log(`#${indexNumber}: ${collision.type}: [${collision.item1.data.x}, ${collision.item1.data.y}] -> [${copyOfCircle.data.x}, ${copyOfCircle.data.y}]`)
+        } else {
+            collision.item1.data.x = collision.stopPoint.x
+            collision.item1.data.y = collision.stopPoint.y
+        }
+
+        if (collision.type != 'start inside') {
+            collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
+        }
+
+    } else {
+        console.warn(`Unhandled square -> mobile-square collision`, collision)
+    }
+
+}
+
 function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
     const { item1, stopPoint } = edgeCollisionReport
@@ -328,6 +362,7 @@ function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
         case "circle-square":
             return bounceCircleOffSquare(collisionReport)
         case "square-circle": // TO DO - more detection functions
+            return bounceSquareOffCircle(collisionReport)
         case "square-square":
         default:
             console.log(`Unhandled ${collisionType} collision`, collisionReport)
