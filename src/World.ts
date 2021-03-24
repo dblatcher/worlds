@@ -7,6 +7,23 @@ import { TinyEmitter } from 'tiny-emitter'
 import { BackGround } from './BackGround'
 
 
+class WorldTickReport {
+    startTime: number
+    bodyCount: number
+    collisionCount: number
+    collisionTestCount: number
+    edgeCollisionTestCount: number
+    calculationTime: number
+
+    constructor(bodyCount: number) {
+        this.startTime = Date.now()
+        this.bodyCount = bodyCount
+        this.collisionCount = 0
+        this.collisionTestCount = 0
+        this.edgeCollisionTestCount = 0
+        this.calculationTime = 0
+    }
+}
 
 class WorldConfig {
     name?: string
@@ -83,8 +100,10 @@ class World extends WorldConfig {
 
     tick() {
 
-        const {fluids, effects, bodies} =this
- 
+        const { fluids, effects, bodies } = this
+
+        let tickReport = new WorldTickReport(this.bodies.length)
+
         this.bodiesLeavingAtNextTick.forEach(body => {
             if (this.bodies.indexOf(body) !== -1) {
                 this.bodies.splice(this.bodies.indexOf(body), 1)
@@ -103,16 +122,24 @@ class World extends WorldConfig {
         mobileBodies.forEach(body => { body.updateMomentum() })
         mobileBodies.filter(body => body.world == this).forEach(body => {
             const reports = body.detectCollisions(false, true)
-            reports.forEach(report => body.handleCollision(report))
+            const nonNullReports = reports.filter(report => report !== null)
+            nonNullReports.forEach(report => body.handleCollision(report))
+            tickReport.collisionCount += nonNullReports.length
+            tickReport.collisionTestCount += reports.length
         })
         mobileBodies.filter(body => body.world == this).forEach(body => {
             const reports = body.detectCollisions(true, false)
-            reports.forEach(report => body.handleCollision(report))
+            const nonNullReports = reports.filter(report => report !== null)
+            nonNullReports.forEach(report => body.handleCollision(report))
+            tickReport.collisionCount += nonNullReports.length
+            tickReport.collisionTestCount += reports.length
         })
         if (this.hasHardEdges) {
             mobileBodies.filter(body => body.world == this).forEach(body => {
                 const reports = body.detectWorldEdgeCollisions()
-                reports.forEach(report => body.handleWorldEdgeCollision(report))
+                const nonNullReports = reports.filter(report => report !== null)
+                tickReport.edgeCollisionTestCount += reports.length
+                nonNullReports.forEach(report => body.handleWorldEdgeCollision(report))
             })
         }
         mobileBodies.filter(body => body.world == this).forEach(body => { body.move() })
@@ -120,7 +147,8 @@ class World extends WorldConfig {
         this.backGrounds.forEach(backGround => backGround.tick())
         effects.forEach(effect => effect.tick())
 
-        this.emitter.emit('tick')
+        tickReport.calculationTime = Date.now() - tickReport.startTime
+        this.emitter.emit('tick', tickReport)
     }
 
     set ticksPerSecond(speed: number) {
@@ -145,6 +173,8 @@ class World extends WorldConfig {
         this.timerSpeed = 0
         return this
     }
+
+    static get TickReport() { return WorldTickReport.prototype }
 }
 
 export { World, WorldConfig, ViewPort }

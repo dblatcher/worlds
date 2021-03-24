@@ -198,9 +198,7 @@ class Body {
     }
 
     handleCollision(report: CollisionReport) {
-        if (report) {
-            handleCollisionAccordingToShape(report)
-        }
+        handleCollisionAccordingToShape(report)
     }
 
     detectWorldEdgeCollisions() {
@@ -212,7 +210,7 @@ class Body {
     }
 
     handleWorldEdgeCollision(report: EdgeCollisionReport) {
-        if (report) { bounceOffWorldEdge(report) }
+        bounceOffWorldEdge(report)
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
