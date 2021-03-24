@@ -1,5 +1,5 @@
 import { World } from '../World'
-import { ViewPort} from '../ViewPort'
+import { ViewPort } from '../ViewPort'
 
 interface ViewPortControlPanelConfig {
     worldOptions?: World[]
@@ -7,29 +7,44 @@ interface ViewPortControlPanelConfig {
 }
 
 class ViewPortControlPanel {
-    
+
     worldOptions: World[]
     reportElement: HTMLElement
+    calcTimeElement: HTMLElement
+    collisionTestCountElement: HTMLElement
     viewPort: ViewPort
-    constructor( config: ViewPortControlPanelConfig) {
-        
+    constructor(config: ViewPortControlPanelConfig) {
+
         this.viewPort = config.viewPort
         this.worldOptions = config.worldOptions || [this.viewPort.world]
+
+        this.handleTickReport = this.handleTickReport.bind(this)
+        if (this.viewPort.world) {
+            this.viewPort.world.emitter.on('tick', this.handleTickReport)
+        }
     }
 
     updateReport() {
         if (!this.reportElement) { return }
-        this.reportElement.innerText = (this.viewPort.world.name || `World`)+ ":  " + this.viewPort.world.report
+        this.reportElement.innerText = (this.viewPort.world.name || `World`) + ":  " + this.viewPort.world.report
+    }
+
+    handleTickReport(tickReport: typeof World.TickReport) {
+        this.calcTimeElement.innerText = `calctime: ${tickReport.calculationTime}`
+        this.collisionTestCountElement.innerText = `collisionTests: ${tickReport.collisionTestCount}`
     }
 
     changeWorld(world: World) {
         if (this.viewPort.world == world) { return }
-        
+
         this.viewPort.world.stopTime()
+        this.viewPort.world.emitter.off('tick', this.handleTickReport)
 
         this.viewPort.setWorld(world, true)
         this.viewPort.reset()
         this.updateReport()
+
+        this.viewPort.world.emitter.on('tick', this.handleTickReport)
     }
 
     makeTimeSection() {
@@ -105,6 +120,20 @@ class ViewPortControlPanel {
         return section
     }
 
+    makeTickReportSection() {
+        const section = document.createElement('section')
+
+        this.collisionTestCountElement = document.createElement('p')
+        this.collisionTestCountElement.classList.add('collisionTestCount')
+        
+        this.calcTimeElement = document.createElement('p')
+        this.calcTimeElement.classList.add('calcTime')
+        
+        section.appendChild(this.collisionTestCountElement)
+        section.appendChild(this.calcTimeElement)
+        return section
+    }
+
     makeElement() {
         const container = document.createElement('article')
 
@@ -116,12 +145,14 @@ class ViewPortControlPanel {
         container.appendChild(reportLine)
         container.appendChild(this.makeTimeSection())
         container.appendChild(this.makeGravitySection())
+        container.appendChild(this.makeTickReportSection())
 
         if (this.worldOptions.length > 1) {
             container.appendChild(this.makeWorldPickerSection())
         }
 
         container.style.position = 'fixed'
+        container.style.maxWidth = '15rem'
         container.style.backgroundColor = 'rgba(250,100,100,.75)'
         container.style.right = '0'
         container.style.zIndex = '5'
