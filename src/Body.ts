@@ -151,7 +151,7 @@ class Body {
 
         //undo any moves that would put this inside an immobile body
         // problem - this won't undo moves made by the physics module to separate collising bodies or put a body at its stop point
-        
+
 
         let i = 0;
         for (i = 0; i < immobileBodies.length; i++) {
@@ -185,10 +185,22 @@ class Body {
             otherBody !== this && (withMobileBodies || otherBody.data.immobile) && (withImmobileBodies || !otherBody.data.immobile)
         )
 
+        const { vectorX, vectorY } = this.momentum
+        const { x, y } = this.data
+
+        const lazyYRange = (this.data.size * 1.5) + 2 * Math.abs(vectorY)
+        const lazyXRange = (this.data.size * 1.5) + 2 * Math.abs(vectorX)
+
+        const otherBodiesInRange = otherBodies.filter(otherBody => {
+            return (
+                Math.abs(otherBody.data.y - y) < (lazyYRange + otherBody.data.size * 1.5) &&
+                Math.abs(otherBody.data.x - x) < (lazyXRange + otherBody.data.size * 1.5)
+            )
+        })
 
         const reports: CollisionReport[] = []
 
-        otherBodies.forEach(otherBody => {
+        otherBodiesInRange.forEach(otherBody => {
             const collisionDetectionFunction = getCollisionDetectionFunction(this.data.shape, otherBody.data.shape)
             let report = collisionDetectionFunction(this, otherBody)
             reports.push(report)
