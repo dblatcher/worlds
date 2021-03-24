@@ -4,7 +4,7 @@ import { Body, BodyData } from './Body'
 import { Force } from './Force'
 import { Shape, shapes } from './Shape'
 import { Fluid, FluidData } from './Fluid'
-import { Effect, EffectData, ExpandingRing } from './Effect'
+import { Effect, EffectData, ExpandingRing, ExpandingRingData } from './Effect'
 import { CameraFollowInstruction, CameraInstruction } from "./CameraInstruction";
 import { BackGround, StarField, StarFieldData, } from "./BackGround"
 import { AbstractGradientFill, LinearGradientFill, RadialGradientFill } from "./GradientFill"
@@ -20,7 +20,7 @@ export {
     Body, World, Force, Shape, Fluid,
     ViewPort, RenderTransformationRule,
     WorldConfig, BodyData, FluidData,
-    Effect, EffectData, ExpandingRing,
+    Effect, EffectData, ExpandingRing, ExpandingRingData,
     CameraFollowInstruction, CameraInstruction,
     BackGround, StarField, StarFieldData,
     Physics, Geometry, CollisionDetection, RenderFunctions,

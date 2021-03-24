@@ -80,4 +80,4 @@ class ExpandingRing extends Effect {
     }
 }
 
-export { Effect, EffectData, ExpandingRing }
+export { Effect, EffectData, ExpandingRing, ExpandingRingData }
