@@ -32,13 +32,20 @@ const redPlanet = new Body({
     renderHeadingIndicator: true,
 })
 
+const starOffEdge = new Body({
+    x: -300,
+    y: 0,
+    size: 150,
+    fillColor: 'blue',
+    immobile: true,
+})
 
 const bigWorld = new World([
     redPlanet,
     whiteStar,
     blueStar,
     redStar,
-
+    starOffEdge,
     makeSquare(.1, .4),
     makeSquare(.4, .45, 1),
     makeSquare(.84, .25, 2),
@@ -53,8 +60,8 @@ const bigWorld = new World([
     name: "Galaxy",
     airDensity: 20,
     backGrounds: [
-        new StarField( { numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 5 }),
-        new StarField( { numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 10 }),
+        new StarField({ numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 5 }),
+        new StarField({ numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 10 }),
     ]
 });
 

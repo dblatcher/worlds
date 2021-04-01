@@ -1,7 +1,7 @@
-import { Body } from "."
+import { Body, Geometry } from "."
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
-import { Point, _90deg } from "./geometry"
+import { getXYVector, Point, _90deg } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
@@ -169,7 +169,7 @@ class ViewPort {
     }
 
     renderCanvas() {
-        const { world, canvas, cameraInstruction, transformRules } = this
+        const { world, canvas, cameraInstruction, transformRules, worldCorners } = this
 
         if (!canvas) { return }
         canvas.setAttribute('height', this.height.toString());
@@ -182,10 +182,9 @@ class ViewPort {
 
         if (typeof this.framefill === 'string') { ctx.fillStyle = this.framefill }
         else { this.framefill.setFillStyleForViewPort(ctx, this) }
-
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        renderPolygon.onCanvas(ctx, this.worldCorners, { fillColor: 'black' }, this)
+        renderPolygon.onCanvas(ctx, worldCorners, { fillColor: 'black' }, this)
 
         if (!this.dontRenderBackground) {
             world.backGrounds.forEach(backGround => backGround.renderOnCanvas(ctx, this))
@@ -205,6 +204,31 @@ class ViewPort {
         if (!this.dontRenderEffects) {
             world.effects.forEach(effect => { effect.renderOnCanvas(ctx, this) })
         }
+
+        // re - cover any area of the canvas outside the bounds of the world.
+        if (typeof this.framefill === 'string') { ctx.fillStyle = this.framefill }
+        else { this.framefill.setFillStyleForViewPort(ctx, this) }
+        ctx.lineWidth = 0;
+        ctx.strokeStyle = "transparent";
+        const mappedEdges = Geometry.getPolygonLineSegments(worldCorners.map(point => this.mapPoint(point)))
+
+        mappedEdges.forEach(edge => {
+            const angle = Geometry.getHeadingFromPointToPoint(...edge);
+            const extremeDistance = (this.width + this.height) * 2
+            const v = getXYVector(extremeDistance, angle);
+            const v2 = getXYVector(extremeDistance, angle - _90deg);
+
+            ctx.beginPath()
+
+            ctx.moveTo(edge[0].x + v.x, edge[0].y + v.y);
+            ctx.lineTo(edge[1].x, edge[1].y);
+            ctx.lineTo(edge[1].x + v2.x, edge[1].y + v2.y);
+            ctx.lineTo(edge[0].x + v2.x + v.x, edge[0].y + v2.y + v.y);
+
+            ctx.lineTo(edge[0].x + v.x, edge[0].y + v.y);
+            ctx.stroke()
+            ctx.fill()
+        })
     }
 
 

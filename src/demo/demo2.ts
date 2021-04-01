@@ -37,12 +37,13 @@ const viewPort2 = new ViewPort({
     width: demoWorld.width,
     world: demoWorld,
     rotate: 3,
+    framefill:'white',
 })
 
 viewPort2.cameraInstruction = new CameraFollowInstruction({
     body: redPlanet,
     followHeading: false,
-    magnify: 1.5,
+    magnify: .5,
     leadDistance: 0
 })
 
@@ -52,7 +53,7 @@ demoWorld.emitter.on('tick', () => {
 
 redPlanet.momentum = new Force(50, 2)
 
-demoWorld.ticksPerSecond = 20
+demoWorld.ticksPerSecond = 5
 
 const frame = document.querySelector('.frame')
 frame.appendChild(canvasElement1);
