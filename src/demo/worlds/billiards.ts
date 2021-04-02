@@ -1,9 +1,9 @@
-import { Fluid, Force } from "../..";
-import { Circle, getVectorX, getVectorY, Point, Vector, _360deg, _90deg } from "../../geometry";
+import { Fluid, Force, RenderFunctions } from "../..";
+import { Circle, getVectorX, getVectorY, getXYVector, Point, reverseHeading, translatePoint, Vector, Wedge, _360deg, _90deg } from "../../geometry";
 import { LinearGradientFill, RadialGradientFill } from "../../GradientFill"
 import { shapes } from "../../Shape";
 import { Body } from "../../Body";
-import { World } from "../../World";
+import { ViewPort, World } from "../../World";
 
 
 const ball = {
@@ -30,8 +30,8 @@ const greenStripes = new LinearGradientFill({
 const redCircles = new RadialGradientFill({
     fallbackColor: "pink",
     canvasFunction: (ctx: CanvasRenderingContext2D, circle: Circle, heading: number) => {
-        
-        const offCenter:Vector = {
+
+        const offCenter: Vector = {
             x: getVectorX(circle.radius * .25, heading),
             y: getVectorY(circle.radius * .25, heading)
         }
@@ -64,16 +64,38 @@ const greenBall = new Body(Object.assign({
 }, ball))
 
 const redBall = new Body(Object.assign({
-    x: 40, y: 150, fillColor: redCircles, shape:shapes.circle
+    x: 40, y: 150, fillColor: redCircles, shape: shapes.circle
 }, ball))
 
 const blueBall = new Body(Object.assign({
     x: 120, y: 130, fillColor: 'blue'
 }, ball))
 
-const yellowBall = new Body(Object.assign({
-    x: 420, y: 230, fillColor: 'yellow'
-}, ball, { size: 20, density: 50 }))
+
+class WedgedBody extends Body {
+
+    renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
+
+        const { shapeValues, data } = this
+
+        const wedge1: Wedge = Object.assign({
+            angle: _90deg, heading: data.heading
+        }, shapeValues)
+
+        const wedge2: Wedge = Object.assign({
+            angle: _90deg, heading: reverseHeading(data.heading)
+        }, shapeValues)
+
+        RenderFunctions.renderCircle.onCanvas(ctx, shapeValues, { fillColor: 'grey', strokeColor: data.color }, viewPort)
+        RenderFunctions.renderWedge.onCanvas(ctx, wedge1, { fillColor: data.fillColor, strokeColor: data.color }, viewPort)
+        RenderFunctions.renderWedge.onCanvas(ctx, wedge2, { fillColor: data.fillColor, strokeColor: data.color }, viewPort)
+    }
+
+}
+
+const yellowBall = new WedgedBody(Object.assign({
+    x: 420, y: 230, fillColor: 'yellow', color: 'white'
+}, ball, { size: 40, density: 5 }))
 
 
 const world = new World([

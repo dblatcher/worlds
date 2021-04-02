@@ -1,5 +1,5 @@
 import { Body } from "./Body"
-import { getVectorX, getVectorY, Point, _90deg, Circle } from './geometry'
+import { getVectorX, getVectorY, Point, _90deg, Circle, Wedge, translatePoint, getXYVector, normaliseHeading, _360deg } from './geometry'
 import { ViewPort } from "./World"
 import { AbstractGradientFill } from "./GradientFill"
 
@@ -37,6 +37,43 @@ const renderCircle = {
 
         const mappedCenter = viewPort.mapPoint(circle, parallax);
         ctx.arc(mappedCenter.x, mappedCenter.y, (radius * viewPort.magnify / parallax), 0, Math.PI * 2)
+
+        if (style.fillColor) { ctx.fill() }
+        if (style.strokeColor) { ctx.stroke() }
+    }
+}
+
+const renderWedge = {
+    onCanvas: function (ctx: CanvasRenderingContext2D, wedge: Wedge, style: CanvasRenderStyle, viewPort: ViewPort): void {
+        beginPathAndStyle(ctx, style);
+        if (typeof style.fillColor == 'object') {
+            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(wedge, style.heading || 0, ctx, viewPort)
+        }
+        const { parallax = 1 } = style
+        const { radius, heading, angle } = wedge
+
+        const startHeading = heading - (angle / 2) + viewPort.rotate
+        const endHeading = heading + (angle / 2) + viewPort.rotate
+        const arcStart = translatePoint(wedge, getXYVector(radius, startHeading))
+        const arcEnd = translatePoint(wedge, getXYVector(radius, endHeading))
+
+
+        const mappedCenter = viewPort.mapPoint(wedge, parallax);
+        const mappedArcStart = viewPort.mapPoint(arcStart, parallax);
+        const mappedArcEnd = viewPort.mapPoint(arcEnd, parallax);
+        const mappedRadius = (radius * viewPort.magnify / parallax)
+
+        const arcStartAngle = _90deg -startHeading
+        const arcEndAngle = arcStartAngle - angle
+
+        ctx.moveTo(mappedCenter.x, mappedCenter.y);
+        ctx.lineTo(mappedArcStart.x, mappedArcStart.y);
+
+        ctx.moveTo(mappedCenter.x, mappedCenter.y);
+        ctx.arc(mappedCenter.x, mappedCenter.y, mappedRadius, arcStartAngle, arcEndAngle, true);
+
+        ctx.moveTo(mappedArcEnd.x, mappedArcEnd.y);
+        ctx.lineTo(mappedCenter.x, mappedCenter.y);
 
         if (style.fillColor) { ctx.fill() }
         if (style.strokeColor) { ctx.stroke() }
@@ -138,5 +175,5 @@ const renderHeadingIndicator = {
 
 
 export {
-    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon, renderPoint, renderLine
+    renderPathAhead, renderHeadingIndicator, renderCircle, renderPolygon, renderPoint, renderLine, renderWedge
 }

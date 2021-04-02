@@ -1,6 +1,7 @@
 interface Point { x: number, y: number }
 interface Circle { x: number, y: number, radius: number }
 interface Vector { x: number, y: number }
+interface Wedge { x: number, y: number, radius: number, heading:number, angle:number }
 
 
 const extreme = 10 ** 30
@@ -364,7 +365,7 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
 
 
 export {
-    Point, Circle, Vector,
+    Point, Circle, Vector, Wedge,
     _90deg, _360deg,
     getDirection, getMagnitude, getVectorX, getVectorY, getXYVector, normaliseHeading,
     doLineSegmentsIntersect, findIntersectionPointOfLineSegments,
