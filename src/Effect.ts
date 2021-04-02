@@ -29,6 +29,8 @@ class Effect {
         this.duration = config.duration || 100
     }
 
+    get typeId() { return "Effect" }
+
     enterWorld(world: World) {
         if (this.world) { this.leaveWorld() }
         world.effects.push(this)
@@ -64,6 +66,8 @@ interface ExpandingRingData  {
 class ExpandingRing extends Effect {
     size: number
     color: string
+
+    get typeId() { return "ExpandingRing" }
 
     constructor(config:ExpandingRingData) {
         super(config)
