@@ -31,6 +31,5 @@ const balance = new World([
     name: "balance",
 });
 
-console.log(balance.bodies.map(body => body.mass))
 
 export { balance }

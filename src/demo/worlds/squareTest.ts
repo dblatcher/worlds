@@ -101,6 +101,5 @@ const squareTestWorld = new World([
     name: "squareTestWorld",
 });
 
-console.log({ bigWhiteSquare, redPlanet, bluePlanets, litteWhiteSquare })
 
 export { squareTestWorld }

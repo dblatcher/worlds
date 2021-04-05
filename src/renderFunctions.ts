@@ -139,7 +139,7 @@ const renderPathAhead = {
         ].map(point => viewPort.mapPoint(point))
 
         ctx.beginPath();
-        ctx.fillStyle = 'yellow';
+        ctx.fillStyle = 'rgba(100,100,0,.5)';
         ctx.moveTo(pathArea[0].x, pathArea[0].y)
         for (let i = 1; i < pathArea.length; i++) {
             ctx.lineTo(pathArea[i].x, pathArea[i].y)

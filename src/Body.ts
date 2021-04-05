@@ -49,6 +49,8 @@ class Body {
     get isFluid() { return false }
     get typeId() { return 'Body' }
 
+    get description() { return `${this.data.immobile ? 'immobile ' : ''}${this.data.color} ${this.data.shape.id} ${this.typeId}` }
+
     duplicate() {
         const myPrototype = Object.getPrototypeOf(this)
         return new myPrototype.constructor(Object.assign({}, this.data), new Force(this.momentum.magnitude, this.momentum.direction))
@@ -138,13 +140,13 @@ class Body {
         this.momentum = Force.combine([this.momentum, gravitationalForces, upthrustForces, drag])
     }
 
-    move() {
+    move(timeRemaining = 1) {
         const copyOfThis = this.duplicate();
         const { top, bottom, radius, left, right } = copyOfThis.shapeValues
 
         if (!this.data.immobile) {
-            copyOfThis.data.y += copyOfThis.momentum.vectorY
-            copyOfThis.data.x += copyOfThis.momentum.vectorX
+            copyOfThis.data.y += copyOfThis.momentum.vectorY * timeRemaining
+            copyOfThis.data.x += copyOfThis.momentum.vectorX * timeRemaining
         }
 
         const immobileBodies = this.world.bodies.filter(body => body.data.immobile && body !== this)
@@ -182,7 +184,9 @@ class Body {
 
     detectCollisions(withMobileBodies: boolean = true, withImmobileBodies: boolean = true) {
         const otherBodies = this.world.bodies.filter(otherBody =>
-            otherBody !== this && (withMobileBodies || otherBody.data.immobile) && (withImmobileBodies || !otherBody.data.immobile)
+            otherBody !== this &&
+            (withMobileBodies || otherBody.data.immobile) &&
+            (withImmobileBodies || !otherBody.data.immobile)
         )
 
         const { vectorX, vectorY } = this.momentum

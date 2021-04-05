@@ -135,30 +135,19 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
     }
 
 
-    function errorTest(Q: any) {
-        var badValues = [];
-        if (!isFinite(Q.x)) { badValues.push('x') }
-        if (!isFinite(Q.y)) { badValues.push('y') }
-        if (badValues.length) { return badValues }
-        return null;
-    };
-
-    if (errorTest(vector)) {
-        console.log('bad vector for ' + item1.data.color + ' ' + item1.data.shape.id + 'in checkForCircleCollisions')
-        console.log(vector)
-        return null
-    }
-
-
     var force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
     var force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
 
-    var movedObject = {
-        x: (item1.data.x + vector.x),
-        y: (item1.data.y + vector.y),
-        circular: true,
-        radius: item1.shapeValues.radius,
-    }
+    // var item1AtEnd = {
+    //     x: (item1.data.x + vector.x),
+    //     y: (item1.data.y + vector.y),
+    //     circular: true,
+    //     radius: item1.shapeValues.radius,
+    // }
+
+    const item1AtEnd = item1.duplicate() as Body
+    item1AtEnd.data.x = (item1.data.x + vector.x)
+    item1AtEnd.data.y = (item1.data.y + vector.y)
 
     if (item1.isIntersectingWith(item2)) {
         var unitVector: Vector = { x: undefined, y: undefined };
@@ -202,7 +191,7 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
     // TO DO - optimise calculations - only calculate if needed
 
     // d is the closest point to item2 on the path taken by item1
-    var d = Geometry.closestpointonline(item1.shapeValues, movedObject, item2.shapeValues);
+    var d = Geometry.closestpointonline(item1.shapeValues, item1AtEnd.shapeValues, item2.shapeValues);
     var closestDist = Geometry.getDistanceBetweenPoints(item2.shapeValues, d);
     var closestDistSq = closestDist * closestDist;
 
@@ -220,14 +209,14 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
 
     var directionFromItem2ToImpactPoint = Force.fromVector(item1PointWhenHit.x - item2.shapeValues.x, item1PointWhenHit.y - item2.shapeValues.y).direction
 
-    if (item1.isIntersectingWith(item2)) {
+    if (item1AtEnd.isIntersectingWith(item2)) {
 
         var impactPoint = {
-            x: item1PointWhenHit.x + (movedObject.radius * -Math.sin(
+            x: item1PointWhenHit.x + (item1AtEnd.shapeValues.radius * -Math.sin(
                 directionFromItem2ToImpactPoint
             )),
 
-            y: item1PointWhenHit.y + (movedObject.radius * -Math.cos(
+            y: item1PointWhenHit.y + (item1AtEnd.shapeValues.radius * -Math.cos(
                 directionFromItem2ToImpactPoint
             ))
         } as Point
@@ -246,20 +235,20 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
     };
 
 
-    if (closestDist <= item2.shapeValues.radius + movedObject.radius) { // is on collision course
+    if (closestDist <= item2.shapeValues.radius + item1AtEnd.shapeValues.radius) { // is on collision course
         var item1WouldPassThroughItem2;
 
         if (vector.x !== 0) {
             if (
-                (item1.shapeValues.x < item1PointWhenHit.x && item1PointWhenHit.x < movedObject.x) ||
-                (item1.shapeValues.x > item1PointWhenHit.x && item1PointWhenHit.x > movedObject.x)
+                (item1.shapeValues.x < item1PointWhenHit.x && item1PointWhenHit.x < item1AtEnd.shapeValues.x) ||
+                (item1.shapeValues.x > item1PointWhenHit.x && item1PointWhenHit.x > item1AtEnd.shapeValues.x)
             ) {
                 item1WouldPassThroughItem2 = true;
             }
         } else { //no x velocity, so check by y coords
             if (
-                (item1.shapeValues.y < item1PointWhenHit.y && item1PointWhenHit.y < movedObject.y) ||
-                (item1.shapeValues.y > item1PointWhenHit.y && item1PointWhenHit.y > movedObject.y)
+                (item1.shapeValues.y < item1PointWhenHit.y && item1PointWhenHit.y < item1AtEnd.shapeValues.y) ||
+                (item1.shapeValues.y > item1PointWhenHit.y && item1PointWhenHit.y > item1AtEnd.shapeValues.y)
             ) {
                 item1WouldPassThroughItem2 = true;
             }
@@ -267,10 +256,10 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
 
         if (item1WouldPassThroughItem2) {
             var impactPoint = {
-                x: item1PointWhenHit.x + (movedObject.radius * -Math.sin(
+                x: item1PointWhenHit.x + (item1AtEnd.shapeValues.radius * -Math.sin(
                     directionFromItem2ToImpactPoint
                 )),
-                y: item1PointWhenHit.y + (movedObject.radius * -Math.cos(
+                y: item1PointWhenHit.y + (item1AtEnd.shapeValues.radius * -Math.cos(
                     directionFromItem2ToImpactPoint
                 ))
             };
