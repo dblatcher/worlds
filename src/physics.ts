@@ -3,7 +3,7 @@ import { Force } from './Force'
 
 import * as Geometry from './geometry'
 import { Vector } from './geometry'
-import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
+import { CollisionReport, EdgeCollisionReport } from './collision-detection/collisionDetection'
 import { Fluid } from './Fluid'
 
 
