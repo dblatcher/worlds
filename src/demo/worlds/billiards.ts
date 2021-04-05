@@ -104,8 +104,14 @@ const world = new World([
     width: 600,
     height: 400,
     airDensity: 1,
-    gravitationalConstant: 0,
-    hasHardEdges: true,
+    gravitationalConstant: 0.05,
+    globalGravityForce: new Force(1,0),
+    edges: {
+        top: "SOFT",
+        left: "HARD",
+        bottom: "HARD",
+        right: "HARD",
+    }
 })
 
 export { world, greenStripes, redCircles }

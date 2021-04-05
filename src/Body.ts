@@ -164,12 +164,23 @@ class Body {
         }
 
         // problem - BODIES GET STUCK - need to 'shake loose' by moving them to radius +1 or  h|w - (radius +1) ?
-        if (this.world.hasHardEdges && !this.data.immobile) {
-            copyOfThis.data.y = top < 0 ? radius : copyOfThis.data.y
-            copyOfThis.data.y = bottom > this.world.height ? this.world.height - radius : copyOfThis.data.y
+        if ( !this.data.immobile) {
+            
+            if (this.world.edges.top === 'HARD') {
+                copyOfThis.data.y = top < 0 ? radius : copyOfThis.data.y
+            }
 
-            copyOfThis.data.x = left < 0 ? radius : copyOfThis.data.x
-            copyOfThis.data.x = right > this.world.width ? this.world.width - radius : copyOfThis.data.x
+            if (this.world.edges.bottom === 'HARD') {
+                copyOfThis.data.y = bottom > this.world.height ? this.world.height - radius : copyOfThis.data.y
+            }
+
+            if (this.world.edges.left === 'HARD') {
+                copyOfThis.data.x = left < 0 ? radius : copyOfThis.data.x
+            }
+
+            if (this.world.edges.right === 'HARD') {
+                copyOfThis.data.x = right > this.world.width ? this.world.width - radius : copyOfThis.data.x
+            }
         }
 
         if (this.data.headingFollowsDirection) {

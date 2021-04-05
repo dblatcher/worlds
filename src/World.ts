@@ -32,11 +32,17 @@ class WorldConfig {
     gravitationalConstant?: number
     globalGravityForce?: Force
     bodiesExertGravity?: boolean
-    hasHardEdges?: boolean
     minimumMassToExertGravity?: number
     airDensity?: number
     effects?: Effect[]
     backGrounds?: BackGround[]
+    hasHardEdges?: boolean
+    edges?: {
+        top:   "HARD" | "WRAP" | "SOFT"
+        left:  "HARD" | "WRAP" | "SOFT"
+        bottom:"HARD" | "WRAP" | "SOFT"
+        right: "HARD" | "WRAP" | "SOFT"
+    }
 }
 
 class World extends WorldConfig {
@@ -46,7 +52,12 @@ class World extends WorldConfig {
     gravitationalConstant: number
     globalGravityForce: Force
     bodiesExertGravity: boolean
-    hasHardEdges: boolean
+    edges: {
+        top:   "HARD" | "WRAP" | "SOFT"
+        left:  "HARD" | "WRAP" | "SOFT"
+        bottom:"HARD" | "WRAP" | "SOFT"
+        right: "HARD" | "WRAP" | "SOFT"
+    }
     minimumMassToExertGravity: number
     airDensity: number
     timerSpeed: number
@@ -71,7 +82,22 @@ class World extends WorldConfig {
         this.airDensity = config.airDensity || 0
         this.globalGravityForce = config.globalGravityForce || null
         this.bodiesExertGravity = config.bodiesExertGravity || false
-        this.hasHardEdges = config.hasHardEdges || false
+
+        this.edges = config.edges ? config.edges
+            : config.hasHardEdges 
+            ? {
+                top: "HARD" ,
+                left: "HARD" ,
+                bottom: "HARD" ,
+                right: "HARD" ,
+            }
+            : {
+                top: "SOFT" ,
+                left: "SOFT" ,
+                bottom: "SOFT" ,
+                right: "SOFT" ,
+            }
+
 
         const bodies = contents.filter(content => content.isBody) as Body[]
         const fluids = contents.filter(content => content.isFluid) as Fluid[]
@@ -134,14 +160,14 @@ class World extends WorldConfig {
             tickReport.collisionCount += nonNullReports.length
             tickReport.collisionTestCount += reports.length
         })
-        if (this.hasHardEdges) {
-            mobileBodies.filter(body => body.world == this).forEach(body => {
-                const reports = body.detectWorldEdgeCollisions()
-                const nonNullReports = reports.filter(report => report !== null)
-                tickReport.edgeCollisionTestCount += reports.length
-                nonNullReports.forEach(report => body.handleWorldEdgeCollision(report))
-            })
-        }
+
+        mobileBodies.filter(body => body.world == this).forEach(body => {
+            const reports = body.detectWorldEdgeCollisions()
+            const nonNullReports = reports.filter(report => report !== null)
+            tickReport.edgeCollisionTestCount += reports.length
+            nonNullReports.forEach(report => body.handleWorldEdgeCollision(report))
+        })
+        
         mobileBodies.filter(body => body.world == this).forEach(body => { body.move() })
 
         this.backGrounds.forEach(backGround => backGround.tick())
