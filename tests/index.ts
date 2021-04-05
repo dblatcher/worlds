@@ -1,3 +1,4 @@
+import extendLineSegmentTest from './extendline'
 import headingTest from './headingTest'
 import intersectionTest from './intersection'
 import propotypeTest from './prototypeIdentify'
@@ -14,6 +15,6 @@ console.log('********\n')
 //propotypeTest()
 
 console.log('********\n')
-headingTest()
+extendLineSegmentTest()
 
 console.log('\n\n')

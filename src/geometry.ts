@@ -1,7 +1,7 @@
 interface Point { x: number, y: number }
 interface Circle { x: number, y: number, radius: number }
 interface Vector { x: number, y: number }
-interface Wedge { x: number, y: number, radius: number, heading:number, angle:number }
+interface Wedge { x: number, y: number, radius: number, heading: number, angle: number }
 
 
 const extreme = 10 ** 30
@@ -94,17 +94,31 @@ function getCircleTangentAtPoint(circle: Circle, point: Point) {
 };
 
 
+function extendLineSegment(lineSegment: [Point, Point], factor = extreme): [Point, Point] {
+
+    const vector: Vector = {
+        x: (lineSegment[1].x - lineSegment[0].x) * factor,
+        y: (lineSegment[1].y - lineSegment[0].y) * factor
+    }
+
+    const extendedPoint1: Point = translatePoint(lineSegment[0], vector,true)
+    const extendedPoint2: Point = translatePoint(lineSegment[1], vector)
+    return [extendedPoint1, extendedPoint2]
+
+}
+
+
 function getVectorX(magnitude: number, direction: number) { return magnitude * Math.sin(direction) }
 
 function getVectorY(magnitude: number, direction: number) { return magnitude * Math.cos(direction) }
 
 function getXYVector(magnitude: number, direction: number) { return { x: getVectorX(magnitude, direction), y: getVectorY(magnitude, direction) } }
 
-function translatePoint(start: Point, vector: Vector, reverse = false):Point {
+function translatePoint(start: Point, vector: Vector, reverse = false): Point {
     const multiplier = reverse ? -1 : 1;
     return {
-        x: start.x + (multiplier* vector.x),
-        y: start.y + (multiplier* vector.y),
+        x: start.x + (multiplier * vector.x),
+        y: start.y + (multiplier * vector.y),
     }
 }
 
@@ -372,5 +386,5 @@ export {
     arePolygonsIntersecting, getPolygonLineSegments,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
-    areCircleAndPolygonIntersecting, isPointInsidePolygon,translatePoint,
+    areCircleAndPolygonIntersecting, isPointInsidePolygon, translatePoint,extendLineSegment
 }
