@@ -138,12 +138,6 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
     var force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
     var force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
 
-    // var item1AtEnd = {
-    //     x: (item1.data.x + vector.x),
-    //     y: (item1.data.y + vector.y),
-    //     circular: true,
-    //     radius: item1.shapeValues.radius,
-    // }
 
     const item1AtEnd = item1.duplicate() as Body
     item1AtEnd.data.x = (item1.data.x + vector.x)
@@ -155,24 +149,23 @@ function detectCircleCollidingWithCircle(item1: Body, item2: Body): CollisionRep
 
         // this doesn't work well - shoves the object back the shortest route out of item2
         // should move backward relative to direction of travel - use the c calculation below
-        if (item1.mass <= item2.mass) { // only move the lighter object out of the way
-            var distanceBetweenCenters = Geometry.getDistanceBetweenPoints(item1.data, item2.data);
-            if (distanceBetweenCenters) {
-                var vectorBetweenCenters = { x: item1.data.x - item2.data.x, y: item1.data.y - item2.data.y };
-                var vectorSize = Force.fromVector(vectorBetweenCenters.x, vectorBetweenCenters.y).magnitude
-                unitVector = {
-                    x: vectorBetweenCenters.x / vectorSize,
-                    y: vectorBetweenCenters.y / vectorSize
-                };
-            } else {
-                unitVector.x = Math.random()
-                unitVector.y = 1 - unitVector.x;
-            }
 
-            var shiftDistance = item1.data.size + item2.data.size - distanceBetweenCenters;
-            stopPoint.x += unitVector.x * shiftDistance;
-            stopPoint.y += unitVector.y * shiftDistance;
+        var distanceBetweenCenters = Geometry.getDistanceBetweenPoints(item1.data, item2.data);
+        if (distanceBetweenCenters) {
+            var vectorBetweenCenters = { x: item1.data.x - item2.data.x, y: item1.data.y - item2.data.y };
+            var vectorSize = Force.fromVector(vectorBetweenCenters.x, vectorBetweenCenters.y).magnitude
+            unitVector = {
+                x: vectorBetweenCenters.x / vectorSize,
+                y: vectorBetweenCenters.y / vectorSize
+            };
+        } else {
+            unitVector.x = Math.random()
+            unitVector.y = 1 - unitVector.x;
         }
+
+        var shiftDistance = item1.data.size + item2.data.size - distanceBetweenCenters;
+        stopPoint.x += unitVector.x * shiftDistance;
+        stopPoint.y += unitVector.y * shiftDistance;    
 
         return ({
             type: 'start inside',
