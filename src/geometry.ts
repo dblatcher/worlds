@@ -101,7 +101,7 @@ function extendLineSegment(lineSegment: [Point, Point], factor = extreme): [Poin
         y: (lineSegment[1].y - lineSegment[0].y) * factor
     }
 
-    const extendedPoint1: Point = translatePoint(lineSegment[0], vector,true)
+    const extendedPoint1: Point = translatePoint(lineSegment[0], vector, true)
     const extendedPoint2: Point = translatePoint(lineSegment[1], vector)
     return [extendedPoint1, extendedPoint2]
 
@@ -179,7 +179,7 @@ function areCirclesIntersecting(circle1: Circle, circle2: Circle) {
     return getDistanceBetweenPoints(circle1, circle2) < circle1.radius + circle2.radius
 }
 
-function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[]) {
+function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[], applyHackForEqualYValue: boolean = false) {
 
     let point1, point2, closestPointToCenter, edgeIntersects = false
     for (let i = 0; i < polygon.length; i++) {
@@ -194,7 +194,18 @@ function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[]) {
     if (edgeIntersects) { return true }
 
     // is the circle inside the polygon?
-    return isPointInsidePolygon(circle, polygon);
+
+    if (applyHackForEqualYValue) {
+        let circleCopy: Circle = {
+            x: circle.x,
+            y: circle.y - .001,
+            radius: circle.radius,
+        }
+        return isPointInsidePolygon(circleCopy, polygon);
+    } else {
+        return isPointInsidePolygon(circle, polygon);
+    }
+
 }
 
 function arePolygonsIntersecting(polygon1: Point[], polygon2: Point[]) {
@@ -386,5 +397,5 @@ export {
     arePolygonsIntersecting, getPolygonLineSegments,
     getDistanceBetweenPoints, getHeadingFromPointToPoint, closestpointonline,
     areCirclesIntersecting, reflectHeading, reverseHeading, getCircleTangentAtPoint,
-    areCircleAndPolygonIntersecting, isPointInsidePolygon, translatePoint,extendLineSegment
+    areCircleAndPolygonIntersecting, isPointInsidePolygon, translatePoint, extendLineSegment
 }

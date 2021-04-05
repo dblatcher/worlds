@@ -88,12 +88,12 @@ const circle = new Shape({
         }
 
         if (otherThingOrFluid.isBody) {
+            let equalYvalues = this.data.y == (otherThingOrFluid as Body).data.y
             switch ((otherThingOrFluid as Body).data.shape.id) {
-
                 case 'circle':
                     return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).shapeValues)
                 case 'square':
-                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).polygonPoints)
+                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).polygonPoints, equalYvalues)
                 default:
                     return false
             }

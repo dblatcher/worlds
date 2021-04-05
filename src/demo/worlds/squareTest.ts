@@ -1,4 +1,4 @@
-import { Point } from '../../geometry'
+import { Point, _90deg } from '../../geometry'
 import { LinearGradientFill } from '../../GradientFill'
 import { World, Body, Force, shapes } from '../../index'
 
@@ -15,10 +15,10 @@ const bigWhiteSquare = new Body({
 })
 
 const litteWhiteSquare = new Body({
-    heading: 1,
+    heading: _90deg/2,
     x: 500,
     y: 525,
-    size: 20,
+    size: 50,
     density: .1,
     immobile: true,
     color: 'antiquewhite',
@@ -39,15 +39,16 @@ const litteWhiteSquare = new Body({
 })
 
 const redPlanet = new Body({
-    x: 280,
-    y: 500,
+    x: 250,
+    y: 525,
     size: 50,
     density: 1,
     color: 'red',
     elasticity: 1,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
-}, new Force(15, Math.PI * 1))
+    renderPathAhead:true,
+}, new Force(45, _90deg))
 
 const greenPlanet = new Body({
     x: 400,
@@ -58,7 +59,7 @@ const greenPlanet = new Body({
     elasticity: .5,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
-}, new Force(1, Math.PI * 1.5))
+}, new Force(0, Math.PI * 1.5))
 
 const blueMatter = {
     density: 1,

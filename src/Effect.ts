@@ -9,6 +9,7 @@ interface EffectData {
     color?: string
     frame?: number
     duration: number
+    size?: number
 }
 
 class Effect {
@@ -19,6 +20,7 @@ class Effect {
     frame: number
     duration: number
     world?: World
+    size?: number
 
     constructor(config: EffectData) {
         this.x = config.x
@@ -26,6 +28,7 @@ class Effect {
         this.heading = config.heading
         this.color = config.color
         this.frame = config.frame || 0
+        this.size = config.size || 10
         this.duration = config.duration || 100
     }
 
@@ -48,13 +51,13 @@ class Effect {
     }
 
     renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
-        const { x, y, color='red' } = this
-        renderCircle.onCanvas(ctx, { x, y, radius: 10 }, { fillColor: color }, viewPort)
+        const { x, y, color = 'red', size = 10 } = this
+        renderCircle.onCanvas(ctx, { x, y, radius: size }, { fillColor: color }, viewPort)
     }
 }
 
 
-interface ExpandingRingData  {
+interface ExpandingRingData {
     x: number
     y: number
     frame?: number
@@ -69,7 +72,7 @@ class ExpandingRing extends Effect {
 
     get typeId() { return "ExpandingRing" }
 
-    constructor(config:ExpandingRingData) {
+    constructor(config: ExpandingRingData) {
         super(config)
         this.size = config.size || 100
         this.color = config.color || 'red'
