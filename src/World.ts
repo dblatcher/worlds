@@ -37,11 +37,12 @@ class WorldConfig {
     effects?: Effect[]
     backGrounds?: BackGround[]
     hasHardEdges?: boolean
+    hasWrappingEdges?: boolean
     edges?: {
-        top:   "HARD" | "WRAP" | "SOFT"
-        left:  "HARD" | "WRAP" | "SOFT"
-        bottom:"HARD" | "WRAP" | "SOFT"
-        right: "HARD" | "WRAP" | "SOFT"
+        top?: "HARD" | "WRAP" | "SOFT"
+        left?: "HARD" | "WRAP" | "SOFT"
+        bottom?: "HARD" | "WRAP" | "SOFT"
+        right?: "HARD" | "WRAP" | "SOFT"
     }
 }
 
@@ -53,9 +54,9 @@ class World extends WorldConfig {
     globalGravityForce: Force
     bodiesExertGravity: boolean
     edges: {
-        top:   "HARD" | "WRAP" | "SOFT"
-        left:  "HARD" | "WRAP" | "SOFT"
-        bottom:"HARD" | "WRAP" | "SOFT"
+        top: "HARD" | "WRAP" | "SOFT"
+        left: "HARD" | "WRAP" | "SOFT"
+        bottom: "HARD" | "WRAP" | "SOFT"
         right: "HARD" | "WRAP" | "SOFT"
     }
     minimumMassToExertGravity: number
@@ -83,20 +84,32 @@ class World extends WorldConfig {
         this.globalGravityForce = config.globalGravityForce || null
         this.bodiesExertGravity = config.bodiesExertGravity || false
 
-        this.edges = config.edges ? config.edges
-            : config.hasHardEdges 
+        this.edges = config.edges
             ? {
-                top: "HARD" ,
-                left: "HARD" ,
-                bottom: "HARD" ,
-                right: "HARD" ,
+                top: config.edges.top || "SOFT",
+                left: config.edges.left || "SOFT",
+                bottom: config.edges.bottom || "SOFT",
+                right: config.edges.right || "SOFT",
             }
-            : {
-                top: "SOFT" ,
-                left: "SOFT" ,
-                bottom: "SOFT" ,
-                right: "SOFT" ,
-            }
+            : config.hasHardEdges
+                ? {
+                    top: "HARD",
+                    left: "HARD",
+                    bottom: "HARD",
+                    right: "HARD",
+                }
+                : config.hasWrappingEdges
+                    ? {
+                        top: "WRAP",
+                        left: "WRAP",
+                        bottom: "WRAP",
+                        right: "WRAP",
+                    } : {
+                        top: "SOFT",
+                        left: "SOFT",
+                        bottom: "SOFT",
+                        right: "SOFT",
+                    }
 
 
         const bodies = contents.filter(content => content.isBody) as Body[]
@@ -167,7 +180,7 @@ class World extends WorldConfig {
             tickReport.edgeCollisionTestCount += reports.length
             nonNullReports.forEach(report => body.handleWorldEdgeCollision(report))
         })
-        
+
         mobileBodies.filter(body => body.world == this).forEach(body => { body.move() })
 
         this.backGrounds.forEach(backGround => backGround.tick())

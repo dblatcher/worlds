@@ -43,7 +43,7 @@ const redCircles = new RadialGradientFill({
         }
 
         const gradient = ctx.createRadialGradient(innerCircle.x, innerCircle.y, innerCircle.radius, circle.x, circle.y, circle.radius);
-        gradient.addColorStop(0, 'red');
+        gradient.addColorStop( 0, 'red');
         gradient.addColorStop(.1, 'pink');
         gradient.addColorStop(.2, 'red');
         gradient.addColorStop(.3, 'pink');
@@ -53,7 +53,7 @@ const redCircles = new RadialGradientFill({
         gradient.addColorStop(.7, 'pink');
         gradient.addColorStop(.8, 'red');
         gradient.addColorStop(.9, 'pink');
-        gradient.addColorStop(1, 'red');
+        gradient.addColorStop( 1, 'red');
 
         return gradient;
     }
@@ -101,16 +101,15 @@ const yellowBall = new WedgedBody(Object.assign({
 const world = new World([
     greenBall, redBall, blueBall, yellowBall
 ], {
-    width: 600,
+    width: 800,
     height: 400,
-    airDensity: 1,
+    airDensity: .5,
     gravitationalConstant: 0.05,
     globalGravityForce: new Force(1,0),
     edges: {
-        top: "SOFT",
-        left: "HARD",
+        left: "WRAP",
         bottom: "HARD",
-        right: "HARD",
+        right: "WRAP",
     }
 })
 

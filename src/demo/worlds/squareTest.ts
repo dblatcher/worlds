@@ -98,7 +98,7 @@ const squareTestWorld = new World([
     gravitationalConstant: 0,
     bodiesExertGravity: true,
     minimumMassToExertGravity: 1000,
-    hasHardEdges: true,
+    hasWrappingEdges: true,
     name: "squareTestWorld",
 });
 
