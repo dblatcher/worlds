@@ -8,6 +8,7 @@ import { Effect, EffectData, ExpandingRing, ExpandingRingData } from './Effect'
 import { CameraFollowInstruction, CameraInstruction } from "./CameraInstruction";
 import { BackGround, StarField, StarFieldData, } from "./BackGround"
 import { AbstractGradientFill, LinearGradientFill, RadialGradientFill } from "./GradientFill"
+import { Area, AreaData } from './Area'
 
 
 import * as Physics from './physics'
@@ -26,6 +27,7 @@ export {
     Physics, Geometry, CollisionDetection, RenderFunctions,
     shapes,
     AbstractGradientFill, LinearGradientFill, RadialGradientFill,
+    Area, AreaData,
 }
 
 

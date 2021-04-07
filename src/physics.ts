@@ -5,6 +5,7 @@ import * as Geometry from './geometry'
 import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collision-detection/collisionDetection'
 import { Fluid } from './Fluid'
+import { Area } from './Area'
 
 
 function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, body: Body, fluid: Fluid): Force {
@@ -33,8 +34,8 @@ function getUpthrustForce(gravitationalConstant: number, globalGravityForce: For
 
 function calculateDragForce(body: Body, currentForce: Force): Force {
     if (!body.world) { return Force.none }
-    const { fluids, airDensity } = body.world
-    if (fluids.length == 0 && airDensity == 0) { return Force.none }
+    const { fluids, airDensity, areas } = body.world
+    if (fluids.length == 0 && areas.length == 0 && airDensity == 0) { return Force.none }
 
     const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
     let velocity = currentForce.magnitude
@@ -54,7 +55,20 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
         }
     })
 
-    const drag = calculateDragThroughMedium(fluidBodyStartsIn ? fluidBodyStartsIn.data.density : airDensity, body.mass, velocity, crossSectionalArea)
+    let areaBodyStartsIn: Area = null
+    areas.forEach(area => {
+        if (body.isIntersectingWith(area)) {
+            areaBodyStartsIn = area
+        }
+    })
+
+    const mediumDensity = fluidBodyStartsIn
+        ? fluidBodyStartsIn.data.density
+        : areaBodyStartsIn
+            ? areaBodyStartsIn.data.density
+            : airDensity
+
+    const drag = calculateDragThroughMedium(mediumDensity, body.mass, velocity, crossSectionalArea)
 
     return new Force(
         Math.min(drag, velocity),

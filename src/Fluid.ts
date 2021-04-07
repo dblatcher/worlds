@@ -20,6 +20,7 @@ class Fluid {
 
     get isFluid() { return true }
     get isBody() { return false }
+    get isArea() { return false }
     get typeId() { return 'Fluid' }
 
 

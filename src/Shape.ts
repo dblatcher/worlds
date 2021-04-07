@@ -3,6 +3,7 @@ import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsInt
 import { renderCircle, renderPolygon } from "./renderFunctions"
 import { Body } from "./Body"
 import { ViewPort } from "./World"
+import { Area } from "./Area"
 
 
 
@@ -23,7 +24,7 @@ interface PolygonPointsFunction {
 }
 
 interface CanvasRenderFunction {
-    (ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort): void
+    (ctx: CanvasRenderingContext2D, thisThing: Body | Area, viewPort: ViewPort): void
 }
 
 class ShapeConfig {
@@ -73,33 +74,33 @@ const circle = new Shape({
 
     },
     getPolygonPoints() {
-        const thisThing = this as Body
+        const thisThing = this as Body | Area
         return []
     },
     containsPoint(point) {
-        const thisThing = this as Body
+        const thisThing = this as Body | Area
         return getDistanceBetweenPoints(thisThing.data, point) <= thisThing.data.size
     },
-    intersectingWithShape(otherThingOrFluid: Body | Fluid) {
+    intersectingWithShape(otherThingOrFluid: Body | Fluid | Area) {
         const thisThing = this as Body
 
         if (otherThingOrFluid.isFluid) {
             return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThingOrFluid.polygonPoints)
         }
 
-        if (otherThingOrFluid.isBody) {
-            let equalYvalues = this.data.y == (otherThingOrFluid as Body).data.y
-            switch ((otherThingOrFluid as Body).data.shape.id) {
+        if (otherThingOrFluid.isBody || otherThingOrFluid.isArea) {
+            let equalYvalues = this.data.y == (otherThingOrFluid as Body | Area).data.y
+            switch ((otherThingOrFluid as Body | Area).data.shape.id) {
                 case 'circle':
-                    return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).shapeValues)
+                    return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body | Area).shapeValues)
                 case 'square':
-                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body).polygonPoints, equalYvalues)
+                    return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as Body | Area).polygonPoints, equalYvalues)
                 default:
                     return false
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body | Area, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading } = thisThing.data
         renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor, heading }, viewPort)
     }
@@ -108,7 +109,7 @@ const circle = new Shape({
 const square = new Shape({
     id: "square",
     getShapeValues() {
-        const thisThing = this as Body
+        const thisThing = this as Body | Area
         return {
             radius: thisThing.data.size,
             x: thisThing.data.x,
@@ -148,14 +149,14 @@ const square = new Shape({
         const thisThing = this as Body
         return isPointInsidePolygon(point, thisThing.polygonPoints)
     },
-    intersectingWithShape(otherThingOrFluid: Body | Fluid) {
+    intersectingWithShape(otherThingOrFluid: Body | Fluid | Area) {
         const thisThing = this as Body
 
         if (otherThingOrFluid.isFluid) {
             return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThingOrFluid.polygonPoints)
         }
 
-        if (otherThingOrFluid.isBody) {
+        if (otherThingOrFluid.isBody || otherThingOrFluid.isArea) {
             switch ((otherThingOrFluid as Body).data.shape.id) {
                 case 'square':
                     arePolygonsIntersecting((otherThingOrFluid as Body).polygonPoints, thisThing.polygonPoints)
@@ -166,7 +167,7 @@ const square = new Shape({
             }
         }
     },
-    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body, viewPort: ViewPort) {
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: Body | Area, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading = 0 } = thisThing.data
         const { polygonPoints } = thisThing
         renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor, heading }, viewPort)

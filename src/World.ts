@@ -5,6 +5,7 @@ import { ViewPort } from './ViewPort'
 import { Effect } from './Effect'
 import { TinyEmitter } from 'tiny-emitter'
 import { BackGround } from './BackGround'
+import { Area } from './Area'
 
 
 class WorldTickReport {
@@ -63,6 +64,7 @@ class World extends WorldConfig {
     airDensity: number
     timerSpeed: number
     bodies: Body[]
+    areas: Area[]
     fluids: Fluid[]
     effects: Effect[]
     backGrounds: BackGround[]
@@ -70,7 +72,7 @@ class World extends WorldConfig {
     timer: NodeJS.Timeout
     emitter: TinyEmitter
 
-    constructor(contents: (Body | Fluid)[], config: WorldConfig = {}) {
+    constructor(contents: (Body | Fluid | Area)[], config: WorldConfig = {}) {
         super()
         this.timerSpeed = 0
 
@@ -114,9 +116,13 @@ class World extends WorldConfig {
 
         const bodies = contents.filter(content => content.isBody) as Body[]
         const fluids = contents.filter(content => content.isFluid) as Fluid[]
+        const areas = contents.filter(content => content.isArea) as Area[]
 
         this.bodies = []
         bodies.forEach(body => { body.enterWorld(this) })
+
+        this.areas = []
+        areas.forEach(area => { area.enterWorld(this) })
 
         this.effects = []
         if (config.effects) {

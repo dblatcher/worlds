@@ -7,6 +7,7 @@ import { Shape, shapes, ShapeValues } from './Shape'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
 import { Fluid } from './Fluid'
 import { AbstractGradientFill } from './GradientFill'
+import { Area } from './Area'
 
 
 
@@ -47,6 +48,7 @@ class Body {
 
     get isBody() { return true }
     get isFluid() { return false }
+    get isArea() { return false }
     get typeId() { return 'Body' }
 
     get description() { return `${this.data.immobile ? 'immobile ' : ''}${this.data.color} ${this.data.shape.id} ${this.typeId}` }
@@ -272,7 +274,7 @@ class Body {
         return this.data.shape.containsPoint.apply(this, [point]) as boolean
     }
 
-    isIntersectingWith(otherThing: Body | Fluid) {
+    isIntersectingWith(otherThing: Body | Fluid | Area) {
         return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
     }
 }

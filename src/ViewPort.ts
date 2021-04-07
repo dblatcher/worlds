@@ -191,6 +191,7 @@ class ViewPort {
         }
 
         world.fluids.forEach(fluid => { fluid.renderOnCanvas(ctx, this) })
+        world.areas.forEach(area => { area.renderOnCanvas(ctx, this) })
 
         world.bodies.forEach(body => {
             let applicableRule = transformRules.filter(rule => rule.test(body))[0]
