@@ -37,10 +37,19 @@ const roundArea = new Area({
     density: 2,
 })
 
+const squareArea = new Area({
+    x: 650,
+    y: 400,
+    size: 100,
+    shape: shapes.square,
+    fillColor: 'rgba(30,140,17,.5)',
+    density: 2,
+})
+
 const areaDemo = new World([
     redPlanet,
     greenPlanet,
-    roundArea
+    squareArea
 ], {
     height: 800,
     width: 800,

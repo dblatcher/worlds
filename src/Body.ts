@@ -1,13 +1,12 @@
 import { World, ViewPort } from './World'
 import { Force } from './Force'
-import { Point, _90deg } from './geometry'
+import { _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collision-detection/collisionDetection'
-import { Shape, shapes, ShapeValues } from './Shape'
+import { Shape } from './Shape'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
-import { Fluid } from './Fluid'
 import { AbstractGradientFill } from './GradientFill'
-import { Area } from './Area'
+import { ThingWithShape } from './ThingWithShape'
 
 
 
@@ -28,16 +27,15 @@ interface BodyData {
 }
 
 
-class Body {
+class Body extends ThingWithShape {
     world: World
     data: BodyData
     momentum: Force
     constructor(config: BodyData, momentum: Force = Force.none) {
-        this.data = config
+        super(config)
         this.data.heading = this.data.heading || 0
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
-        this.data.shape = this.data.shape || shapes.circle
         this.data.headingFollowsDirection = config.headingFollowsDirection || false
         this.data.immobile = config.immobile || false
         this.data.renderHeadingIndicator = config.renderHeadingIndicator || false
@@ -47,8 +45,6 @@ class Body {
     }
 
     get isBody() { return true }
-    get isFluid() { return false }
-    get isArea() { return false }
     get typeId() { return 'Body' }
 
     get description() { return `${this.data.immobile ? 'immobile ' : ''}${this.data.color} ${this.data.shape.id} ${this.typeId}` }
@@ -68,14 +64,6 @@ class Body {
         const { density } = this.data
         const { volume } = this
         return volume * density
-    }
-
-    get polygonPoints() {
-        return this.data.shape.getPolygonPoints.apply(this, []) as Point[]
-    }
-
-    get shapeValues() {
-        return this.data.shape.getShapeValues.apply(this, []) as ShapeValues
     }
 
     get gravitationalForces(): Force {
@@ -270,13 +258,7 @@ class Body {
         }
     }
 
-    checkIfContainsPoint(point: { x: number, y: number }) {
-        return this.data.shape.containsPoint.apply(this, [point]) as boolean
-    }
 
-    isIntersectingWith(otherThing: Body | Fluid | Area) {
-        return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
-    }
 }
 
 
