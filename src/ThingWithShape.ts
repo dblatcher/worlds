@@ -9,7 +9,6 @@ interface ThingWithShapeData {
     y: number
     size?: number
     shape?: Shape
-    density?: number
     heading?: number
     color?: string
     fillColor?: string | AbstractGradientFill

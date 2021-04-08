@@ -37,8 +37,10 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     const { fluids, airDensity, areas } = body.world
     if (fluids.length == 0 && areas.length == 0 && airDensity == 0) { return Force.none }
 
+    // assuming sphere
     const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
     let velocity = currentForce.magnitude
+    const expectedEndPoint = Geometry.translatePoint(body.data, body.momentum.vector)
 
     // to do - build list of the mediums (air, fluid) on the body's path with distances traveled through each
     // calculate the drag through the first
@@ -48,31 +50,45 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
 
     // to do after that - calculat effect of REFRACTION at medium boundary....
 
-    let fluidBodyStartsIn: Fluid = null
-    fluids.forEach(fluid => {
-        if (Geometry.isPointInsidePolygon(body.shapeValues, fluid.polygonPoints)) {
-            fluidBodyStartsIn = fluid
-        }
-    })
+    // possible problem - only looking at center point of body
+    // models perfect spheres moving on a flat surface
 
-    let areaBodyStartsIn: Area = null
-    areas.forEach(area => {
-        if (body.isIntersectingWith(area)) {
-            areaBodyStartsIn = area
-        }
-    })
+    const fluidBodyStartsIn = fluids.find(fluid => Geometry.isPointInsidePolygon(body.data, fluid.polygonPoints))
+    const fluidBodyEndsIn = fluids.find(fluid => Geometry.isPointInsidePolygon(expectedEndPoint, fluid.polygonPoints))
+    const areaBodyStartsIn = areas.find(area => area.checkIfContainsPoint(body.data)) || null;
+    const areaBodyEndsIn = areas.find(area => area.checkIfContainsPoint(expectedEndPoint)) || null;
 
-    const mediumDensity = fluidBodyStartsIn
-        ? fluidBodyStartsIn.data.density
-        : areaBodyStartsIn
-            ? areaBodyStartsIn.data.density
-            : airDensity
+    const startMedium = fluidBodyStartsIn || areaBodyStartsIn || null
+    const endMedium = fluidBodyEndsIn || areaBodyEndsIn || null
 
-    const drag = calculateDragThroughMedium(mediumDensity, body.mass, velocity, crossSectionalArea)
+    const startingMediumDensity = startMedium
+        ? startMedium.data.density
+        : airDensity
+
+    let dragMagnitude, dragDirection;
+    // assumes the body never passes through an area/fluid in one tick or crosses muliple boundaries
+    if (startMedium != endMedium) {
+        // TO DO - calculateDragThroughMedium with direction refraction
+        // for circulare areas, need to use tagents...
+        //console.log('medium change', {startMedium, endMedium})
+        dragMagnitude = calculateDragThroughMedium(startingMediumDensity, body.mass, velocity, crossSectionalArea);
+        dragDirection = Geometry.reverseHeading (currentForce.direction);
+    } else {
+        dragMagnitude = calculateDragThroughMedium(startingMediumDensity, body.mass, velocity, crossSectionalArea);
+        dragDirection = Geometry.reverseHeading (currentForce.direction);
+    }
+
+    // problem - body would not reach expectedEndPoint if it will collide with another body first,
+    // so might not actually cross the boundary. 
+    // For greater accuracy may need to detect collisions with Areas in the same way as detect collisions
+    // with Bodies and apply the effects (momentum changes) in order and recalculate the path and
+    // after each one.
+    // Would only use this method to calculate drag from starting medium.
+
 
     return new Force(
-        Math.min(drag, velocity),
-        currentForce.direction + Math.PI
+        Math.min(dragMagnitude, velocity),
+        dragDirection
     )
 
     // https://en.wikipedia.org/wiki/Drag_(physics)
