@@ -6,7 +6,7 @@ import { fluidTest } from './worlds/fluidTest';
 import { movingSquareTest } from './worlds/movingSquare';
 
 import { ViewPortControlPanel } from './ViewPortControlPanel';
-import { ViewPort } from '../ViewPort';
+import { ViewPort } from '../src/ViewPort';
 import { areaDemo } from './worlds/areaDemo';
 
 import './addStyleSheetAndFrame'

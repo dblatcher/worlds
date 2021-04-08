@@ -1,4 +1,4 @@
-import { World, shapes, Body, Force, Fluid, ViewPort } from '../../index'
+import { World, shapes, Body, Force, Fluid, ViewPort } from '../../src/index'
 
 
 

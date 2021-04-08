@@ -1,4 +1,4 @@
-import { World, shapes, Body, Force } from '../../index'
+import { World, shapes, Body, Force } from '../../src/index'
 
 
 function makeRock() {

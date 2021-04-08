@@ -3,9 +3,9 @@ const path = require('path');
 module.exports = {
   watch: true,
   entry: {
-    demo: './src/demo/demo.ts',
-    demo2: './src/demo/demo2.ts',
-    demo3: './src/demo/demo3.ts',
+    demo: './demo/demo.ts',
+    demo2: './demo/demo2.ts',
+    demo3: './demo/demo3.ts',
   },
   module: {
     rules: [

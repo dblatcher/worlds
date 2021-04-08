@@ -1,8 +1,8 @@
 import { world as world, greenStripes, redCircles } from './worlds/billiards'
-import { ViewPort } from '../ViewPort';
-import { CameraFollowInstruction } from '../CameraInstruction';
-import { Force, RenderFunctions, RenderTransformationRule, Body } from '..';
-import { getDistanceBetweenPoints, getHeadingFromPointToPoint, Point, _90deg } from '../geometry';
+import { ViewPort } from '../src/ViewPort';
+import { CameraFollowInstruction } from '../src/CameraInstruction';
+import { Force, RenderFunctions, RenderTransformationRule, Body } from '../src';
+import { getDistanceBetweenPoints, getHeadingFromPointToPoint, Point, _90deg } from '../src/geometry';
 import './addStyleSheetAndFrame'
 
 

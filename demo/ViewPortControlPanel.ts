@@ -1,5 +1,5 @@
-import { World } from '../World'
-import { ViewPort } from '../ViewPort'
+import { World } from '../src/World'
+import { ViewPort } from '../src/ViewPort'
 
 interface ViewPortControlPanelConfig {
     worldOptions?: World[]

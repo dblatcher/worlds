@@ -1,6 +1,6 @@
-import { Point, _90deg } from '../../geometry'
-import { LinearGradientFill } from '../../GradientFill'
-import { World, Body, Force, shapes } from '../../index'
+import { Point, _90deg } from '../../src/geometry'
+import { LinearGradientFill } from '../../src/GradientFill'
+import { World, Body, Force, shapes } from '../../src/index'
 
 
 const bigWhiteSquare = new Body({

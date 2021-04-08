@@ -1,7 +1,7 @@
-import { Area } from '../../Area'
-import { Point, _90deg } from '../../geometry'
-import { LinearGradientFill } from '../../GradientFill'
-import { World, Body, Force, shapes } from '../../index'
+import { Area } from '../../src/Area'
+import { Point, _90deg } from '../../src/geometry'
+import { LinearGradientFill } from '../../src/GradientFill'
+import { World, Body, Force, shapes } from '../../src/index'
 
 
 const redPlanet = new Body({

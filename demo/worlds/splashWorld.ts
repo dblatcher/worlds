@@ -1,7 +1,7 @@
-import { Fluid, Force } from "../..";
-import { _360deg, _90deg } from "../../geometry";
-import { Body } from "../../Body";
-import { World } from "../../World";
+import { Fluid, Force } from "../../src";
+import { _360deg, _90deg } from "../../src/geometry";
+import { Body } from "../../src/Body";
+import { World } from "../../src/World";
 
 
 

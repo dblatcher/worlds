@@ -1,9 +1,9 @@
-import { Fluid, Force, RenderFunctions } from "../..";
-import { Circle, getVectorX, getVectorY, getXYVector, Point, reverseHeading, translatePoint, Vector, Wedge, _360deg, _90deg } from "../../geometry";
-import { LinearGradientFill, RadialGradientFill } from "../../GradientFill"
-import { shapes } from "../../Shape";
-import { Body } from "../../Body";
-import { ViewPort, World } from "../../World";
+import { Fluid, Force, RenderFunctions } from "../../src";
+import { Circle, getVectorX, getVectorY, getXYVector, Point, reverseHeading, translatePoint, Vector, Wedge, _360deg, _90deg } from "../../src/geometry";
+import { LinearGradientFill, RadialGradientFill } from "../../src/GradientFill"
+import { shapes } from "../../src/Shape";
+import { Body } from "../../src/Body";
+import { ViewPort, World } from "../../src/World";
 
 
 const ball = {

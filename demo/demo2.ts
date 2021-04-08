@@ -1,9 +1,9 @@
 
-import { RenderFunctions } from '..';
-import { CameraFollowInstruction } from '../CameraInstruction';
-import { Force } from '../Force';
-import { _360deg, _90deg } from '../geometry';
-import { RenderTransformationRule, ViewPort } from '../ViewPort';
+import { RenderFunctions } from '../src';
+import { CameraFollowInstruction } from '../src/CameraInstruction';
+import { Force } from '../src/Force';
+import { _360deg, _90deg } from '../src/geometry';
+import { RenderTransformationRule, ViewPort } from '../src/ViewPort';
 import { bigWorld, redPlanet } from './worlds/bigWorld';
 
 
