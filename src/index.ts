@@ -13,7 +13,7 @@ import { Area, AreaData } from './Area'
 
 import * as Physics from './physics'
 import * as Geometry from './geometry'
-import * as CollisionDetection from './collision-detection/collisionDetection';
+import * as CollisionDetection from './collisionDetection';
 import * as RenderFunctions from './renderFunctions'
 
 

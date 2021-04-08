@@ -1,10 +1,10 @@
-import { Shape } from '../Shape'
+import { Shape } from './Shape'
 
-import { CollisionReport, EdgeCollisionReport } from './CollisionReport'
-import { detectCircleCollidingWithCircle } from './circle-circle'
-import { detectCircleCollidingWithEdge } from './circle-edge'
-import { detectCircleCollidingWithSquare } from './circle-square'
-import { detectSquareCollidingWithCircle } from './square-circle'
+import { CollisionReport, EdgeCollisionReport } from './collision-detection/CollisionReport'
+import { detectCircleCollidingWithCircle } from './collision-detection/circle-circle'
+import { detectCircleCollidingWithEdge } from './collision-detection/circle-edge'
+import { detectCircleCollidingWithSquare } from './collision-detection/circle-square'
+import { detectSquareCollidingWithCircle } from './collision-detection/square-circle'
 
 
 
