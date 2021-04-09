@@ -1,5 +1,5 @@
 import { Fluid } from "./Fluid"
-import { Point } from "./geometry"
+import { IntersectionInfo, Point } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { Shape, shapes, ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
@@ -51,6 +51,10 @@ class ThingWithShape {
 
     isIntersectingWith(otherThing: ThingWithShape | Fluid) {
         return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
+    }
+
+    getIntersectionsWithPath(path:[Point, Point]) {
+        return this.data.shape.intersectionWithPath.apply(this, [path]) as IntersectionInfo[]
     }
 
 }

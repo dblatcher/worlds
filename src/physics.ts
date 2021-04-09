@@ -6,6 +6,8 @@ import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 import { Fluid } from './Fluid'
 import { Area } from './Area'
+import { Effect } from './Effect'
+import { _90deg } from './geometry/definitions'
 
 
 function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, body: Body, fluid: Fluid): Force {
@@ -65,17 +67,75 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
         ? startMedium.data.density
         : airDensity
 
-    let dragMagnitude, dragDirection;
+    const endingMediumDensity = endMedium
+        ? endMedium.data.density
+        : airDensity
+
+    const averageDensity = startingMediumDensity + endingMediumDensity / 2
+    const backwards = Geometry.reverseHeading(currentForce.direction)
+    const densityChange = (startingMediumDensity - endingMediumDensity) / (startingMediumDensity + endingMediumDensity)
+
+
+
+    let dragMagnitude: number,
+        dragDirection: number,
+        crossingInfo: Geometry.IntersectionInfo;
     // assumes the body never passes through an area/fluid in one tick or crosses muliple boundaries
-    if (startMedium != endMedium) {
+
+
+    if (startMedium == endMedium) {
+        dragMagnitude = calculateDragThroughMedium(averageDensity, body.mass, velocity, crossSectionalArea);
+        dragDirection = Geometry.reverseHeading(currentForce.direction);
+    }
+    else if (startMedium == null) {
         // TO DO - calculateDragThroughMedium with direction refraction
         // for circulare areas, need to use tagents...
-        //console.log('medium change', {startMedium, endMedium})
-        dragMagnitude = calculateDragThroughMedium(startingMediumDensity, body.mass, velocity, crossSectionalArea);
-        dragDirection = Geometry.reverseHeading (currentForce.direction);
+
+        if (endMedium.isArea) {
+            crossingInfo = areaBodyEndsIn.getIntersectionsWithPath([body.data, expectedEndPoint])[0];
+        }
+
+        if (endMedium.isFluid) {
+            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges([body.data, expectedEndPoint], Geometry.getPolygonLineSegments(fluidBodyEndsIn.polygonPoints))[0]
+        }
+
+        if (crossingInfo) {
+            new Effect({ color: 'yellow', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
+                .enterWorld(body.world)
+
+            const normalAngle = Geometry.normaliseHeading(crossingInfo.edgeAngle - _90deg)
+            const incomingAngleOfincidence = Geometry.normaliseHeading(normalAngle - Geometry.getHeadingFromPointToPoint(body.data, expectedEndPoint))
+
+            dragDirection = Geometry.normaliseHeading(backwards + (densityChange * incomingAngleOfincidence));
+        } else {
+            console.log('no crossing info')
+            dragDirection = backwards;
+        }
+
+    }
+    else if (endMedium == null) {
+        if (startMedium.isArea) {
+            crossingInfo = areaBodyStartsIn.getIntersectionsWithPath([body.data, expectedEndPoint])[0];
+        }
+        if (startMedium.isFluid) {
+            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges([body.data, expectedEndPoint], Geometry.getPolygonLineSegments(fluidBodyStartsIn.polygonPoints))[0]
+        }
+
+        if (crossingInfo) {
+            new Effect({ color: 'yellow', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
+                .enterWorld(body.world)
+
+            const normalAngle = Geometry.normaliseHeading(crossingInfo.edgeAngle - _90deg)
+            const incomingAngleOfincidence = Geometry.normaliseHeading(normalAngle - Geometry.getHeadingFromPointToPoint(body.data, expectedEndPoint))
+
+            dragDirection = Geometry.normaliseHeading(backwards - (densityChange * incomingAngleOfincidence));
+        }else {
+            console.log('no crossing info')
+            dragDirection = backwards;
+        }
+
     } else {
-        dragMagnitude = calculateDragThroughMedium(startingMediumDensity, body.mass, velocity, crossSectionalArea);
-        dragDirection = Geometry.reverseHeading (currentForce.direction);
+        dragDirection = backwards;
     }
 
     // problem - body would not reach expectedEndPoint if it will collide with another body first,
@@ -85,6 +145,7 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     // after each one.
     // Would only use this method to calculate drag from starting medium.
 
+    dragMagnitude = calculateDragThroughMedium(averageDensity, body.mass, velocity, crossSectionalArea);
 
     return new Force(
         Math.min(dragMagnitude, velocity),

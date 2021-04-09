@@ -1,8 +1,8 @@
-import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint } from './geometry/definitions';
+import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint, IntersectionInfo } from './geometry/definitions';
 
 import { getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint } from './geometry/basics';
 import { normaliseHeading, reflectHeading, reverseHeading } from './geometry/headings';
-import { doLineSegmentsIntersect, findIntersectionPointOfLineSegments } from './geometry/line-intersections';
+import { doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle } from './geometry/line-intersections';
 import { arePolygonsIntersecting, getPolygonLineSegments, isPointInsidePolygon } from './geometry/polygons';
 import { areCirclesIntersecting, getCircleTangentAtPoint } from './geometry/circles';
 
@@ -114,15 +114,15 @@ function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[], apply
 
 
 export {
-    Point, Circle, Vector, Wedge, _90deg, _360deg,
+    Point, Circle, Vector, Wedge, IntersectionInfo, _90deg, _360deg,
     getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint,
     normaliseHeading, reflectHeading, reverseHeading,
-    doLineSegmentsIntersect, findIntersectionPointOfLineSegments,
+    doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle,
     arePolygonsIntersecting, getPolygonLineSegments, isPointInsidePolygon,
     areCirclesIntersecting, getCircleTangentAtPoint,
 
     closestpointonline,
-    areCircleAndPolygonIntersecting, 
-    translatePoint, 
+    areCircleAndPolygonIntersecting,
+    translatePoint,
     extendLineSegment
 }

@@ -1,4 +1,5 @@
-import { Point, _90deg, _360deg, _extreme } from './definitions'
+import { getDistanceBetweenPoints, getHeadingFromPointToPoint } from './basics';
+import { Point, _90deg, _360deg, _extreme, IntersectionInfo, Circle, } from './definitions'
 
 
 
@@ -44,7 +45,7 @@ function getIntersectionWithAVertical(nonVerticalSegment: [Point, Point], vertic
  * @param segment2 the two points of the second segment
  * @returns whether the sements intersect
  */
- function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Point]): boolean {
+function doLineSegmentsIntersect(segment1: [Point, Point], segment2: [Point, Point]): boolean {
 
     // Find the four orientations needed for general and 
     // special cases 
@@ -71,7 +72,6 @@ function getIntersectionWithAVertical(nonVerticalSegment: [Point, Point], vertic
 
     return false; // Doesn't fall in any of the above cases 
 }
-
 
 
 
@@ -121,5 +121,60 @@ function findIntersectionPointOfLineSegments(segment1: [Point, Point], segment2:
 }
 
 
+/**
+ * Find where any how a path will interesect with an array of line segments (probably making up a polygon)
+ * 
+ * @param path a line segment, representing a path from the first to second point
+ * @param edges an array of line segments
+ * @returns an array of IntersectionInfo (edgeIndex, point, edge, edgeAngle), sorted by the closest to the path start first
+ */
+function getSortedIntersectionInfoWithEdges(path: [Point, Point], edges: [Point, Point][]): IntersectionInfo[] {
 
-export { doLineSegmentsIntersect, findIntersectionPointOfLineSegments}
+    let intersections: IntersectionInfo[] = []
+    edges.forEach((edge, edgeIndex) => {
+        let point = findIntersectionPointOfLineSegments(edge, path)
+        const edgeAngle = getHeadingFromPointToPoint(...edge)
+        if (point !== null) {
+            intersections.push({ edgeIndex, point, edge, edgeAngle })
+        }
+    })
+
+    intersections = intersections
+        .sort((intersectionA, intersectionB) =>
+            getDistanceBetweenPoints(intersectionA.point, path[0]) - getDistanceBetweenPoints(intersectionB.point, path[0])
+        )
+
+    return intersections
+}
+
+
+/**
+ * Find where any how a path will interesect with a circle[incomplete]
+ * 
+ * @param path a line segment, representing a path from the first to second point
+ * @param circle 
+ * @returns an array of IntersectionInfo (edgeIndex, point, edge, edgeAngle), sorted by the closest to the path start first
+ */
+function getSortedIntersectionInfoWithCircle(path: [Point, Point], circle: Circle): IntersectionInfo[] {
+
+    let intersections: IntersectionInfo[] = []
+
+    console.warn('getSortedIntersectionInfoWithCircle is incomplete')
+    intersections.push({
+        point: circle,
+        edgeIndex: -1,
+        edge: null,
+        edgeAngle: 0,
+    })
+
+    intersections = intersections
+        .sort((intersectionA, intersectionB) =>
+            getDistanceBetweenPoints(intersectionA.point, path[0]) - getDistanceBetweenPoints(intersectionB.point, path[0])
+        )
+
+    return intersections
+}
+
+
+
+export { doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle }

@@ -41,7 +41,12 @@ function arePolygonsIntersecting(polygon1: Point[], polygon2: Point[]) {
     return false
 }
 
-
+/**
+ * PROBLEM - seems to fail when squares are at a 45 degree orientation...?
+ * @param point 
+ * @param polygon 
+ * @returns if the point is inside the polygon
+ */
 function isPointInsidePolygon(point: Point, polygon: Point[]) {
     var n = polygon.length;
     if (n < 3) { return false };

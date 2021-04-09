@@ -28,27 +28,6 @@ function getInfoAboutNearestPointOnPolygon(startingPoint: Point, polygon: Point[
 }
 
 
-interface IntersectionInfo { edgeIndex: number, point: Point, edge: [Point, Point] }[]
-
-
-function getSortedIntersectionInfo(path: [Point, Point], edges: [Point, Point][]): IntersectionInfo[] {
-
-    let intersections: IntersectionInfo[] = []
-    edges.forEach((edge, edgeIndex) => {
-        let point = Geometry.findIntersectionPointOfLineSegments(edge, path)
-        if (point !== null) {
-            intersections.push({ edgeIndex, point, edge })
-        }
-    })
-
-    intersections = intersections
-        .sort((intersectionA, intersectionB) =>
-            Geometry.getDistanceBetweenPoints(intersectionA.point, path[0]) - Geometry.getDistanceBetweenPoints(intersectionB.point, path[0])
-        )
-
-    return intersections
-}
-
 
 /**
  * find collision information between a circlular and square body
@@ -83,7 +62,7 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
 
     // the point that centerPathOfCircle interesects with the expanded edge is the stop point
     // the closestPointOnLine (real egde, stopPoint) = impactPoint
-    const intersectionsWithExpandedSquare = getSortedIntersectionInfo(centerPathOfCircle, Geometry.getPolygonLineSegments(expandedSquareBody.polygonPoints))
+    const intersectionsWithExpandedSquare = Geometry.getSortedIntersectionInfoWithEdges(centerPathOfCircle, Geometry.getPolygonLineSegments(expandedSquareBody.polygonPoints))
 
     if (intersectionsWithExpandedSquare.length > 0) {
         const edgeWhichCircleWillHit = squareEdges[intersectionsWithExpandedSquare[0].edgeIndex];
@@ -99,7 +78,7 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
     // above fails where the center path will not hit the expanding edges, but will hit the real edges
     // because the center stays between the expanded and real edges!
 
-    const intersectionsWithExtendedEdges = getSortedIntersectionInfo(centerPathOfCircle, squareEdges.map(edge => Geometry.extendLineSegment(edge, 2)))
+    const intersectionsWithExtendedEdges = Geometry.getSortedIntersectionInfoWithEdges(centerPathOfCircle, squareEdges.map(edge => Geometry.extendLineSegment(edge, 2)))
     if (intersectionsWithExtendedEdges.length > 0) {
         const pointWherePathWouldIntersectEdge = intersectionsWithExtendedEdges[0].point
         const edgeWhichCircleWillHit = squareEdges[intersectionsWithExtendedEdges[0].edgeIndex]

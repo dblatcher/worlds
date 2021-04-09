@@ -1,5 +1,9 @@
 import { Fluid } from "./Fluid"
-import { areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, getDistanceBetweenPoints, getVectorX, getVectorY, isPointInsidePolygon, Point, _90deg } from "./geometry"
+import { 
+    areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, 
+    getDistanceBetweenPoints, getPolygonLineSegments, 
+    getSortedIntersectionInfoWithEdges,getSortedIntersectionInfoWithCircle,
+     getVectorX, getVectorY, IntersectionInfo, isPointInsidePolygon, Point, _90deg } from "./geometry"
 import { renderCircle, renderPolygon } from "./renderFunctions"
 import { ViewPort } from "./World"
 import { ThingWithShape } from "./ThingWithShape"
@@ -21,6 +25,10 @@ interface PolygonPointsFunction {
     (): Point[]
 }
 
+interface PathIntersectionFunction {
+    (path: [Point, Point]): IntersectionInfo[]
+}
+
 interface CanvasRenderFunction {
     (ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort): void
 }
@@ -32,6 +40,7 @@ class ShapeConfig {
     intersectingWithShape: AreIntersectingFunction
     renderOnCanvas: CanvasRenderFunction
     getPolygonPoints: PolygonPointsFunction
+    intersectionWithPath: PathIntersectionFunction
 }
 
 interface ShapeValues {
@@ -53,6 +62,7 @@ class Shape extends ShapeConfig {
         this.containsPoint = config.containsPoint
         this.intersectingWithShape = config.intersectingWithShape
         this.renderOnCanvas = config.renderOnCanvas
+        this.intersectionWithPath = config.intersectionWithPath
     }
 }
 
@@ -98,6 +108,12 @@ const circle = new Shape({
             }
         }
     },
+
+    intersectionWithPath(path: [Point, Point]) {
+        const thisThing = this as ThingWithShape
+        return (getSortedIntersectionInfoWithCircle (path,thisThing.shapeValues));
+    },
+
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading } = thisThing.data
         renderCircle.onCanvas(ctx, thisThing.shapeValues, { strokeColor: color, fillColor, heading }, viewPort)
@@ -165,6 +181,11 @@ const square = new Shape({
                     return false
             }
         }
+    },
+    intersectionWithPath(path: [Point, Point]) {
+        const thisThing = this as ThingWithShape
+        const edges = getPolygonLineSegments(thisThing.polygonPoints);
+        return (getSortedIntersectionInfoWithEdges (path,edges));
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading = 0 } = thisThing.data
