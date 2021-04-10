@@ -1,4 +1,6 @@
-import { getDistanceBetweenPoints, getHeadingFromPointToPoint } from './basics';
+import { closestpointonline } from '../geometry';
+import { closestPointOnLineSegment, getDistanceBetweenPoints, getHeadingFromPointToPoint } from './basics';
+import { getCircleTangentAtPoint, isPointInsideCircle } from './circles';
 import { Point, _90deg, _360deg, _extreme, IntersectionInfo, Circle, } from './definitions'
 
 
@@ -148,6 +150,19 @@ function getSortedIntersectionInfoWithEdges(path: [Point, Point], edges: [Point,
 }
 
 
+function doesLineSegmentCrossCircleEdge(path: [Point, Point], circle: Circle): boolean {
+
+    const point0IsInside = isPointInsideCircle(circle, path[0])
+    const point1IsInside = isPointInsideCircle(circle, path[1])
+
+    if (point0IsInside && point1IsInside) { return false }
+    if (point1IsInside != point0IsInside) { return true }
+
+    return isPointInsideCircle(circle, closestPointOnLineSegment(...path, circle))
+
+}
+
+
 /**
  * Find where any how a path will interesect with a circle[incomplete]
  * 
@@ -156,16 +171,80 @@ function getSortedIntersectionInfoWithEdges(path: [Point, Point], edges: [Point,
  * @returns an array of IntersectionInfo (edgeIndex, point, edge, edgeAngle), sorted by the closest to the path start first
  */
 function getSortedIntersectionInfoWithCircle(path: [Point, Point], circle: Circle): IntersectionInfo[] {
-
     let intersections: IntersectionInfo[] = []
+    if (!doesLineSegmentCrossCircleEdge(path, circle)) { return intersections }
 
-    console.warn('getSortedIntersectionInfoWithCircle is incomplete')
-    intersections.push({
-        point: circle,
-        edgeIndex: -1,
-        edge: null,
-        edgeAngle: 0,
-    })
+    let intersectionPoint1: Point = { x: undefined, y: undefined }, intersectionPoint2: Point = { x: undefined, y: undefined };
+
+    const p = circle.x
+    const q = circle.y
+    const r = circle.radius
+
+    // console.log(`circle: (x-${p})^2 + (y-${q})^2 == ${r}^2`)
+
+    const pathIsVertical = path[0].x == path[1].x;
+
+    if (pathIsVertical) { // x = V
+        const k = path[0].x
+        // console.log(`line: x = ${k}`)
+        // console.log(`(${k-p})^2 + (y-${q})^2  == ${r**2}`)
+
+        const B = -2*q
+        const C = (p**2) + (q**2) - (r**2) - (2*k*p) + (k**2)
+        // console.log(`y^2 + ${B}*y + ${C} = 0`)
+        const W = (B*B) - (4*C)
+        const y1 = (-B + Math.sqrt(W)) / 2
+        const y2 = (-B - Math.sqrt(W)) / 2
+
+        intersectionPoint1.x = k;
+        intersectionPoint1.y = y1;
+
+        if (y1 !== y2) {
+            intersectionPoint2.x = k;
+            intersectionPoint2.y = y2;
+        }
+
+    } else { // Y = mX+ c
+        const m = (path[1].y - path[0].y) / (path[1].x - path[0].x)
+        const c = path[0].y - (m * path[0].x)
+        // console.log(`line: y = ${m}x + ${c}`)
+
+        // console.log(`(x - ${p})^2  +  (${m}x + ${c-q})^2 = ${r*r} `)
+
+        const A = (m ** 2) + 1;
+        const B = 2 * ((m * c) - (m * q) - p);
+        const C = (q*q) - (r*r) + (p*p) - (2 * c * q) + (c*c);
+
+        // console.log(`${A}x^2  + ${B}x + ${C} = 0`)
+
+        const W =( B ** 2) - 4 * A * C
+
+        intersectionPoint1.x = (-B + Math.sqrt(W)) / (2 * A)
+        intersectionPoint1.y = (m * intersectionPoint1.x) + c
+
+        if (W > 0) {
+            intersectionPoint2.x = (-B - Math.sqrt(W)) / (2 * A)
+            intersectionPoint2.y = (m * intersectionPoint2.x) + c
+        }
+    }
+
+    if (onSegment(path[0], intersectionPoint1, path[1])) {
+        intersections.push({
+            edge: null,
+            edgeIndex: -1,
+            point: intersectionPoint1,
+            edgeAngle: getCircleTangentAtPoint(circle, intersectionPoint1)
+        })
+    }
+
+    if (typeof intersectionPoint2.x !== 'undefined' && onSegment(path[0], intersectionPoint2, path[1])) {
+        intersections.push({
+            edge: null,
+            edgeIndex: -1,
+            point: intersectionPoint2,
+            edgeAngle: getCircleTangentAtPoint(circle, intersectionPoint2)
+        })
+    }
 
     intersections = intersections
         .sort((intersectionA, intersectionB) =>

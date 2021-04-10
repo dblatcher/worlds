@@ -1,6 +1,6 @@
 import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint, IntersectionInfo } from './geometry/definitions';
 
-import { getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint } from './geometry/basics';
+import { getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint, closestPointOnLineSegment } from './geometry/basics';
 import { normaliseHeading, reflectHeading, reverseHeading } from './geometry/headings';
 import { doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle } from './geometry/line-intersections';
 import { arePolygonsIntersecting, getPolygonLineSegments, isPointInsidePolygon } from './geometry/polygons';
@@ -27,27 +27,6 @@ function translatePoint(start: Point, vector: Vector, reverse = false): Point {
     }
 }
 
-
-function closestPointOnLineSegment(segmentPoint1: Point, segmentPoint2: Point, p0: Point) {
-    const v: Vector = { x: segmentPoint2.x - segmentPoint1.x, y: segmentPoint2.y - segmentPoint1.y }
-    const u: Vector = { x: segmentPoint1.x - p0.x, y: segmentPoint1.y - p0.y }
-    const vu = v.x * u.x + v.y * u.y
-    const vv = v.x ** 2 + v.y ** 2
-    const t = -vu / vv
-    if (t >= 0 && t <= 1) return _vectorToSegment2D(t, originPoint, segmentPoint1, segmentPoint2)
-    const g0 = _sqDiag2D(_vectorToSegment2D(0, p0, segmentPoint1, segmentPoint2))
-    const g1 = _sqDiag2D(_vectorToSegment2D(1, p0, segmentPoint1, segmentPoint2))
-    return g0 <= g1 ? segmentPoint1 : segmentPoint2
-}
-
-function _vectorToSegment2D(t: number, P: Point, A: Point, B: Point) {
-    return {
-        x: (1 - t) * A.x + t * B.x - P.x,
-        y: (1 - t) * A.y + t * B.y - P.y,
-    } as Vector
-}
-
-function _sqDiag2D(P: Vector) { return P.x ** 2 + P.y ** 2 }
 
 
 

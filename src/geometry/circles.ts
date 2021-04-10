@@ -29,4 +29,8 @@ function areCirclesIntersecting(circle1: Circle, circle2: Circle) {
     return tangentHeading;
 };
 
-export {areCirclesIntersecting, getCircleTangentAtPoint}
+function isPointInsideCircle(circle:Circle, point:Point){
+   return getDistanceBetweenPoints(circle, point) <= circle.radius
+}
+
+export {areCirclesIntersecting, getCircleTangentAtPoint, isPointInsideCircle}

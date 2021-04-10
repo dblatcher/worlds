@@ -1,7 +1,8 @@
-import extendLineSegmentTest from './extendline'
-import headingTest from './headingTest'
-import intersectionTest from './intersection'
-import propotypeTest from './prototypeIdentify'
+// import extendLineSegmentTest from './extendline'
+// import headingTest from './headingTest'
+// import intersectionTest from './intersection'
+import lineCircleTest from './line-circle-test'
+// import propotypeTest from './prototypeIdentify'
 
 console.log('\n\n\n')
 console.log('TESTS')
@@ -12,9 +13,9 @@ console.log('TESTS')
 // console.log('\n\n')
 
 console.log('********\n')
-//propotypeTest()
+
+lineCircleTest()
 
 console.log('********\n')
-extendLineSegmentTest()
 
 console.log('\n\n')

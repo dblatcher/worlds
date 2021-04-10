@@ -5,16 +5,16 @@ import { World, Body, Force, shapes } from '../../src/index'
 
 
 const redPlanet = new Body({
-    x: 500,
-    y: 500,
+    x: 450,
+    y: 650,
     size: 50,
-    density: 15,
+    density: 5,
     color: 'red',
     elasticity: 1,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
     renderPathAhead: true,
-}, new Force(200, _360deg * (-0 / 360)))
+}, new Force(100, _360deg * (180 / 360)))
 
 const greenPlanet = new Body({
     x: 150,
@@ -50,7 +50,8 @@ const squareArea = new Area({
 const areaDemo = new World([
     redPlanet,
     // greenPlanet,
-    roundArea
+    roundArea,
+    // squareArea,
 ], {
     height: 800,
     width: 800,

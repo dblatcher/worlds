@@ -5,9 +5,7 @@ import * as Geometry from './geometry'
 import { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 import { Fluid } from './Fluid'
-import { Area } from './Area'
-import { Effect } from './Effect'
-import { _90deg } from './geometry/definitions'
+import { Point, _90deg } from './geometry/definitions'
 
 
 function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, body: Body, fluid: Fluid): Force {
@@ -43,14 +41,15 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
     let velocity = currentForce.magnitude
     const expectedEndPoint = Geometry.translatePoint(body.data, body.momentum.vector)
+    const path:[Point, Point] = [{x:body.data.x, y:body.data.y}, expectedEndPoint];
 
+    // assumes the body never passes through an area/fluid in one tick or crosses muliple boundaries
     // to do - build list of the mediums (air, fluid) on the body's path with distances traveled through each
     // calculate the drag through the first
     // if drag through the first would stop the body reaching the second
     // calculate the drag through the remaining velocity in the second
     // apply total drag
 
-    // to do after that - calculat effect of REFRACTION at medium boundary....
 
     // possible problem - only looking at center point of body
     // models perfect spheres moving on a flat surface
@@ -75,12 +74,10 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     const backwards = Geometry.reverseHeading(currentForce.direction)
     const densityChange = (startingMediumDensity - endingMediumDensity) / (startingMediumDensity + endingMediumDensity)
 
-
-
     let dragMagnitude: number,
         dragDirection: number,
         crossingInfo: Geometry.IntersectionInfo;
-    // assumes the body never passes through an area/fluid in one tick or crosses muliple boundaries
+
 
 
     if (startMedium == endMedium) {
@@ -88,49 +85,47 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
         dragDirection = Geometry.reverseHeading(currentForce.direction);
     }
     else if (startMedium == null) {
-        // TO DO - calculateDragThroughMedium with direction refraction
-        // for circulare areas, need to use tagents...
 
         if (endMedium.isArea) {
-            crossingInfo = areaBodyEndsIn.getIntersectionsWithPath([body.data, expectedEndPoint])[0];
+            crossingInfo = areaBodyEndsIn.getIntersectionsWithPath(path)[0];
         }
 
         if (endMedium.isFluid) {
-            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges([body.data, expectedEndPoint], Geometry.getPolygonLineSegments(fluidBodyEndsIn.polygonPoints))[0]
+            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges(path, Geometry.getPolygonLineSegments(fluidBodyEndsIn.polygonPoints))[0]
         }
 
         if (crossingInfo) {
-            new Effect({ color: 'yellow', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
-                .enterWorld(body.world)
+            // new Effect({ color: 'yellow', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
+            //     .enterWorld(body.world)
 
             const normalAngle = Geometry.normaliseHeading(crossingInfo.edgeAngle - _90deg)
             const incomingAngleOfincidence = Geometry.normaliseHeading(normalAngle - Geometry.getHeadingFromPointToPoint(body.data, expectedEndPoint))
 
             dragDirection = Geometry.normaliseHeading(backwards + (densityChange * incomingAngleOfincidence));
         } else {
-            console.log('no crossing info')
+            console.log('no crossing info into medium')
             dragDirection = backwards;
         }
 
     }
     else if (endMedium == null) {
         if (startMedium.isArea) {
-            crossingInfo = areaBodyStartsIn.getIntersectionsWithPath([body.data, expectedEndPoint])[0];
+            crossingInfo = areaBodyStartsIn.getIntersectionsWithPath(path)[0];
         }
         if (startMedium.isFluid) {
-            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges([body.data, expectedEndPoint], Geometry.getPolygonLineSegments(fluidBodyStartsIn.polygonPoints))[0]
+            crossingInfo = Geometry.getSortedIntersectionInfoWithEdges(path, Geometry.getPolygonLineSegments(fluidBodyStartsIn.polygonPoints))[0]
         }
 
         if (crossingInfo) {
-            new Effect({ color: 'yellow', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
-                .enterWorld(body.world)
+            // new Effect({ color: 'blue', x: crossingInfo.point.x, y: crossingInfo.point.y, duration: 15 })
+            //     .enterWorld(body.world)
 
             const normalAngle = Geometry.normaliseHeading(crossingInfo.edgeAngle - _90deg)
             const incomingAngleOfincidence = Geometry.normaliseHeading(normalAngle - Geometry.getHeadingFromPointToPoint(body.data, expectedEndPoint))
 
             dragDirection = Geometry.normaliseHeading(backwards - (densityChange * incomingAngleOfincidence));
         }else {
-            console.log('no crossing info')
+            console.log('no crossing info out of medium')
             dragDirection = backwards;
         }
 
