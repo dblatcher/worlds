@@ -16,6 +16,8 @@ import * as Geometry from './geometry'
 import * as CollisionDetection from './collisionDetection';
 import * as RenderFunctions from './renderFunctions'
 
+import { KeyWatcher } from './additions/KeyWatcher';
+import { SoundPlayer } from './additions/SoundPlayer';
 
 export {
     Body, World, Force, Shape, Fluid,
@@ -28,6 +30,7 @@ export {
     shapes,
     AbstractGradientFill, LinearGradientFill, RadialGradientFill,
     Area, AreaData,
+    KeyWatcher, SoundPlayer,
 }
 
 
