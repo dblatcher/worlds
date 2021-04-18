@@ -14,7 +14,7 @@ import './addStyleSheetAndFrame'
 
 const canvasElement = document.createElement('canvas')
 
-const panelWorlds = [areaDemo, squareTestWorld, movingSquareTest,fluidTest, balance, galaxy, rocksAndBallons]
+const panelWorlds = [movingSquareTest, areaDemo, squareTestWorld,fluidTest, balance, galaxy, rocksAndBallons]
 
 const viewPort = ViewPort.full(panelWorlds[0], canvasElement)
 const panel = new ViewPortControlPanel({ viewPort, worldOptions: panelWorlds })

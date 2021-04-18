@@ -37,17 +37,17 @@ function detectPolyGonCollidingWithEdge(body: Body): EdgeCollisionReport {
         impactPoint.y = height
         setPointsForCornerOnHorizontal();
     }
-    if (edgesCrossedAtEnd.includes("TOP")) {
+    else if (edgesCrossedAtEnd.includes("TOP")) {
         cornerThatWillHit = polygonPoints.find(point => point.y === boundingRectangle.top);
         impactPoint.y = 0;
         setPointsForCornerOnHorizontal();
     }
-    if (edgesCrossedAtEnd.includes("LEFT")) {
+    else if (edgesCrossedAtEnd.includes("LEFT")) {
         cornerThatWillHit = polygonPoints.find(point => point.x === boundingRectangle.left);
         impactPoint.x = 0
         setPointsForCornerOnVertical();
     }
-    if (edgesCrossedAtEnd.includes("RIGHT")) {
+    else if (edgesCrossedAtEnd.includes("RIGHT")) {
         cornerThatWillHit = polygonPoints.find(point => point.x === boundingRectangle.right);
         impactPoint.x = width
         setPointsForCornerOnVertical();

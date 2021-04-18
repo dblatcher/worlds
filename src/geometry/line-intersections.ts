@@ -164,7 +164,7 @@ function doesLineSegmentCrossCircleEdge(path: [Point, Point], circle: Circle): b
 
 
 /**
- * Find where any how a path will interesect with a circle[incomplete]
+ * Find where any how a path will interesect with a circle
  * 
  * @param path a line segment, representing a path from the first to second point
  * @param circle 

@@ -1,19 +1,21 @@
 import { Body } from '../Body'
+import { Force } from '../Force'
 import * as Geometry from '../geometry'
-import { Point,Vector, Circle, areCircleAndPolygonIntersecting, _90deg } from '../geometry'
+import { Vector, _90deg } from '../geometry'
 
 import { CollisionReport } from './CollisionReport'
 import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon } from './utility'
 
 /**
  * 
- * [INCOMPLETE] detect collision of one a moving square body with a circular body
+ *  detect collision of one a moving square body with a circular body
+ * [INCOMPLETE] - doesn't detect pass through-collisions
  * 
  * @param item1 a moving square body
  * @param item2 a circular body
  * @returns a collision report (or null)
  */
- function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionReport {
+function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionReport {
 
     if (item1 === item2) { return null };
 
@@ -75,23 +77,39 @@ import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon } from 
     return null
 
     function getImpactAndStopPointAndWallAngle(circularBody: Body, squareBody: Body) {
-        //pretend circle is moving towards polygon in opposit direction
+        //pretend circle is moving towards polygon in opposite direction
         // find where it would hit the edge, get vector
         // apply opposite vector to find where the polygon his the circle
 
+        const copyofCircleBody = circularBody.duplicate() as Body;
+        const copyofSquareBody = squareBody.duplicate() as Body;
+        copyofCircleBody.momentum = new Force(squareBody.momentum.magnitude, Geometry.reverseHeading( squareBody.momentum.direction))
 
-        // have to handle 'glancing' impacts (forward point of circle is past the edge)
-        // can maybe just handle by 'extending' the edges for the purpose of finding pointWherePathWouldIntersectEdge
-        console.warn('MOVING SQUARE, NOT HANDLED')
+        const { stopPoint:stopPointIfBackwards, impactPoint:impactPointIfBackwards } = getCircleSquareCollisionInfo(copyofCircleBody, copyofSquareBody)
+
+        const backwardsPath:Vector = {
+            x: stopPointIfBackwards.x - copyofCircleBody.data.x,
+            y: stopPointIfBackwards.y - copyofCircleBody.data.y,
+        }
+        const realSquareCenterToImpactPointIfBackwards: Vector = {
+            x: impactPointIfBackwards.x - squareBody.data.x,
+            y: impactPointIfBackwards.y - squareBody.data.y,
+        }
+
+        const stopPoint = Geometry.translatePoint(copyofSquareBody.data, backwardsPath);
+        const impactPoint = Geometry.translatePoint(stopPoint, realSquareCenterToImpactPointIfBackwards);
+
+        const wallAngle = Geometry.getCircleTangentAtPoint(circularBody.shapeValues, impactPoint)
+
+        // new Effect({ color: 'yellow', x: stopPoint.x, y: stopPoint.y, duration: 15 }).enterWorld(circularBody.world)
+        // new Effect({ color: 'green', x: impactPoint.x, y: impactPoint.y, duration: 15 }).enterWorld(circularBody.world)
 
         return {
-            stopPoint: { x: squareBody.data.x, y: squareBody.data.y },
-            impactPoint: { x: squareBody.data.x, y: squareBody.data.y },
-            wallAngle: null as number,
+            stopPoint, impactPoint,wallAngle,
         }
 
     }
 
 }
 
-export {detectSquareCollidingWithCircle}
+export { detectSquareCollidingWithCircle }
