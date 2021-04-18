@@ -5,24 +5,25 @@ import { World, Body, Force, shapes } from '../../src/index'
 
 const bigWhiteSquare = new Body({
     heading: .7,
-    x: 210, y: 200,
+    x: 210, y: 250,
     size: 60, density: 1,
-    immobile: false,
     color: 'antiquewhite',
     shape: shapes.square,
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
-}, new Force(10,0.11))
+    renderPathAhead:true,
+    immobile: false,
+}, new Force(10,_360deg * (82/360)))
 
 const bigRedSquare = new Body({
     heading: _360deg*.2,
     x: 510, y: 600,
     size: 80, density: 1,
-    immobile: false,
     color: 'crimson',
     shape: shapes.square,
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
+    immobile: true,
 }, new Force(20,3.11))
 
 
@@ -54,8 +55,8 @@ const greenPlanet = new Body({
 const movingSquareTest = new World([
     bigWhiteSquare,
     bigRedSquare,
-    redPlanet,
-    greenPlanet,
+    // redPlanet,
+    // greenPlanet,
 ], {
     height: 800,
     width: 800,

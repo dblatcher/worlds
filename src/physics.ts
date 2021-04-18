@@ -403,8 +403,6 @@ function bounceCircleOffSquare(collision: CollisionReport) {
 function bounceSquareOffCircle(collision: CollisionReport) {
 
     if (collision.item2.data.immobile) {
-        console.warn(` square -> immobile-square collision(not handled right)`, collision)
-
         const copyOfCircle = collision.item1.duplicate()
         copyOfCircle.data.x = collision.stopPoint.x
         copyOfCircle.data.y = collision.stopPoint.y
@@ -424,7 +422,7 @@ function bounceSquareOffCircle(collision: CollisionReport) {
         }
 
     } else {
-        console.warn(`Unhandled square -> mobile-square collision`, collision)
+        console.warn(`Unhandled square -> mobile-circle collision`, collision)
     }
 
 }

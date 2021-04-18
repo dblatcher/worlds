@@ -82,10 +82,10 @@ function detectPolyGonCollidingWithEdge(body: Body): EdgeCollisionReport {
             y: boundingRectangle.y - cornerThatWillHit.y 
         };
         let adjacentLength = impactPoint.x - cornerThatWillHit.x;
-        let oppositeLength = Math.tan(body.momentum.direction) * adjacentLength;
+        let oppositeLength = Math.tan(body.momentum.direction - _90deg) * adjacentLength;
         impactPoint.y = cornerThatWillHit.y + oppositeLength;
         stopPoint = translatePoint(impactPoint,vectorFromCornerThatWillHitToXY);
-        wallAngle = Math.PI * 0.01
+        wallAngle = 0;
     }
 
     function getHardEdgesCrossed(rect: AlignedRectangle) {
