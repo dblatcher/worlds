@@ -5,6 +5,7 @@ import { detectCircleCollidingWithCircle } from './collision-detection/circle-ci
 import { detectCircleCollidingWithEdge } from './collision-detection/circle-edge'
 import { detectCircleCollidingWithSquare } from './collision-detection/circle-square'
 import { detectSquareCollidingWithCircle } from './collision-detection/square-circle'
+import { detectPolyGonCollidingWithEdge } from './collision-detection/polygon-edge'
 
 
 
@@ -31,8 +32,8 @@ function getEdgeCollisionDetectionFunction(shape: Shape) {
     switch (shape.id) {
         case "circle":
             return detectCircleCollidingWithEdge
-        case "square": // TO DO - write detectSquareCollidingWithEdge
-            return detectCircleCollidingWithEdge
+        case "square": 
+            return detectPolyGonCollidingWithEdge
         default:
             return detectCircleCollidingWithEdge
     }

@@ -1,4 +1,4 @@
-import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint, IntersectionInfo } from './geometry/definitions';
+import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint, IntersectionInfo, AlignedRectangle } from './geometry/definitions';
 
 import { getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint, closestPointOnLineSegment } from './geometry/basics';
 import { normaliseHeading, reflectHeading, reverseHeading } from './geometry/headings';
@@ -93,7 +93,7 @@ function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[], apply
 
 
 export {
-    Point, Circle, Vector, Wedge, IntersectionInfo, _90deg, _360deg,
+    Point, Circle, Vector, Wedge, IntersectionInfo, AlignedRectangle, _90deg, _360deg,
     getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint,
     normaliseHeading, reflectHeading, reverseHeading,
     doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle,

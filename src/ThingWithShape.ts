@@ -1,5 +1,5 @@
 import { Fluid } from "./Fluid"
-import { IntersectionInfo, Point } from "./geometry"
+import { IntersectionInfo, Point, AlignedRectangle } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { Shape, shapes, ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
@@ -32,6 +32,40 @@ class ThingWithShape {
         return this.data.shape.getPolygonPoints.apply(this, []) as Point[]
     }
 
+    get boundingRectangle() {
+        const { polygonPoints, shapeValues } = this;
+        let rect: AlignedRectangle;
+
+        if (polygonPoints[0]) {
+            rect = {
+                top: polygonPoints[0].y,
+                left: polygonPoints[0].x,
+                bottom: polygonPoints[0].y,
+                right: polygonPoints[0].y,
+                x: this.data.x,
+                y: this.data.y,
+            }
+
+            polygonPoints.forEach(point => {
+                rect.top = point.y < rect.top ? point.y : rect.top;
+                rect.bottom = point.y > rect.bottom ? point.y : rect.bottom;
+                rect.left = point.x < rect.left ? point.x : rect.left;
+                rect.right = point.x > rect.right ? point.x : rect.right;
+            })
+
+        } else {
+            rect = {
+                top: shapeValues.top,
+                left: shapeValues.left,
+                bottom: shapeValues.bottom,
+                right: shapeValues.right,
+                x: this.shapeValues.x,
+                y: this.shapeValues.y,
+            }
+        }
+        return rect;
+    }
+
     get shapeValues() {
         return this.data.shape.getShapeValues.apply(this, []) as ShapeValues
     }
@@ -53,7 +87,7 @@ class ThingWithShape {
         return this.data.shape.intersectingWithShape.apply(this, [otherThing]) as boolean
     }
 
-    getIntersectionsWithPath(path:[Point, Point]) {
+    getIntersectionsWithPath(path: [Point, Point]) {
         return this.data.shape.intersectionWithPath.apply(this, [path]) as IntersectionInfo[]
     }
 
