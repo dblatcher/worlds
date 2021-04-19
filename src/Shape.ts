@@ -174,7 +174,7 @@ const square = new Shape({
             const otherThing = otherThingOrFluid as ThingWithShape;
             switch (otherThing.data.shape.id) {
                 case 'square':
-                    arePolygonsIntersecting(otherThing.polygonPoints, thisThing.polygonPoints)
+                    return arePolygonsIntersecting(otherThing.polygonPoints, thisThing.polygonPoints)
                 case 'circle':
                     return areCircleAndPolygonIntersecting(otherThing.shapeValues, thisThing.polygonPoints)
                 default:

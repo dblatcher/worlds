@@ -41,7 +41,7 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     const crossSectionalArea = body.shapeValues.radius ** 2 * Math.PI
     let velocity = currentForce.magnitude
     const expectedEndPoint = Geometry.translatePoint(body.data, body.momentum.vector)
-    const path:[Point, Point] = [{x:body.data.x, y:body.data.y}, expectedEndPoint];
+    const path: [Point, Point] = [{ x: body.data.x, y: body.data.y }, expectedEndPoint];
 
     // assumes the body never passes through an area/fluid in one tick or crosses muliple boundaries
     // to do - build list of the mediums (air, fluid) on the body's path with distances traveled through each
@@ -124,7 +124,7 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
             const incomingAngleOfincidence = Geometry.normaliseHeading(normalAngle - Geometry.getHeadingFromPointToPoint(body.data, expectedEndPoint))
 
             dragDirection = Geometry.normaliseHeading(backwards - (densityChange * incomingAngleOfincidence));
-        }else {
+        } else {
             console.log('no crossing info out of medium')
             dragDirection = backwards;
         }
@@ -134,7 +134,7 @@ function calculateDragForce(body: Body, currentForce: Force): Force {
     }
 
     // problem - body would not reach expectedEndPoint if it will collide with another body first,
-    // so might not actually cross the boundary. 
+    // so might not actually cross the boundary.
     // For greater accuracy may need to detect collisions with Areas in the same way as detect collisions
     // with Bodies and apply the effects (momentum changes) in order and recalculate the path and
     // after each one.
@@ -176,7 +176,7 @@ function getGravitationalForce(gravitationalConstant: number, affectedBody: Body
 
 /**
  * Find the vector resulting from a round body bouncing off a straight edge
- * 
+ *
  * @param edgeCollisionReport the edge collision report
  */
 function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
@@ -189,11 +189,11 @@ function findEdgeBounceForce(edgeCollisionReport: EdgeCollisionReport) {
 }
 
 /**
- * Find the vector resulting from a round body bouncing off an immobile body
- * 
+ * Find the vector resulting from a body bouncing off an immobile body
+ *
  * @param collisionReport the collision report
  */
-function findBounceOfImmobileBodyForce(collisionReport: CollisionReport) {
+function findBounceOffImmobileBodyForce(collisionReport: CollisionReport) {
     const { item1, item2, impactPoint } = collisionReport
 
     const angleToReflectOff = typeof collisionReport.wallAngle === 'number'
@@ -275,7 +275,7 @@ function findRoundBounceCollisionVectorsMethod2(collision: CollisionReport) {
  *
  * @param collision the collision report
  */
-function separateCollidingBodies(collision: CollisionReport) {
+function separateCollidingCircularBodies(collision: CollisionReport) {
 
     const { item1, item2, stopPoint } = collision;
 
@@ -352,13 +352,13 @@ function findRoundBounceCollisionVectorsMethod1(collision: CollisionReport) {
  */
 function bounceCircleOffCircle(collision: CollisionReport) {
 
-    separateCollidingBodies(collision)
+    separateCollidingCircularBodies(collision)
 
     // problem - after a collision, the only force acting to form the momentum used by Body.move()
     // is the reflected force - for gravity from other bodies, thrust etc are ignored
     // need to recalculate withouth them 'applying double'
     if (collision.item2.data.immobile) {
-        collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
+        collision.item1.momentum = findBounceOffImmobileBodyForce(collision)
     } else {
         const bounce = findRoundBounceCollisionVectorsMethod2(collision)
         collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
@@ -367,65 +367,24 @@ function bounceCircleOffCircle(collision: CollisionReport) {
 };
 
 
-function bounceCircleOffSquare(collision: CollisionReport) {
+function bounceBodyOffImmobileBody(collision: CollisionReport) {
 
-    if (collision.item2.data.immobile) {
+    const copyOfItem1 = collision.item1.duplicate()
+    copyOfItem1.data.x = collision.stopPoint.x
+    copyOfItem1.data.y = collision.stopPoint.y
 
-        const copyOfCircle = collision.item1.duplicate()
-        copyOfCircle.data.x = collision.stopPoint.x
-        copyOfCircle.data.y = collision.stopPoint.y
+    const wouldIntersectAtStopPoint = copyOfItem1.isIntersectingWith(collision.item2)
 
-        const wouldIntersectAtStopPoint = copyOfCircle.isIntersectingWith(collision.item2)
-
-        if (wouldIntersectAtStopPoint && collision.type != 'start inside') {
-            // const indexNumber = collision.item1.world.bodies.indexOf(collision.item1)
-            // console.log(`#${indexNumber}: ${collision.type}: [${collision.item1.data.x}, ${collision.item1.data.y}] -> [${copyOfCircle.data.x}, ${copyOfCircle.data.y}]`)
-        } else {
-            collision.item1.data.x = collision.stopPoint.x
-            collision.item1.data.y = collision.stopPoint.y
-        }
-
-        if (collision.type != 'start inside') {
-            collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
-        }
-
-    } else {
-        console.warn(`Unhandled circle-mobile square collision`, collision)
+    if (!wouldIntersectAtStopPoint || collision.type == 'start inside') {
+        collision.item1.data.x = collision.stopPoint.x
+        collision.item1.data.y = collision.stopPoint.y
     }
 
-}
-
-
-/**
- * DOES NOT WORK PROPERLY YET
- * @param collision 
- */
-function bounceSquareOffCircle(collision: CollisionReport) {
-
-    if (collision.item2.data.immobile) {
-        const copyOfCircle = collision.item1.duplicate()
-        copyOfCircle.data.x = collision.stopPoint.x
-        copyOfCircle.data.y = collision.stopPoint.y
-
-        const wouldIntersectAtStopPoint = copyOfCircle.isIntersectingWith(collision.item2)
-
-        if (wouldIntersectAtStopPoint && collision.type != 'start inside') {
-            // const indexNumber = collision.item1.world.bodies.indexOf(collision.item1)
-            // console.log(`#${indexNumber}: ${collision.type}: [${collision.item1.data.x}, ${collision.item1.data.y}] -> [${copyOfCircle.data.x}, ${copyOfCircle.data.y}]`)
-        } else {
-            collision.item1.data.x = collision.stopPoint.x
-            collision.item1.data.y = collision.stopPoint.y
-        }
-
-        if (collision.type != 'start inside') {
-            collision.item1.momentum = findBounceOfImmobileBodyForce(collision)
-        }
-
-    } else {
-        console.warn(`Unhandled square -> mobile-circle collision`, collision)
+    if (collision.type != 'start inside') {
+        collision.item1.momentum = findBounceOffImmobileBodyForce(collision)
     }
-
 }
+
 
 function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
@@ -439,20 +398,35 @@ function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
 
     const collisionType = collisionReport.item1.data.shape.id + "-" + collisionReport.item2.data.shape.id;
+    const withImmobile = collisionReport.item2.data.immobile;
 
-    switch (collisionType) {
-        case "circle-circle":
-            return bounceCircleOffCircle(collisionReport)
-        case "circle-square":
-            return bounceCircleOffSquare(collisionReport)
-        case "square-circle": // TO DO - more detection functions
-            return bounceSquareOffCircle(collisionReport)
-        case "square-square":
-        default:
-            console.log(`Unhandled ${collisionType} collision`, collisionReport)
-            return
+    if (withImmobile) {
+
+        switch (collisionType) {
+            case "circle-circle":
+                return bounceCircleOffCircle(collisionReport)
+            case "circle-square":
+            case "square-circle":
+            case "square-square":
+            default:
+                return bounceBodyOffImmobileBody(collisionReport)
+        }
+
+    } else {
+        switch (collisionType) {
+            case "circle-circle":
+                return bounceCircleOffCircle(collisionReport)
+            case "square-square":
+            case "circle-square": // TO DO - more bounce functions
+            case "square-circle":
+            default:
+                console.log(`Unhandled ${collisionType} collision`, collisionReport)
+                return
+        }
+
     }
+
 
 }
 
-export { getUpthrustForce, getGravitationalForce, bounceCircleOffCircle, bounceOffWorldEdge, handleCollisionAccordingToShape, calculateDragForce }
+export { getUpthrustForce, getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, calculateDragForce }

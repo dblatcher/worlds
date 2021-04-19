@@ -1,11 +1,11 @@
-import { Point, _360deg } from '../../src/geometry'
+import { Point, _360deg, _deg } from '../../src/geometry'
 import { LinearGradientFill } from '../../src/GradientFill'
 import { World, Body, Force, shapes } from '../../src/index'
 
 
 const bigWhiteSquare = new Body({
-    heading: .7,
-    x: 210, y: 250,
+    heading: _deg * 120,
+    x: 210, y: 330,
     size: 60, density: 1,
     color: 'antiquewhite',
     shape: shapes.square,
@@ -13,7 +13,7 @@ const bigWhiteSquare = new Body({
     renderHeadingIndicator: true,
     renderPathAhead:true,
     immobile: false,
-}, new Force(10,_360deg * (82/360)))
+}, new Force(40,45 * _deg))
 
 const bigRedSquare = new Body({
     heading: _360deg*.2,
@@ -24,7 +24,7 @@ const bigRedSquare = new Body({
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
     immobile: true,
-}, new Force(20,3.11))
+}, new Force(0,0))
 
 
 const redPlanet = new Body({
