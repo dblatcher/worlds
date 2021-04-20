@@ -1,12 +1,14 @@
 import { Fluid } from "./Fluid"
-import { 
-    areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting, 
-    getDistanceBetweenPoints, getPolygonLineSegments, 
-    getSortedIntersectionInfoWithEdges,getSortedIntersectionInfoWithCircle,
-     getVectorX, getVectorY, IntersectionInfo, isPointInsidePolygon, Point, _90deg } from "./geometry"
+import {
+    areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting,
+    getDistanceBetweenPoints, getPolygonLineSegments,
+    getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle,
+    getVectorX, getVectorY, IntersectionInfo, isPointInsidePolygon, Point, _90deg
+} from "./geometry"
 import { renderCircle, renderPolygon } from "./renderFunctions"
 import { ViewPort } from "./World"
 import { ThingWithShape } from "./ThingWithShape"
+import { Force } from "./Force"
 
 
 interface ContainsPointFunction {
@@ -34,7 +36,7 @@ interface CanvasRenderFunction {
 }
 
 class ShapeConfig {
-    id: "circle" | "square"
+    id: "circle" | "square" | "polygon"
     getShapeValues: ShapeValuesFunction
     containsPoint: ContainsPointFunction
     intersectingWithShape: AreIntersectingFunction
@@ -101,6 +103,7 @@ const circle = new Shape({
             switch ((otherThingOrFluid as ThingWithShape).data.shape.id) {
                 case 'circle':
                     return areCirclesIntersecting(thisThing.shapeValues, (otherThingOrFluid as ThingWithShape).shapeValues)
+                case 'polygon':
                 case 'square':
                     return areCircleAndPolygonIntersecting(thisThing.shapeValues, (otherThingOrFluid as ThingWithShape).polygonPoints, equalYvalues)
                 default:
@@ -111,7 +114,7 @@ const circle = new Shape({
 
     intersectionWithPath(path: [Point, Point]) {
         const thisThing = this as ThingWithShape
-        return (getSortedIntersectionInfoWithCircle (path,thisThing.shapeValues));
+        return (getSortedIntersectionInfoWithCircle(path, thisThing.shapeValues));
     },
 
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort) {
@@ -173,6 +176,7 @@ const square = new Shape({
         if (otherThingOrFluid.isBody || otherThingOrFluid.isArea) {
             const otherThing = otherThingOrFluid as ThingWithShape;
             switch (otherThing.data.shape.id) {
+                case 'polygon':
                 case 'square':
                     return arePolygonsIntersecting(otherThing.polygonPoints, thisThing.polygonPoints)
                 case 'circle':
@@ -185,7 +189,7 @@ const square = new Shape({
     intersectionWithPath(path: [Point, Point]) {
         const thisThing = this as ThingWithShape
         const edges = getPolygonLineSegments(thisThing.polygonPoints);
-        return (getSortedIntersectionInfoWithEdges (path,edges));
+        return (getSortedIntersectionInfoWithEdges(path, edges));
     },
     renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort) {
         const { color = 'white', fillColor, heading = 0 } = thisThing.data
@@ -194,6 +198,71 @@ const square = new Shape({
     }
 })
 
-const shapes = { circle, square }
+const polygon = new Shape({
+    id: 'polygon',
+    getShapeValues() {
+        const thisThing = this as ThingWithShape
+        return {
+            radius: thisThing.data.size,
+            x: thisThing.data.x,
+            y: thisThing.data.y,
+            top: thisThing.data.y - thisThing.data.size,
+            bottom: thisThing.data.y + thisThing.data.size,
+            left: thisThing.data.x - thisThing.data.size,
+            right: thisThing.data.x + thisThing.data.size,
+        }
+
+    },
+    getPolygonPoints() {
+        const thisThing = this as ThingWithShape
+        const { x, y, size, heading } = thisThing.data;
+
+        return thisThing.data.corners.map(corner => {
+            const cornerPlacement = Force.fromVector(corner.x, corner.y)
+            cornerPlacement.direction += heading
+            cornerPlacement.magnitude *= size
+            return {
+                x: x + cornerPlacement.vectorX,
+                y: y + cornerPlacement.vectorY
+            }
+        })
+    },
+    containsPoint(point: Point) {
+        const thisThing = this as ThingWithShape
+        return isPointInsidePolygon(point, thisThing.polygonPoints)
+    },
+    intersectingWithShape(otherThingOrFluid: ThingWithShape | Fluid) {
+        const thisThing = this as ThingWithShape
+
+        if (otherThingOrFluid.isFluid) {
+            return areCircleAndPolygonIntersecting(thisThing.shapeValues, otherThingOrFluid.polygonPoints)
+        }
+
+        if (otherThingOrFluid.isBody || otherThingOrFluid.isArea) {
+            const otherThing = otherThingOrFluid as ThingWithShape;
+            switch (otherThing.data.shape.id) {
+                case 'polygon':
+                case 'square':
+                    return arePolygonsIntersecting(otherThing.polygonPoints, thisThing.polygonPoints)
+                case 'circle':
+                    return areCircleAndPolygonIntersecting(otherThing.shapeValues, thisThing.polygonPoints)
+                default:
+                    return false
+            }
+        }
+    },
+    intersectionWithPath(path: [Point, Point]) {
+        const thisThing = this as ThingWithShape
+        const edges = getPolygonLineSegments(thisThing.polygonPoints);
+        return (getSortedIntersectionInfoWithEdges(path, edges));
+    },
+    renderOnCanvas(ctx: CanvasRenderingContext2D, thisThing: ThingWithShape, viewPort: ViewPort) {
+        const { color = 'white', fillColor, heading = 0 } = thisThing.data
+        const { polygonPoints } = thisThing
+        renderPolygon.onCanvas(ctx, polygonPoints, { strokeColor: color, fillColor, heading }, viewPort)
+    }
+})
+
+const shapes = { circle, square, polygon }
 
 export { Shape, shapes, ShapeValues }

@@ -436,10 +436,8 @@ function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
                 case "square-square":
                 case "circle-square": // TO DO - more bounce functions
                 case "square-circle":
+                default:
                     return bounceBodyOffMobileBody(collisionReport)
-            default:
-                console.log(`Unhandled ${collisionType} collision`, collisionReport)
-                return
         }
 
     }

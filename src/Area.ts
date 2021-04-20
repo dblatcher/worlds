@@ -1,4 +1,5 @@
 
+import { Vector } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { Shape } from "./Shape"
 import { ThingWithShape } from "./ThingWithShape"
@@ -13,7 +14,7 @@ interface AreaData {
     heading?: number
     color?: string
     fillColor?: string | AbstractGradientFill
-
+    corners?: Vector[]
 }
 
 class Area extends ThingWithShape {

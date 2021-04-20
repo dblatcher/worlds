@@ -1,6 +1,6 @@
 import { World, ViewPort } from './World'
 import { Force } from './Force'
-import { _90deg } from './geometry'
+import { Vector, _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { Shape } from './Shape'
@@ -24,6 +24,7 @@ interface BodyData {
     immobile?: boolean
     renderHeadingIndicator?: boolean
     renderPathAhead?: boolean
+    corners?:Vector[]
 }
 
 

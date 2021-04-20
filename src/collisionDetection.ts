@@ -25,7 +25,7 @@ function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
         case "square-square":
             return detectPolygonCollidingWithPolygon
         default:
-            return () => null as CollisionReport
+            return detectPolygonCollidingWithPolygon
     }
 }
 
@@ -37,7 +37,7 @@ function getEdgeCollisionDetectionFunction(shape: Shape) {
         case "square": 
             return detectPolyGonCollidingWithEdge
         default:
-            return detectCircleCollidingWithEdge
+            return detectPolyGonCollidingWithEdge
     }
 
 }

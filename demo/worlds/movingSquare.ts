@@ -51,12 +51,31 @@ const greenPlanet = new Body({
     renderHeadingIndicator: true,
 })
 
+const triangle = new Body({
+    x: 280,
+    y: 600,
+    size: 50,
+    density: 1,
+    immobile: false,
+    shape: shapes.polygon,
+    corners:[
+        {x:0, y:1},
+        {x:-1, y:-1},
+        {x:1, y:-1},
+    ],
+    color: 'red',
+    elasticity: 1,
+    headingFollowsDirection: false,
+    renderHeadingIndicator: true,
+})
+
 
 const movingSquareTest = new World([
     bigWhiteSquare,
-    bigRedSquare,
-    redPlanet,
-    greenPlanet,
+    // bigRedSquare,
+    // redPlanet,
+    // greenPlanet,
+    triangle
 ], {
     height: 800,
     width: 800,

@@ -1,5 +1,5 @@
 import { Fluid } from "./Fluid"
-import { IntersectionInfo, Point, AlignedRectangle, Circle, getDistanceBetweenPoints } from "./geometry"
+import { IntersectionInfo, Point, Vector, AlignedRectangle, Circle, getDistanceBetweenPoints } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { Shape, shapes, ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
@@ -12,6 +12,7 @@ interface ThingWithShapeData {
     heading?: number
     color?: string
     fillColor?: string | AbstractGradientFill
+    corners?:Vector[]
 }
 
 class ThingWithShape {
@@ -21,6 +22,7 @@ class ThingWithShape {
     constructor(config: ThingWithShapeData) {
         this.data = config
         this.data.shape = config.shape || shapes.circle
+        this.data.corners = config.corners || []
     }
 
     get isFluid() { return false }
