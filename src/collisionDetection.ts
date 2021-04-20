@@ -19,11 +19,11 @@ function getCollisionDetectionFunction(shape1: Shape, shape2: Shape) {
         case "circle-circle":
             return detectCircleCollidingWithCircle
         case "circle-square":
+        case "circle-polygon":
             return detectCircleCollidingWithSquare
-        case "square-circle": // TO DO - more detection functions
+        case "square-circle":
+        case "polygon-circle":
             return detectSquareCollidingWithCircle
-        case "square-square":
-            return detectPolygonCollidingWithPolygon
         default:
             return detectPolygonCollidingWithPolygon
     }
