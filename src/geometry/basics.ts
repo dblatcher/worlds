@@ -16,6 +16,29 @@ function getDistanceBetweenPoints(point1: Point, point2?: Point) {
 }
 
 /**
+ * Calculate the unit vector from one point to another
+ * @param point1 the point the vector heads to
+ * @param point2 the point the vector heads from
+ * @return a vector of magnitude 1 in the direction of point2 to point1
+ */
+function getUnitVectorBetweenPoints(point1: Point, point2: Point):Vector {
+    var distanceBetweenCenters = getDistanceBetweenPoints(point1, point2);
+    if (distanceBetweenCenters > 0) {
+        var vectorBetweenCenters = { x: point1.x - point2.x, y: point1.y - point2.y };
+        return {
+            x: vectorBetweenCenters.x / distanceBetweenCenters,
+            y: vectorBetweenCenters.y / distanceBetweenCenters
+        };
+    } else {
+        var randomX = Math.random()
+        return {
+            x: randomX,
+            y: 1 - randomX
+        };
+    }
+}
+
+/**
  * Calculate the magnitude of an [x,y] vector, using pythagoras' theorum
  *
  * @param x the x value of the vector
@@ -34,7 +57,7 @@ function getMagnitude(x: number, y: number) {
  * @param y the y value of the vector
  * @returns the direction in radians
  */
- function getDirection(x: number, y: number) {
+function getDirection(x: number, y: number) {
     if (x == 0 && y == 0) { return 0; }
     if (y != 0 && x != 0) {
         if (y > 0) {
@@ -90,4 +113,4 @@ function _sqDiag2D(P: Vector) { return P.x ** 2 + P.y ** 2 }
 
 
 
-export { getDistanceBetweenPoints, getMagnitude, getDirection, getVectorX,getVectorY,getXYVector, getHeadingFromPointToPoint, closestPointOnLineSegment }
+export { getDistanceBetweenPoints, getMagnitude, getDirection, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint, closestPointOnLineSegment,getUnitVectorBetweenPoints }

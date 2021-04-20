@@ -21,46 +21,54 @@ interface CornerHittingEgdeData {
  * [INCOMPLETE] not pushing out overlapping at start
  * [INCOMPLETE] not finding passthrough collisions
  *
- * @param item1 a moving polygon body
- * @param item2 a polygon body
+ * @param body1 a moving polygon body
+ * @param body2 a polygon body
  * @returns a collision report (or null)
  */
-function detectPolygonCollidingWithPolygon(item1: Body, item2: Body): CollisionReport {
+function detectPolygonCollidingWithPolygon(body1: Body, body2: Body): CollisionReport {
 
-    if (item1 === item2) { return null };
+    if (body1 === body2) { return null };
 
-    const force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
-    const force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
+    const force = body1.mass && body1.momentum ? body1.mass * body1.momentum.magnitude : 0;
+    const force2 = body2.mass && body2.momentum ? body2.mass * body2.momentum.magnitude : force;
 
-    const { vector } = item1.momentum;
-    const { polygonPoints } = item1
+    const { vector } = body1.momentum;
+    const { polygonPoints } = body1
     const edges = Geometry.getPolygonLineSegments(polygonPoints);
-    const { polygonPoints: polygonPoints2 } = item2
+    const { polygonPoints: polygonPoints2 } = body2
     const edges2 = Geometry.getPolygonLineSegments(polygonPoints2);
 
     let impactPoint: Point, wallAngle: number, stopPoint: Point;
 
-    //START INSIDE
-    if (item1.isIntersectingWith(item2)) {
+    if (body1.isIntersectingWith(body2)) {
 
-        console.log('polygons intersect at start - NOT HANDLED')
+        //find stop point moving body1 away from body2 until it is not intersecting
+        // DONE VERY CRUDELY with bounding circle - moving polygon will 'jump back'
+        // this uses the smallest shift distance that would always separate the bodies, regardless of orientation
+        // could potentially calculate the exact shift distance by examining how the polygons intersect
+        // getting the greatest distance of any vertex is inside the other shape
 
-        stopPoint = { x: item1.data.x, y: item1.data.y }
-        impactPoint = { x: item2.data.x, y: item2.data.y }
-        wallAngle = 0
+        const unitVector = Geometry.getUnitVectorBetweenPoints(body1.data, body2.data);
+        var shiftDistance = body1.boundingCircle.radius + body2.boundingCircle.radius - Geometry.getDistanceBetweenPoints(body1.data, body2.data);
+        stopPoint = { x: body1.data.x, y: body1.data.y }
+        stopPoint.x += unitVector.x * shiftDistance;
+        stopPoint.y += unitVector.y * shiftDistance;
+
+        impactPoint = { x: body1.data.x, y: body1.data.y }
+        wallAngle = null
 
         return {
             type: 'start inside',
             impactPoint, stopPoint, wallAngle,
-            item1, item2, force, force2
+            item1: body1, item2: body2, force, force2
         }
     }
 
-    const item1CopyAfterMoving = item1.duplicate() as Body
+    const item1CopyAfterMoving = body1.duplicate() as Body
     item1CopyAfterMoving.data.x += item1CopyAfterMoving.momentum.vectorX
     item1CopyAfterMoving.data.y += item1CopyAfterMoving.momentum.vectorY
 
-    if (item1CopyAfterMoving.isIntersectingWith(item2)) {
+    if (item1CopyAfterMoving.isIntersectingWith(body2)) {
 
         let item1CornersHittingItem2Edges: CornerHittingEgdeData[] = []
         polygonPoints.forEach(corner => {
@@ -103,16 +111,16 @@ function detectPolygonCollidingWithPolygon(item1: Body, item2: Body): CollisionR
             impactPoint = closestEdgeHit.corner
             wallAngle = Geometry.getHeadingFromPointToPoint(...closestEdgeHit.intersection.edge);
             const fromPointOnItem1EdgeToItem1Center: Vector = {
-                x: item1.data.x - closestEdgeHit.intersection.point.x,
-                y: item1.data.y - closestEdgeHit.intersection.point.y
+                x: body1.data.x - closestEdgeHit.intersection.point.x,
+                y: body1.data.y - closestEdgeHit.intersection.point.y
             }
             stopPoint = Geometry.translatePoint(closestEdgeHit.corner, fromPointOnItem1EdgeToItem1Center)
         } else {
             impactPoint = closestCornerHit.intersection.point
             wallAngle = Geometry.getHeadingFromPointToPoint(...closestCornerHit.intersection.edge);
             const fromCornerToCenter: Vector = {
-                x: item1.data.x - closestCornerHit.corner.x,
-                y: item1.data.y - closestCornerHit.corner.y
+                x: body1.data.x - closestCornerHit.corner.x,
+                y: body1.data.y - closestCornerHit.corner.y
             }
             stopPoint = Geometry.translatePoint(impactPoint, fromCornerToCenter)
         }
@@ -122,7 +130,7 @@ function detectPolygonCollidingWithPolygon(item1: Body, item2: Body): CollisionR
         return {
             type: 'end inside',
             wallAngle, stopPoint, impactPoint,
-            item1, item2, force, force2
+            item1: body1, item2: body2, force, force2
         }
     }
 

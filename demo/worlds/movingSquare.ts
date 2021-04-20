@@ -23,8 +23,8 @@ const bigRedSquare = new Body({
     shape: shapes.square,
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
-    immobile: true,
-}, new Force(0,0))
+    immobile: false,
+}, new Force(1,0))
 
 
 const redPlanet = new Body({
@@ -32,7 +32,7 @@ const redPlanet = new Body({
     y: 500,
     size: 50,
     density: 1,
-    immobile: true,
+    immobile: false,
     color: 'red',
     elasticity: 1,
     headingFollowsDirection: true,
@@ -55,8 +55,8 @@ const greenPlanet = new Body({
 const movingSquareTest = new World([
     bigWhiteSquare,
     bigRedSquare,
-    // redPlanet,
-    // greenPlanet,
+    redPlanet,
+    greenPlanet,
 ], {
     height: 800,
     width: 800,

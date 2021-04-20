@@ -307,14 +307,13 @@ function separateCollidingCircularBodies(collision: CollisionReport) {
 
 
 /**
- * NOT USING - LOOK WRONG IN PRACTISE
  * calculate the vectors at which two colliding bodies will bounce off each other
  * taking account of energy lost to inelasticity
  *
  * @param collision the collision report
  * @returns the vectors they will bounce off at
  */
-function findRoundBounceCollisionVectorsMethod1(collision: CollisionReport) {
+function findBounceCollisionVectors(collision: CollisionReport) {
     //step 1 - normal unit vector and tangent unit vector
     const { item1, item2 } = collision
     const coefficientOfRestitution = ((item1.data.elasticity + item2.data.elasticity) / 2)
@@ -367,6 +366,24 @@ function bounceCircleOffCircle(collision: CollisionReport) {
 };
 
 
+function bounceBodyOffMobileBody(collision: CollisionReport) {
+
+    const copyOfItem1 = collision.item1.duplicate()
+    copyOfItem1.data.x = collision.stopPoint.x
+    copyOfItem1.data.y = collision.stopPoint.y
+
+    const wouldIntersectAtStopPoint = copyOfItem1.isIntersectingWith(collision.item2)
+
+    if (!wouldIntersectAtStopPoint || collision.type == 'start inside') {
+        collision.item1.data.x = collision.stopPoint.x
+        collision.item1.data.y = collision.stopPoint.y
+    }
+
+    const bounce = findBounceCollisionVectors(collision)
+    collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
+    collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+}
+
 function bounceBodyOffImmobileBody(collision: CollisionReport) {
 
     const copyOfItem1 = collision.item1.duplicate()
@@ -410,15 +427,16 @@ function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
             case "square-square":
             default:
                 return bounceBodyOffImmobileBody(collisionReport)
-        }
-
-    } else {
-        switch (collisionType) {
-            case "circle-circle":
-                return bounceCircleOffCircle(collisionReport)
-            case "square-square":
-            case "circle-square": // TO DO - more bounce functions
-            case "square-circle":
+            }
+            
+        } else {
+            switch (collisionType) {
+                case "circle-circle":
+                    return bounceCircleOffCircle(collisionReport)
+                case "square-square":
+                case "circle-square": // TO DO - more bounce functions
+                case "square-circle":
+                    return bounceBodyOffMobileBody(collisionReport)
             default:
                 console.log(`Unhandled ${collisionType} collision`, collisionReport)
                 return

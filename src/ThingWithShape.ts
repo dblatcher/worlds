@@ -1,5 +1,5 @@
 import { Fluid } from "./Fluid"
-import { IntersectionInfo, Point, AlignedRectangle } from "./geometry"
+import { IntersectionInfo, Point, AlignedRectangle, Circle, getDistanceBetweenPoints } from "./geometry"
 import { AbstractGradientFill } from "./GradientFill"
 import { Shape, shapes, ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
@@ -32,7 +32,7 @@ class ThingWithShape {
         return this.data.shape.getPolygonPoints.apply(this, []) as Point[]
     }
 
-    get boundingRectangle() {
+    get boundingRectangle():AlignedRectangle {
         const { polygonPoints, shapeValues } = this;
         let rect: AlignedRectangle;
 
@@ -64,6 +64,23 @@ class ThingWithShape {
             }
         }
         return rect;
+    }
+
+    get boundingCircle():Circle {
+        const { polygonPoints } = this
+        if (polygonPoints.length == 0) { return this.shapeValues }
+
+        let greatestPointDistance = 0
+        polygonPoints.forEach(point => {
+            const distance = getDistanceBetweenPoints(point, this.data)
+            greatestPointDistance = distance > greatestPointDistance ? distance : greatestPointDistance
+        })
+
+        return {
+            x:this.data.x,
+            y:this.data.y,
+            radius: greatestPointDistance,
+        }
     }
 
     get shapeValues() {
