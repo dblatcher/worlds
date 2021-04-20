@@ -130,6 +130,8 @@ class Body extends ThingWithShape {
         this.momentum = Force.combine([this.momentum, gravitationalForces, upthrustForces, drag])
     }
 
+    tick() {}
+
     move(timeRemaining = 1) {
         const copyOfThis = this.duplicate();
         const { top, bottom, radius, left, right } = copyOfThis.shapeValues

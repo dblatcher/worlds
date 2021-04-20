@@ -189,6 +189,8 @@ class World extends WorldConfig {
 
         mobileBodies.filter(body => body.world == this).forEach(body => { body.move() })
 
+        bodies.filter(body => body.world == this).forEach(body => { body.tick() })
+
         this.backGrounds.forEach(backGround => backGround.tick())
         effects.forEach(effect => effect.tick())
 
