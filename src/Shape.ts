@@ -222,8 +222,8 @@ const polygon = new Shape({
             cornerPlacement.direction += heading
             cornerPlacement.magnitude *= size
             return {
-                x: x + cornerPlacement.vectorX,
-                y: y + cornerPlacement.vectorY
+                x: Math.round(x + cornerPlacement.vectorX),
+                y: Math.round(y + cornerPlacement.vectorY)
             }
         })
     },

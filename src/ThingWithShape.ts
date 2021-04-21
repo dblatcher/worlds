@@ -43,7 +43,7 @@ class ThingWithShape {
                 top: polygonPoints[0].y,
                 left: polygonPoints[0].x,
                 bottom: polygonPoints[0].y,
-                right: polygonPoints[0].y,
+                right: polygonPoints[0].x,
                 x: this.data.x,
                 y: this.data.y,
             }
