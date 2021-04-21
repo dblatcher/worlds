@@ -94,7 +94,14 @@ function detectPolygonCollidingWithPolygon(body1: Body, body2: Body): CollisionR
         const closestEdgeHit = item2CornersHittingItem1Edges[0] || null;
 
         if (!closestCornerHit && !closestEdgeHit) {
-            console.warn('failed to find impact in polygon-polygon collision');
+            console.warn('failed to find impact point in polygon-polygon collision');
+            stopPoint = {x: body1.data.x, y:body1.data.y};
+            impactPoint = {x: body1.data.x, y:body1.data.y};
+            return {
+                type: 'end inside',
+                wallAngle, stopPoint, impactPoint,
+                item1: body1, item2: body2, force, force2
+            }
         }
 
         let useEdgeHit: boolean;

@@ -70,12 +70,38 @@ const triangle = new Body({
 })
 
 
+const star = new Body({
+    x: 580,
+    y: 500,
+    size: 50,
+    density: 1,
+    immobile: false,
+    shape: shapes.polygon,
+    corners:[
+        {x:0, y:1},
+        {x:1, y:.4},
+        {x:.5, y:0},
+        {x:1, y:-1},
+        {x:0, y:-.5},
+        {x:-1, y:-1},
+        {x:-.5, y:0},
+        {x:-1, y:.4},
+        
+    ],
+    color: 'red',
+    elasticity: 1,
+    headingFollowsDirection: false,
+    renderHeadingIndicator: true,
+})
+
+
 const movingSquareTest = new World([
     bigWhiteSquare,
     // bigRedSquare,
     // redPlanet,
     // greenPlanet,
-    triangle
+    triangle,
+    star
 ], {
     height: 800,
     width: 800,
