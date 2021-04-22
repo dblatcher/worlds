@@ -1,16 +1,17 @@
-import { Point, _90deg } from '../../src/geometry'
+import { Point, _90deg, _deg } from '../../src/geometry'
 import { LinearGradientFill } from '../../src/GradientFill'
 import { World, Body, Force, shapes } from '../../src/index'
+
 
 
 const bigWhiteSquare = new Body({
     heading: .7,
     x: 200, y: 200,
-    size: 100, density: 1,
-    immobile: true,
+    size: 100, density: 5,
+    immobile: false,
     color: 'antiquewhite',
     shape: shapes.square,
-    headingFollowsDirection: true,
+    headingFollowsDirection: false,
     renderHeadingIndicator: true,
 })
 
@@ -38,9 +39,21 @@ const litteWhiteSquare = new Body({
     headingFollowsDirection: true,
 })
 
+
+const blueMatter = {
+    density: 1,
+    color: 'blue',
+    fillColor: 'rgba(10,10,150,.4)',
+    elasticity: .8,
+    headingFollowsDirection: true,
+    renderHeadingIndicator: true,
+    renderPathAhead:true,
+}
+
+
 const redPlanet = new Body({
-    x: 250,
-    y: 525,
+    x: 615,
+    y: 225,
     size: 50,
     density: 1,
     color: 'red',
@@ -48,7 +61,7 @@ const redPlanet = new Body({
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
     renderPathAhead:true,
-}, new Force(45, _90deg))
+}, new Force(100, _deg*1))
 
 const greenPlanet = new Body({
     x: 400,
@@ -61,42 +74,45 @@ const greenPlanet = new Body({
     renderHeadingIndicator: true,
 }, new Force(0, Math.PI * 1.5))
 
-const blueMatter = {
-    density: 1,
-    color: 'blue',
-    fillColor: 'purple',
-    elasticity: 1,
-    headingFollowsDirection: true,
-    renderHeadingIndicator: true,
-}
+
 
 const bluePlanets = [
     new Body(
-        Object.assign({ x: 250, y: 210, size: 10, }, blueMatter),
-        new Force(0, Math.PI * 1.5)
+        Object.assign({ x: 400, y: 550, size: 40, }, blueMatter),
+        new Force(0, 180 * _deg)
     ),
     new Body(
-        Object.assign({ x: 250, y: 100, size: 30, }, blueMatter),
-        new Force(0, Math.PI * 1.5)
+        Object.assign({ x: 150, y: 550, size: 30, }, blueMatter),
+        new Force(20, 90 * _deg)
     ),
     new Body(
-        Object.assign({ x: 100, y: 260, size: 35, }, blueMatter),
-        new Force(0, Math.PI * 1.5)
+        Object.assign({ x: 650, y: 550, size: 30, }, blueMatter),
+        new Force(10, 270 * _deg)
     ),
 ]
 
+bluePlanets[0].tick = function() {
+
+    let totalEnergyInSystem = 0;
+    (this as Body).world.bodies.forEach(body => {
+        totalEnergyInSystem += body.momentum.magnitude
+    })
+
+    console.log({totalEnergyInSystem})
+}
+
 const squareTestWorld = new World([
+    ...bluePlanets,
     bigWhiteSquare,
     litteWhiteSquare,
-    ...bluePlanets,
     redPlanet,
     greenPlanet,
 ], {
     height: 800,
     width: 800,
-    airDensity: .5,
+    airDensity: 0,
     gravitationalConstant: 0,
-    bodiesExertGravity: true,
+    bodiesExertGravity: false,
     minimumMassToExertGravity: 1000,
     hasWrappingEdges: true,
     name: "squareTestWorld",

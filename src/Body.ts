@@ -32,6 +32,7 @@ class Body extends ThingWithShape {
     world: World
     data: BodyData
     momentum: Force
+    otherBodiesCollidedWithThisTick: Body[]
     constructor(config: BodyData, momentum: Force = Force.none) {
         super(config)
         this.data.heading = this.data.heading || 0
@@ -43,6 +44,7 @@ class Body extends ThingWithShape {
         this.data.renderPathAhead = config.renderPathAhead || false
         this.data.elasticity = typeof this.data.elasticity === 'number' ? this.data.elasticity : 1
         this.momentum = momentum || Force.none
+        this.otherBodiesCollidedWithThisTick = []
     }
 
     get isBody() { return true }
@@ -129,6 +131,7 @@ class Body extends ThingWithShape {
         const drag = calculateDragForce(this, Force.combine([this.momentum, gravitationalForces, upthrustForces]))
 
         this.momentum = Force.combine([this.momentum, gravitationalForces, upthrustForces, drag])
+        this.otherBodiesCollidedWithThisTick = []
     }
 
     tick() {}

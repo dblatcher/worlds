@@ -287,20 +287,21 @@ function separateCollidingCircularBodies(collision: CollisionReport) {
     var shape2 = item2.shapeValues
 
     if (item1.isIntersectingWith(item2)) {
-        var distanceToSeparate = 1 + shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2);
+        var distanceToSeparate = 2 + 1.1*(shape1.radius + shape2.radius - Geometry.getDistanceBetweenPoints(shape1, shape2));
+
 
         var headingToSeparate = Force.fromVector(shape1.x - shape2.x, shape1.y - shape2.y).direction;
         var magicV: Vector = new Force(distanceToSeparate, headingToSeparate).vector
 
-        if (item2.data.immobile) {
+        // if (item2.data.immobile) {
             item1.data.x += magicV.x;
             item1.data.y += magicV.y;
-        } else {
-            item1.data.x += magicV.x / 2;
-            item1.data.y += magicV.y / 2;
-            item2.data.x -= magicV.x / 2;
-            item2.data.y -= magicV.y / 2;
-        }
+        // } else {
+        //     item1.data.x += magicV.x / 2;
+        //     item1.data.y += magicV.y / 2;
+        //     item2.data.x -= magicV.x / 2;
+        //     item2.data.y -= magicV.y / 2;
+        // }
 
     }
 }
@@ -359,9 +360,10 @@ function bounceCircleOffCircle(collision: CollisionReport) {
     if (collision.item2.data.immobile) {
         collision.item1.momentum = findBounceOffImmobileBodyForce(collision)
     } else {
-        const bounce = findRoundBounceCollisionVectorsMethod2(collision)
+        const bounce = findBounceCollisionVectors(collision)
         collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
-        collision.item2.momentum = Force.combine([Force.fromVector(bounce.vector2.x, bounce.vector2.y), collision.item2.momentum])
+        collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
+        // collision.item2.momentum = Force.combine([Force.fromVector(bounce.vector2.x, bounce.vector2.y), collision.item2.momentum])
     }
 };
 
@@ -414,11 +416,12 @@ function bounceOffWorldEdge(edgeCollisionReport: EdgeCollisionReport) {
 
 function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
 
-    const collisionType = collisionReport.item1.data.shape.id + "-" + collisionReport.item2.data.shape.id;
-    const withImmobile = collisionReport.item2.data.immobile;
+    const { item1, item2 } = collisionReport;
+
+    const collisionType = item1.data.shape.id + "-" + item2.data.shape.id;
+    const withImmobile = item2.data.immobile;
 
     if (withImmobile) {
-
         switch (collisionType) {
             case "circle-circle":
                 return bounceCircleOffCircle(collisionReport)
@@ -427,17 +430,24 @@ function handleCollisionAccordingToShape(collisionReport: CollisionReport) {
             case "square-square":
             default:
                 return bounceBodyOffImmobileBody(collisionReport)
-            }
-            
-        } else {
-            switch (collisionType) {
-                case "circle-circle":
-                    return bounceCircleOffCircle(collisionReport)
-                case "square-square":
-                case "circle-square": // TO DO - more bounce functions
-                case "square-circle":
-                default:
-                    return bounceBodyOffMobileBody(collisionReport)
+        }
+
+    } else {
+
+        if (item1.otherBodiesCollidedWithThisTick.includes(item2) || item2.otherBodiesCollidedWithThisTick.includes(item1)) {
+            return
+        }
+        item1.otherBodiesCollidedWithThisTick.push(item2)
+        item2.otherBodiesCollidedWithThisTick.push(item1)
+
+        switch (collisionType) {
+            case "circle-circle":
+                return bounceCircleOffCircle(collisionReport)
+            case "square-square":
+            case "circle-square": // TO DO - more bounce functions
+            case "square-circle":
+            default:
+                return bounceBodyOffMobileBody(collisionReport)
         }
 
     }

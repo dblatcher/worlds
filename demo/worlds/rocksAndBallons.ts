@@ -24,7 +24,7 @@ function makeBallon() {
     let x = 50 + Math.floor(Math.random() * 500)
     let y = 50 + Math.floor(Math.random() * 300)
     let size = 10 + Math.floor(Math.random() * 20)
-    let density = 1
+    let density = .5
     let elasticity = .8
     let headingFollowsDirection = true
     let color = 'red'
@@ -44,11 +44,19 @@ function makeRocksAndBallons(amount: number) {
     return bodies
 }
 
+const pair = [makeRock(), makeRock()]
+
+pair[0].data.x=500
+pair[0].data.y=40
+pair[1].data.x=500
+pair[1].data.y=60
+
 const slope = new Body({shape:shapes.square, x:-100, y:900, size:400, heading:-2.1,immobile:true})
 
 const rocksAndBallons = new World([
     slope,
-    ...makeRocksAndBallons(9),
+    ...makeRocksAndBallons(7),
+    ...pair
 ], {
     globalGravityForce: new Force(1, 0),
     hasHardEdges: true,
