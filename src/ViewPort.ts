@@ -184,7 +184,7 @@ class ViewPort {
         else { this.framefill.setFillStyleForViewPort(ctx, this) }
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        renderPolygon.onCanvas(ctx, worldCorners, { fillColor: 'black' }, this)
+        renderPolygon.onCanvas(ctx, worldCorners, { fillColor: world.fillColor }, this)
 
         if (!this.dontRenderBackground) {
             world.backGrounds.forEach(backGround => backGround.renderOnCanvas(ctx, this))

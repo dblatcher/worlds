@@ -6,6 +6,7 @@ import { Effect } from './Effect'
 import { TinyEmitter } from 'tiny-emitter'
 import { BackGround } from './BackGround'
 import { Area } from './Area'
+import { AbstractGradientFill } from './GradientFill'
 
 
 class WorldTickReport {
@@ -36,6 +37,7 @@ class WorldConfig {
     minimumMassToExertGravity?: number
     airDensity?: number
     effects?: Effect[]
+    fillColor?: string | AbstractGradientFill
     backGrounds?: BackGround[]
     hasHardEdges?: boolean
     hasWrappingEdges?: boolean
@@ -67,6 +69,7 @@ class World extends WorldConfig {
     areas: Area[]
     fluids: Fluid[]
     effects: Effect[]
+    fillColor?: string | AbstractGradientFill
     backGrounds: BackGround[]
     bodiesLeavingAtNextTick: Body[]
     timer: NodeJS.Timeout
@@ -129,6 +132,7 @@ class World extends WorldConfig {
             config.effects.forEach(effect => { effect.enterWorld(this) })
         }
 
+        this.fillColor = config.fillColor || "black";
         this.backGrounds = config.backGrounds || []
 
         this.fluids = []
