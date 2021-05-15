@@ -17,7 +17,11 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'physics-worlds.js',
     path: path.resolve(__dirname, 'dist'),
+    library: {
+      name: "physicsWorlds",
+      type: "umd"
+    },
   },
 };

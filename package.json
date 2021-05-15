@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
-    "build": "webpack --mode=development",
+    "build": "webpack --mode=production",
     "demo": "webpack --mode=development --config webpack.demo.config.js"
   },
   "keywords": [],
@@ -19,5 +19,6 @@
   },
   "dependencies": {
     "tiny-emitter": "^2.1.0"
-  }
+  },
+  "main": "dist/physics-worlds.js"
 }
