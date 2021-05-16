@@ -13,7 +13,7 @@ const bigWhiteSquare = new Body({
     renderHeadingIndicator: true,
     renderPathAhead:true,
     immobile: false,
-}, new Force(50,48 * _deg))
+}, new Force(100,48 * _deg))
 
 
 const wall = new Body({
@@ -70,9 +70,9 @@ const redPlanet = new Body({
 }, new Force(11,_deg*-90))
 
 const greenPlanet = new Body({
-    x: 500,
-    y: 100,
-    size: 70,
+    x: 270,
+    y: 370,
+    size: 10,
     density: 1,
     immobile: false,
     color: 'green',
@@ -85,10 +85,11 @@ const greenPlanet = new Body({
 
 const passThrough = new World([
     bigWhiteSquare,
-    wall, wall2
+    wall, 
+    wall2,
     // bigRedSquare,
     // redPlanet,
-    // greenPlanet,
+    greenPlanet,
 
 ], {
     height: 800,

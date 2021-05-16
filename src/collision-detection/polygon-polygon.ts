@@ -6,6 +6,7 @@ import { Vector, _90deg, Point } from '../geometry'
 import { arePolygonsIntersecting } from '../geometry/polygons'
 
 import { CollisionReport } from './CollisionReport'
+import { getPolygonPathArea } from './utility'
 
 
 interface CornerHittingEdgeData {
@@ -138,46 +139,6 @@ function getEndInsideOrPassThroughCollision(body1: Body, body2: Body, force: num
     }
 }
 
-/**
- * Get the area that would be under the path of a moving polygonal body.
- * ASSUMES BODY IS NOT CONCAVE - path is a paralellogram using the
- * left most and right most corners of the shape to defin the sides
- * obstables within body's bounding circle coudl be missed
- * 
- * @param body1 
- * @returns a polygon describing the area covered by body1's path ahead
- */
-function getPathPolygon(body1: Body, body1CopyAfterMoving: Body): Point[] {
-
-    const { polygonPoints, shapeValues } = body1
-    const tangentUnitVectorLeft = new Force(1, body1.momentum.direction - _90deg);
-    const tangentUnitVectorRight = new Force(1, body1.momentum.direction + _90deg);
-
-    const pointsWithDistances = polygonPoints.map(point => {
-        const displacementFromCenter: Vector = {
-            x: point.x - shapeValues.x,
-            y: point.y - shapeValues.y
-        }
-        const leftDistance = (tangentUnitVectorLeft.vectorX * displacementFromCenter.x) + (tangentUnitVectorLeft.vectorY * displacementFromCenter.y)
-        const rightDistance = (tangentUnitVectorRight.vectorX * displacementFromCenter.x) + (tangentUnitVectorRight.vectorY * displacementFromCenter.y)
-        return { point, leftDistance, rightDistance }
-    })
-
-    let leftMostPoint = pointsWithDistances[0], rightMostPoint = pointsWithDistances[0];
-
-    for (let index = 1; index < pointsWithDistances.length; index++) {
-        let element = pointsWithDistances[index];
-        if (element.leftDistance > leftMostPoint.leftDistance) { leftMostPoint = element }
-        if (element.rightDistance > rightMostPoint.rightDistance) { rightMostPoint = element }
-    }
-
-    return [
-        leftMostPoint.point, rightMostPoint.point,
-        Geometry.translatePoint(rightMostPoint.point, body1.momentum.vector),
-        Geometry.translatePoint(leftMostPoint.point, body1.momentum.vector),
-    ]
-}
-
 
 /**
  * detect collision of one a moving polygon body with another polygon body
@@ -206,7 +167,7 @@ function detectPolygonCollidingWithPolygon(body1: Body, body2: Body): CollisionR
         return getEndInsideOrPassThroughCollision(body1, body2, force, force2, 'end inside');
     }
 
-    const pathArea = getPathPolygon(body1, body1CopyAfterMoving)
+    const pathArea = getPolygonPathArea(body1)
     if (arePolygonsIntersecting(pathArea, body2.polygonPoints)) {
         return getEndInsideOrPassThroughCollision(body1, body2, force, force2, 'passed through');
     }

@@ -4,7 +4,51 @@ import * as Geometry from '../geometry'
 import { Vector, _90deg } from '../geometry'
 
 import { CollisionReport } from './CollisionReport'
-import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon } from './utility'
+import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon, getPolygonPathArea } from './utility'
+
+
+/**
+ * Get the collision report when the polygon starts inside the circle
+ * 
+ * @param item1 the moving polygon body
+ * @param item2 the impacted circular body
+ * @param force 
+ * @param force2 
+ * @returns the collision report for a start inside collisions
+ */
+function getStartInsideCollision(item1: Body, item2: Body, force: number, force2: number): CollisionReport {
+
+    const { polygonPoints } = item1
+    const circleShapeValues = item2.shapeValues
+
+    const nearestIntersection = getInfoAboutNearestPointOnPolygon(circleShapeValues, polygonPoints)
+    const cicleCenterIsInside = Geometry.isPointInsidePolygon(circleShapeValues, polygonPoints)
+
+    let vectorToMoveCircleOut: Vector
+
+    if (cicleCenterIsInside) {
+        const directionToImpactPoint = Geometry.getHeadingFromPointToPoint(nearestIntersection.point, circleShapeValues)
+        vectorToMoveCircleOut = {
+            x: nearestIntersection.point.x + Geometry.getVectorX(circleShapeValues.radius + 1, directionToImpactPoint) - circleShapeValues.x,
+            y: nearestIntersection.point.y + Geometry.getVectorY(circleShapeValues.radius + 1, directionToImpactPoint) - circleShapeValues.y
+        }
+    } else {
+        vectorToMoveCircleOut = {
+            x: nearestIntersection.point.x + Geometry.getVectorX(circleShapeValues.radius + 1, nearestIntersection.edgeAngle - _90deg) - circleShapeValues.x,
+            y: nearestIntersection.point.y + Geometry.getVectorY(circleShapeValues.radius + 1, nearestIntersection.edgeAngle - _90deg) - circleShapeValues.y
+        }
+    }
+
+
+    return {
+        type: 'start inside',
+        impactPoint: nearestIntersection.point,
+        wallAngle: nearestIntersection.edgeAngle,
+        stopPoint: Geometry.translatePoint(item1.data, vectorToMoveCircleOut, true),
+        item1, item2, force, force2
+    }
+}
+
 
 /**
  * 
@@ -22,37 +66,10 @@ function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionRep
     const force = item1.mass && item1.momentum ? item1.mass * item1.momentum.magnitude : 0;
     const force2 = item2.mass && item2.momentum ? item2.mass * item2.momentum.magnitude : force;
 
-    const { polygonPoints } = item1
-    const circleShapeValues = item2.shapeValues
 
     //START INSIDE
     if (item1.isIntersectingWith(item2)) {
-        const nearestIntersection = getInfoAboutNearestPointOnPolygon(circleShapeValues, polygonPoints)
-        const cicleCenterIsInside = Geometry.isPointInsidePolygon(circleShapeValues, polygonPoints)
-
-        let vectorToMoveCircleOut: Vector
-
-        if (cicleCenterIsInside) {
-            const directionToImpactPoint = Geometry.getHeadingFromPointToPoint(nearestIntersection.point, circleShapeValues)
-            vectorToMoveCircleOut = {
-                x: nearestIntersection.point.x + Geometry.getVectorX(circleShapeValues.radius + 1, directionToImpactPoint) - circleShapeValues.x,
-                y: nearestIntersection.point.y + Geometry.getVectorY(circleShapeValues.radius + 1, directionToImpactPoint) - circleShapeValues.y
-            }
-        } else {
-            vectorToMoveCircleOut = {
-                x: nearestIntersection.point.x + Geometry.getVectorX(circleShapeValues.radius + 1, nearestIntersection.edgeAngle - _90deg) - circleShapeValues.x,
-                y: nearestIntersection.point.y + Geometry.getVectorY(circleShapeValues.radius + 1, nearestIntersection.edgeAngle - _90deg) - circleShapeValues.y
-            }
-        }
-
-
-        return {
-            type: 'start inside',
-            impactPoint: nearestIntersection.point,
-            wallAngle: nearestIntersection.edgeAngle,
-            stopPoint: Geometry.translatePoint(item1.data, vectorToMoveCircleOut, true),
-            item1, item2, force, force2
-        }
+        return getStartInsideCollision(item1, item2, force, force2);
     }
 
     const item1CopyAfterMoving = item1.duplicate() as Body
@@ -61,12 +78,24 @@ function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionRep
 
     if (item1CopyAfterMoving.isIntersectingWith(item2)) {
 
-        // TO DO - calculate stopPoint, wallAngle, impactPoint
         const stuff = getImpactAndStopPointAndWallAngle(item2, item1)
         const { wallAngle, stopPoint, impactPoint } = stuff
 
         return {
             type: 'end inside',
+            wallAngle, stopPoint, impactPoint,
+            item1, item2, force, force2
+        }
+    }
+
+    const pathArea = getPolygonPathArea(item1)
+
+    if (Geometry.areCircleAndPolygonIntersecting(item2.shapeValues, pathArea)) {
+        const stuff = getImpactAndStopPointAndWallAngle(item2, item1)
+        const { wallAngle, stopPoint, impactPoint } = stuff
+
+        return {
+            type: 'passed through',
             wallAngle, stopPoint, impactPoint,
             item1, item2, force, force2
         }
@@ -113,3 +142,4 @@ function detectSquareCollidingWithCircle(item1: Body, item2: Body): CollisionRep
 }
 
 export { detectSquareCollidingWithCircle }
+

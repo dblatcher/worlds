@@ -1,4 +1,4 @@
-import { World } from '..'
+import { Force, World } from '..'
 import { Body } from '../Body'
 import { Effect } from '../Effect'
 import * as Geometry from '../geometry'
@@ -29,6 +29,46 @@ function getInfoAboutNearestPointOnPolygon(startingPoint: Point, polygon: Point[
     return nearestIntersection
 }
 
+
+/**
+ * Get the area that would be under the path of a moving polygonal body.
+ * ASSUMES BODY IS NOT CONCAVE - path is a paralellogram using the
+ * left most and right most corners of the shape to defin the sides
+ * obstables within body's bounding circle could be missed
+ * 
+ * @param body1 
+ * @returns a polygon describing the area covered by body1's path ahead
+ */
+ function getPolygonPathArea(body1: Body): Point[] {
+
+    const { polygonPoints, shapeValues } = body1
+    const tangentUnitVectorLeft = new Force(1, body1.momentum.direction - _90deg);
+    const tangentUnitVectorRight = new Force(1, body1.momentum.direction + _90deg);
+
+    const pointsWithDistances = polygonPoints.map(point => {
+        const displacementFromCenter: Vector = {
+            x: point.x - shapeValues.x,
+            y: point.y - shapeValues.y
+        }
+        const leftDistance = (tangentUnitVectorLeft.vectorX * displacementFromCenter.x) + (tangentUnitVectorLeft.vectorY * displacementFromCenter.y)
+        const rightDistance = (tangentUnitVectorRight.vectorX * displacementFromCenter.x) + (tangentUnitVectorRight.vectorY * displacementFromCenter.y)
+        return { point, leftDistance, rightDistance }
+    })
+
+    let leftMostPoint = pointsWithDistances[0], rightMostPoint = pointsWithDistances[0];
+
+    for (let index = 1; index < pointsWithDistances.length; index++) {
+        let element = pointsWithDistances[index];
+        if (element.leftDistance > leftMostPoint.leftDistance) { leftMostPoint = element }
+        if (element.rightDistance > rightMostPoint.rightDistance) { rightMostPoint = element }
+    }
+
+    return [
+        leftMostPoint.point, rightMostPoint.point,
+        Geometry.translatePoint(rightMostPoint.point, body1.momentum.vector),
+        Geometry.translatePoint(leftMostPoint.point, body1.momentum.vector),
+    ]
+}
 
 
 /**
@@ -140,4 +180,4 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body, worl
 }
 
 
-export { getInfoAboutNearestPointOnPolygon, getCircleSquareCollisionInfo }
+export { getInfoAboutNearestPointOnPolygon, getCircleSquareCollisionInfo, getPolygonPathArea }
