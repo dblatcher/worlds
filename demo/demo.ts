@@ -8,13 +8,14 @@ import { movingSquareTest } from './worlds/movingSquare';
 import { ViewPortControlPanel } from './ViewPortControlPanel';
 import { ViewPort } from '../src/ViewPort';
 import { areaDemo } from './worlds/areaDemo';
+import { glancingHit } from './worlds/glancingHit';
 
 import './addStyleSheetAndFrame'
 
 
 const canvasElement = document.createElement('canvas')
 
-const panelWorlds = [squareTestWorld, movingSquareTest, areaDemo ,fluidTest, balance, galaxy, rocksAndBallons]
+const panelWorlds = [glancingHit, squareTestWorld, movingSquareTest, areaDemo ,fluidTest, balance, galaxy, rocksAndBallons]
 
 const viewPort = ViewPort.full(panelWorlds[0], canvasElement)
 const panel = new ViewPortControlPanel({ viewPort, worldOptions: panelWorlds })

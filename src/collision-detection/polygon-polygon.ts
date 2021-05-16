@@ -6,7 +6,7 @@ import { Vector, _90deg } from '../geometry'
 import { Point } from '../geometry/definitions'
 
 import { CollisionReport } from './CollisionReport'
-import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon } from './utility'
+import { getCircleSquareCollisionInfo } from './utility'
 
 
 interface CornerHittingEgdeData {

@@ -6,14 +6,14 @@ import { World, Body, Force, shapes } from '../../src/index'
 const bigWhiteSquare = new Body({
     heading: _deg * 120,
     x: 210, y: 330,
-    size: 60, density: 1,
+    size: 140, density: 1,
     color: 'antiquewhite',
     shape: shapes.square,
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
     renderPathAhead:true,
-    immobile: false,
-}, new Force(40,45 * _deg))
+    immobile: true,
+}, new Force(40,48 * _deg))
 
 const bigRedSquare = new Body({
     heading: _360deg*.2,
@@ -28,80 +28,38 @@ const bigRedSquare = new Body({
 
 
 const redPlanet = new Body({
-    x: 280,
-    y: 300,
-    size: 50,
+    x: 675,
+    y: 450,
+    size: 90,
     density: 1,
     immobile: false,
     color: 'red',
     elasticity: 1,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
-}, new Force(25, _deg*170))
+    renderPathAhead:true
+}, new Force(11,_deg*-90))
 
 const greenPlanet = new Body({
     x: 500,
-    y: 300,
+    y: 100,
     size: 70,
     density: 1,
-    immobile: true,
+    immobile: false,
     color: 'green',
     elasticity: .5,
     headingFollowsDirection: true,
     renderHeadingIndicator: true,
 })
 
-const triangle = new Body({
-    x: 280,
-    y: 600,
-    size: 50,
-    density: 1,
-    immobile: false,
-    shape: shapes.polygon,
-    corners:[
-        {x:0, y:1},
-        {x:-1, y:-1},
-        {x:1, y:-1},
-    ],
-    color: 'red',
-    elasticity: 1,
-    headingFollowsDirection: false,
-    renderHeadingIndicator: true,
-})
 
 
-const star = new Body({
-    x: 580,
-    y: 500,
-    size: 50,
-    density: 1,
-    immobile: false,
-    shape: shapes.polygon,
-    corners:[
-        {x:0, y:1},
-        {x:1, y:.4},
-        {x:.5, y:0},
-        {x:1, y:-1},
-        {x:0, y:-.5},
-        {x:-1, y:-1},
-        {x:-.5, y:0},
-        {x:-1, y:.4},
-        
-    ],
-    color: 'red',
-    elasticity: 1,
-    headingFollowsDirection: false,
-    renderHeadingIndicator: true,
-})
-
-
-const movingSquareTest = new World([
+const glancingHit = new World([
     bigWhiteSquare,
-    bigRedSquare,
+    // bigRedSquare,
     redPlanet,
     greenPlanet,
-    triangle,
-    star
+
 ], {
     height: 800,
     width: 800,
@@ -110,8 +68,8 @@ const movingSquareTest = new World([
     bodiesExertGravity: true,
     minimumMassToExertGravity: 1000,
     hasHardEdges: true,
-    name: "movingSquareTest",
+    name: "glancingHit",
 });
 
 
-export { movingSquareTest }
+export { glancingHit }

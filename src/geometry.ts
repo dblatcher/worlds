@@ -94,7 +94,7 @@ function areCircleAndPolygonIntersecting(circle: Circle, polygon: Point[], apply
 
 export {
     Point, Circle, Vector, Wedge, IntersectionInfo, AlignedRectangle, _deg, _90deg, _360deg,
-    getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint, getUnitVectorBetweenPoints,
+    getDirection, getDistanceBetweenPoints, getMagnitude, getVectorX, getVectorY, getXYVector, getHeadingFromPointToPoint, getUnitVectorBetweenPoints,closestPointOnLineSegment,
     normaliseHeading, reflectHeading, reverseHeading,
     doLineSegmentsIntersect, findIntersectionPointOfLineSegments, getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle,
     arePolygonsIntersecting, getPolygonLineSegments, isPointInsidePolygon,

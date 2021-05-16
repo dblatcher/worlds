@@ -1,13 +1,15 @@
+import { World } from '..'
 import { Body } from '../Body'
+import { Effect } from '../Effect'
 import * as Geometry from '../geometry'
-import { Vector, Point, _90deg } from '../geometry'
+import { Vector, Point, _90deg, getSortedIntersectionInfoWithCircle, closestPointOnLineSegment } from '../geometry'
 
 
 /**
- * Find the point on a polygon's edges closest to a give starting point
+ * Find the point on a polygon's edges closest to a given starting point
  *
  * @param startingPoint a point
- * @param polygon a pollygon
+ * @param polygon a polygon
  * @returns the point on the polygon edge closest to the startingPoint,
  * the distance between them, which edge they are on and the angle of that edge
  */
@@ -15,7 +17,7 @@ function getInfoAboutNearestPointOnPolygon(startingPoint: Point, polygon: Point[
     point: Point, distance: number, edge: [Point, Point], edgeAngle: number
 } {
     const intersectionsFromInside = Geometry.getPolygonLineSegments(polygon).map(edge => {
-        const pointOnEdge = Geometry.closestpointonline(edge[0], edge[1], startingPoint)
+        const pointOnEdge = closestPointOnLineSegment(edge[0], edge[1], startingPoint)
         const distance = Geometry.getDistanceBetweenPoints(pointOnEdge, startingPoint)
         return { edge, point: pointOnEdge, distance, edgeAngle: 0 }
     })
@@ -35,7 +37,7 @@ function getInfoAboutNearestPointOnPolygon(startingPoint: Point, polygon: Point[
  * @param squareBody the still square body
  * @returns the stopPoint, impactPoint and wallAngle of the circular body's collision with the square
  */
-function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
+function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body, worldToMarkWithIndicators: World = null) {
 
     const squareEdges = Geometry.getPolygonLineSegments(squareBody.polygonPoints)
 
@@ -55,6 +57,8 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
         },
     ]
 
+    /** The routine below seems to work as a general solution, so crufting this for now
+
     // 'push out' each egde from polygon center by distance equal to circle radius
     // by creating duplicate of square body and increasing data.size
     const expandedSquareBody = squareBody.duplicate() as Body
@@ -72,8 +76,6 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
         const wallAngle = Geometry.getHeadingFromPointToPoint(...edgeWhichCircleWillHit)
         return { stopPoint, impactPoint, wallAngle }
     }
-
-
 
     // above fails where the center path will not hit the expanding edges, but will hit the real edges
     // because the center stays between the expanded and real edges!
@@ -95,32 +97,46 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body) {
         return { stopPoint, impactPoint, wallAngle }
     }
 
+*/
 
 
-    console.warn('GLANCING HIT, NOT HANDLED')
+    // the circle will hit the point on the polygon which is closest to its centre
+    const impactIntersection = getInfoAboutNearestPointOnPolygon(circularBody.shapeValues, squareBody.polygonPoints);
+    const impactPoint = impactIntersection.point
 
-    // new Effect({ color: 'yellow', x: circularBody.data.x, y: circularBody.data.y, duration: 15 })
-    //     .enterWorld(circularBody.world)
-    // new Effect({ color: 'rgba(100,250,0,.25)', x: circularBody.data.x, size: circularBody.data.size, y: circularBody.data.y, duration: 15 })
-    //     .enterWorld(circularBody.world)
+    // the circle's stop point will be a point where the distance between the center and impact point
+    // is equal to the circle's radius...
+    const intersectionsWithPathAndCircleAroundImpactPoint = getSortedIntersectionInfoWithCircle(centerPathOfCircle, {
+        radius: circularBody.shapeValues.radius,
+        x: impactPoint.x,
+        y: impactPoint.y,
+    })
 
-    // new Effect({ color: 'yellow', x: centerPathOfCircle[1].x, y: centerPathOfCircle[1].y, duration: 15 })
-    //     .enterWorld(circularBody.world)
-    // new Effect({ color: 'rgba(250,100,0,.25)', x: centerPathOfCircle[1].x, size: circularBody.data.size, y: centerPathOfCircle[1].y, duration: 15 })
-    //     .enterWorld(circularBody.world)
+    // ...which is the closest of those point to the starting point
+    const stopPoint = intersectionsWithPathAndCircleAroundImpactPoint[0]
+        ? intersectionsWithPathAndCircleAroundImpactPoint[0].point
+        : { x: circularBody.shapeValues.x, y: circularBody.shapeValues.y }; // default to starting point of can't find where the circle would be
 
+    // if the impact point is a corner, the wallAngle should be null (angle of deflection defaults to tangent angle at the impactPoint)
+    const impactPointDistanceFromCorner: number = Math.min(
+        Geometry.getDistanceBetweenPoints(impactPoint, impactIntersection.edge[0]),
+        Geometry.getDistanceBetweenPoints(impactPoint, impactIntersection.edge[1]),
+    )
 
-    return {
-        stopPoint: {
-            x: circularBody.data.x,
-            y: circularBody.data.x,
-        },
-        impactPoint: {
-            x: circularBody.data.x,
-            y: circularBody.data.x,
-        },
-        wallAngle: null
+    const wallAngle = impactPointDistanceFromCorner == 0 ? null : impactIntersection.edgeAngle
+
+    if (worldToMarkWithIndicators) {
+        new Effect({ color: 'blue', x: impactPoint.x, y: impactPoint.y, duration: 15, size: 8 })
+            .enterWorld(worldToMarkWithIndicators)
+        new Effect({ color: 'rgba(0,0,250,.25)', x: impactPoint.x, y: impactPoint.y, duration: 15, size: circularBody.shapeValues.radius })
+            .enterWorld(worldToMarkWithIndicators)
+        new Effect({ color: 'yellow', x: stopPoint.x, y: stopPoint.y, duration: 15 })
+            .enterWorld(worldToMarkWithIndicators)
+        new Effect({ color: 'rgba(100,250,0,.125)', x: stopPoint.x, size: circularBody.data.size, y: stopPoint.y, duration: 15 })
+            .enterWorld(worldToMarkWithIndicators)
     }
+
+    return { stopPoint, impactPoint, wallAngle }
 }
 
 
