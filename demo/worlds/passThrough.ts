@@ -6,14 +6,43 @@ import { World, Body, Force, shapes } from '../../src/index'
 const bigWhiteSquare = new Body({
     heading: _deg * 120,
     x: 210, y: 330,
-    size: 140, density: 1,
+    size: 20, density: 1,
     color: 'antiquewhite',
     shape: shapes.square,
     headingFollowsDirection: false,
     renderHeadingIndicator: true,
     renderPathAhead:true,
-    immobile: true,
-}, new Force(40,48 * _deg))
+    immobile: false,
+}, new Force(50,48 * _deg))
+
+
+const wall = new Body({
+    heading: _deg * -30,
+    x:500, y:500,
+    size:100,
+    shape:shapes.polygon,
+    corners: [
+        {x:-.01,y:-1},
+        {x:.01,y:-1},
+        {x:.01,y:1},
+        {x:-.01,y:1},
+    ],
+    immobile:true,
+})
+
+const wall2 = new Body({
+    heading: _deg * -130,
+    x:100, y:500,
+    size:100,
+    shape:shapes.polygon,
+    corners: [
+        {x:-.01,y:-1},
+        {x:.01,y:-1},
+        {x:.01,y:1},
+        {x:-.01,y:1},
+    ],
+    immobile:true,
+})
 
 const bigRedSquare = new Body({
     heading: _360deg*.2,
@@ -54,22 +83,23 @@ const greenPlanet = new Body({
 
 
 
-const glancingHit = new World([
+const passThrough = new World([
     bigWhiteSquare,
+    wall, wall2
     // bigRedSquare,
-    redPlanet,
-    greenPlanet,
+    // redPlanet,
+    // greenPlanet,
 
 ], {
     height: 800,
     width: 800,
-    airDensity: .1,
+    airDensity: 0,
     gravitationalConstant: 0,
     bodiesExertGravity: true,
     minimumMassToExertGravity: 1000,
     hasHardEdges: true,
-    name: "glancingHit",
+    name: "passThrough",
 });
 
 
-export { glancingHit }
+export { passThrough }
