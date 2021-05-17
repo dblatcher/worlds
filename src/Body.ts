@@ -240,6 +240,9 @@ class Body extends ThingWithShape {
         handleCollisionAccordingToShape(report)
     }
 
+    respondToImpact(report: CollisionReport): void {
+    }
+
     detectWorldEdgeCollisions() {
         if (!this.world) { return [] }
         const reports: EdgeCollisionReport[] = []

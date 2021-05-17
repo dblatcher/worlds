@@ -173,6 +173,7 @@ class World extends WorldConfig {
             const reports = body.detectCollisions(false, true)
             const nonNullReports = reports.filter(report => report !== null)
             nonNullReports.forEach(report => body.handleCollision(report))
+            nonNullReports.forEach(report => report.item2.respondToImpact(report))
             tickReport.collisionCount += nonNullReports.length
             tickReport.collisionTestCount += reports.length
         })
@@ -180,6 +181,7 @@ class World extends WorldConfig {
             const reports = body.detectCollisions(true, false)
             const nonNullReports = reports.filter(report => report !== null)
             nonNullReports.forEach(report => body.handleCollision(report))
+            nonNullReports.forEach(report => report.item2.respondToImpact(report))
             tickReport.collisionCount += nonNullReports.length
             tickReport.collisionTestCount += reports.length
         })
