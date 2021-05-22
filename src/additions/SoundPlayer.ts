@@ -6,12 +6,38 @@ interface PlayOptions {
     volume?: number
 }
 
+interface ToneConfigInput {
+    frequency?: number
+    endFrequency?: number
+    duration?: number
+    type?: OscillatorType
+    volume?: number
+}
+
+class ToneConfig implements ToneConfigInput {
+    frequency: number
+    endFrequency: number
+    duration: number
+    type: OscillatorType
+    volume: number
+
+    constructor(config: ToneConfigInput) {
+        this.frequency = config.frequency || 440
+        this.endFrequency = config.endFrequency || this.frequency
+        this.duration = config.duration || 1
+        this.type = config.type || 'sine'
+        this.volume = config.volume || .1
+    }
+}
+
 class SoundPlayer {
 
     audioElements: Map<string, HTMLAudioElement>
     sources: Map<string, MediaElementAudioSourceNode>
     audioCtx: AudioContext
     elements: SoundPlayerElements
+    savedNoises: Map<string, ToneConfigInput>
+    tonesPlaying: Map<string, OscillatorNode>
 
     constructor(sounds: any, elements: SoundPlayerElements = {}) {
 
@@ -43,9 +69,61 @@ class SoundPlayer {
                 this.elements.toggleButton.setAttribute('data-toggle-broken', 'true');
             }
         }
+
+        this.tonesPlaying = new Map();
+        this.savedNoises = new Map();
     }
 
 
+    defineTone(name: string, configInput: ToneConfigInput) {
+        this.savedNoises.set(name, configInput);
+    }
+
+    playTone(input: ToneConfigInput | string, label: string = null) {
+        if (!this.audioCtx) { return }
+
+        let config: ToneConfig;
+
+        if (typeof input == 'string') {
+            if (!this.savedNoises.has(input)) {
+                console.warn(`no saved tone called ${input}`);
+                return
+            }
+            config = new ToneConfig(this.savedNoises.get(input))
+        } else {
+            config = new ToneConfig(input as ToneConfigInput)
+        }
+
+        const tone = this.audioCtx.createOscillator()
+        const gainNode = this.audioCtx.createGain()
+
+        gainNode.gain.setValueAtTime(config.volume, this.audioCtx.currentTime)
+
+        tone.frequency.setValueAtTime(config.frequency, this.audioCtx.currentTime);
+        tone.frequency.linearRampToValueAtTime(config.endFrequency, this.audioCtx.currentTime + config.duration);
+        tone.type = config.type;
+
+        tone.connect(gainNode)
+        gainNode.connect(this.audioCtx.destination)
+        tone.start();
+        tone.stop(this.audioCtx.currentTime + config.duration);
+
+        if (label) {
+            this.tonesPlaying.set(label, tone);
+        }
+        tone.onended = () => {
+            if (label) {this.tonesPlaying.delete(label)}
+            tone.disconnect();
+            gainNode.disconnect();
+        }
+        return tone
+    }
+
+    stopTone(label: string) {
+        const tone = this.tonesPlaying.get(label);
+        if (!tone) { return }
+        tone.stop();
+    }
 
     play(soundName: string, options: PlayOptions = {}) {
 
@@ -105,4 +183,4 @@ class SoundPlayer {
 
 }
 
-export { SoundPlayer }
+export { SoundPlayer, ToneConfigInput }
