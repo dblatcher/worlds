@@ -126,8 +126,8 @@ class ViewPort {
 
         const elementX = event.clientX - rect.left - canvas.clientLeft
         const elementY = event.clientY - rect.top - canvas.clientTop
-        const viewPortX = elementX * (this.width / canvas.width)
-        const viewPortY = elementY * (this.height / canvas.height)
+        const viewPortX = elementX * (this.width / canvas.clientWidth) 
+        const viewPortY = elementY * (this.height / canvas.clientHeight) 
 
         if (!allowClicksOutsideCanvasElement && (viewPortX < 0 || viewPortY < 0 || viewPortX > this.width || viewPortY > this.height)) { return null }
 
