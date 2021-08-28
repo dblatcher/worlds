@@ -74,7 +74,7 @@ viewPort.transformRules.push(
 const frame = document.querySelector('.frame')
 frame.appendChild(canvasElement);
 
-world.ticksPerSecond = 100;
+world.ticksPerSecond = 300;
 
 document.body.addEventListener('click', handleClick);
 document.body.addEventListener('mousemove', handleHover);
