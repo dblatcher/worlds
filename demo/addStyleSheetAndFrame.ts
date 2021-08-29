@@ -3,6 +3,7 @@ styleSheet.textContent = `
 
 body {
     margin:0;
+    touch-action: none;
 }
 
 .frame {
