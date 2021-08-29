@@ -14,7 +14,7 @@ const greenBall = new Body(Object.assign({
 const whiteBall = new Body(Object.assign({
     x: 200, y: 100, fillColor: 'white',
 }, ball))
-
+ 
 
 function randomPoint(): Point {
     return {
