@@ -10,10 +10,11 @@ interface CanvasRenderStyle {
     lineDash?: number[]
     heading?: number
     lineWidth?: number
+    lineDashOffset?: number
 }
 
 function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderStyle) {
-    const { fillColor, strokeColor, lineDash = [], lineWidth } = style
+    const { fillColor, strokeColor, lineDash = [], lineWidth, lineDashOffset = 0 } = style
 
     const fillStyle = typeof fillColor === 'object'
         ? (fillColor as AbstractGradientFill).fallbackColor
@@ -21,6 +22,7 @@ function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderSty
 
     ctx.beginPath();
     ctx.setLineDash(lineDash);
+    ctx.lineDashOffset = lineDashOffset;
     ctx.fillStyle = fillStyle;
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = lineWidth || 1
@@ -63,7 +65,7 @@ const renderWedge = {
         const mappedArcEnd = viewPort.mapPoint(arcEnd, parallax);
         const mappedRadius = (radius * viewPort.magnify / parallax)
 
-        const arcStartAngle = _90deg -startHeading
+        const arcStartAngle = _90deg - startHeading
         const arcEndAngle = arcStartAngle - angle
 
         ctx.moveTo(mappedCenter.x, mappedCenter.y);
