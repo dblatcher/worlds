@@ -1,9 +1,14 @@
-import { RenderFunctions, ViewPort } from ".";
+import { RenderFunctions, ViewPort, World } from ".";
 
 
 class BackGround {
+    world: World
     tick() { }
     renderOnCanvas(ctx: CanvasRenderingContext2D, viewPort: ViewPort) { }
+
+    enterWorld(world: World) {
+        this.world = world
+    }
 }
 
 interface StarFieldData {

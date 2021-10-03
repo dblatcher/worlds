@@ -134,6 +134,7 @@ class World extends WorldConfig {
 
         this.fillColor = config.fillColor || "black";
         this.backGrounds = config.backGrounds || []
+        this.backGrounds.forEach(backGround => backGround.enterWorld(this))
 
         this.fluids = []
         fluids.forEach(fluid => fluid.enterWorld(this))
