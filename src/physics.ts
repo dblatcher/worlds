@@ -360,7 +360,7 @@ function bounceCircleOffCircle(collision: CollisionReport) {
     if (collision.item2.data.immobile) {
         collision.item1.momentum = findBounceOffImmobileBodyForce(collision)
     } else {
-        const bounce = findBounceCollisionVectors(collision)
+        const bounce = findRoundBounceCollisionVectorsMethod2(collision)
         collision.item1.momentum = Force.fromVector(bounce.vector1.x, bounce.vector1.y)
         collision.item2.momentum = Force.fromVector(bounce.vector2.x, bounce.vector2.y)
         // collision.item2.momentum = Force.combine([Force.fromVector(bounce.vector2.x, bounce.vector2.y), collision.item2.momentum])
