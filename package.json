@@ -2,14 +2,13 @@
   "name": "worlds",
   "version": "1.0.0",
   "description": "",
-  "private": true,
   "scripts": {
     "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
     "build": "webpack --mode=production",
     "demo": "webpack --mode=development --config webpack.demo.config.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["physics", "geometry","simulation","games"],
+  "author": "David Blatcher",
   "license": "ISC",
   "devDependencies": {
     "ts-loader": "^8.0.15",
