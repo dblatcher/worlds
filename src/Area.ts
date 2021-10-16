@@ -1,22 +1,18 @@
 
-import { Vector } from "./geometry"
-import { AbstractGradientFill } from "./GradientFill"
-import { Shape } from "./Shape"
-import { ThingWithShape } from "./ThingWithShape"
+import { ThingWithShape, ThingWithShapeData } from "./ThingWithShape"
 import { World } from "./World"
 
-interface AreaData {
-    x: number
-    y: number
-    size: number
-    shape?: Shape
+interface AreaData extends ThingWithShapeData {
     density?: number
-    heading?: number
-    color?: string
-    fillColor?: string | AbstractGradientFill
-    corners?: Vector[]
 }
 
+/**
+ * An Area represents region of the World. They can influence the motion
+ * of Bodies which pass through them owing the difference between thier density
+ * and the World.airDensity.
+ * 
+ * Areas are not subject to Forces and are immobile by default.
+ */
 class Area extends ThingWithShape {
     data: AreaData
     world: World

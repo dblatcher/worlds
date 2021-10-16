@@ -113,4 +113,4 @@ class ThingWithShape {
 }
 
 
-export { ThingWithShape }
+export { ThingWithShape, ThingWithShapeData }

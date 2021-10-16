@@ -12,7 +12,20 @@ interface EffectData {
     size?: number
 }
 
-class Effect {
+/**
+ * An Effect represents something which has a position (and possibly an physical
+ * extension) and is visible in a World, but which has no mass and 
+ * is not subject to physics.
+ * 
+ * Effects last for a defined duration (in ticks) before it removes itself from the
+ * World. The Effect class is an abstract intended to be subClassed to create animated
+ * visual effects in the world.
+ * 
+ * By default, the are purely visual and do not have affect other entities in the
+ * World, however instances and subClasses of Effect can be created that will do so by
+ * changeing the Effect's default tick method.
+ */
+class Effect implements EffectData {
     x: number
     y: number
     heading?: number
@@ -57,15 +70,13 @@ class Effect {
 }
 
 
-interface ExpandingRingData {
-    x: number
-    y: number
-    frame?: number
-    duration: number
-    size: number
-    color?: string
+interface ExpandingRingData extends EffectData {
 }
 
+/**
+ * Creates an Effect rendered as a ring which starts from zero radius
+ * and expands to the defined size over the defined duration.
+ */
 class ExpandingRing extends Effect {
     size: number
     color: string

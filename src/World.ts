@@ -7,6 +7,7 @@ import { TinyEmitter } from 'tiny-emitter'
 import { BackGround } from './BackGround'
 import { Area } from './Area'
 import { AbstractGradientFill } from './GradientFill'
+import { ThingWithShape } from './ThingWithShape'
 
 
 class WorldTickReport {
@@ -27,14 +28,49 @@ class WorldTickReport {
     }
 }
 
-class WorldConfig {
+interface WorldConfig {
     name?: string
     width?: number
     height?: number
+    /**
+     * The gravitational constant in the world - a scalar value applied
+     * as a multiplier in determining the magnitude of all gravitational
+     * forces applied in the world.
+     */
     gravitationalConstant?: number
+
+    /**
+     * A Force constantly applied to all Bodies in the world, representing
+     * 'downward' gravity in a World approximating 'terrestrial' conditions
+     * on the surface of a planet, where the planet itself is not represented
+     * by a Body.
+     * 
+     * Can also be used to simulate the effect of a World representing a flat
+     * plane being tilted at an angle.
+     */
     globalGravityForce?: Force
+
+    /**
+     * Whether bodies will exhert any gravity on each other.
+     */
     bodiesExertGravity?: boolean
+
+    /**
+     * The minimum mass a Body must be to exhert graviational force.
+     * 
+     * If set when bodiesExertGravity=true, bodies with a mass 
+     * below the valuw will not exert any graviational force. 
+     */
     minimumMassToExertGravity?: number
+
+    /**
+     * The amount of drag/friction applied to bodies moving through
+     * 'empty space' within the World. Works in the same way as
+     * Area.density.
+     * 
+     * To simulate a space-like enviornment, or a friction free flat
+     * surface, airDensity should be 0.
+     */
     airDensity?: number
     effects?: Effect[]
     fillColor?: string | AbstractGradientFill
@@ -49,7 +85,25 @@ class WorldConfig {
     }
 }
 
-class World extends WorldConfig {
+/**
+ * A World represents an extended space within which objects representing
+ * physical things will move and interact with each other, subject to the
+ * physical laws defined by the World's configuration.
+ * 
+ * A World updates its internal state with the tick method, which 
+ * simulates the passage of time and triggers
+ * the behaviour of its contents - for example, making any Bodies move.
+ * 
+ * The timerSpeed property sets the the number of 'ticks' per second. 
+ * It can be changed at runtime to change the speed of time in a World
+ * or pause time by setting timerSpeed to zero.
+ * 
+ * Worlds do not have an inherent render method. The ViewPort class is
+ * used to render a World (or a part of a World) to a canvas element,
+ * re-rendering after every tick event of the World. Not that the same
+ * World can be rendered by multiple ViewPorts.
+ */
+class World implements WorldConfig {
     name: string
     width: number
     height: number
@@ -64,6 +118,10 @@ class World extends WorldConfig {
     }
     minimumMassToExertGravity: number
     airDensity: number
+
+    /**
+     * DO NOT SET DIRECTLY - use the ticksPerSecond property.
+     */
     timerSpeed: number
     bodies: Body[]
     areas: Area[]
@@ -75,8 +133,13 @@ class World extends WorldConfig {
     timer: NodeJS.Timeout
     emitter: TinyEmitter
 
-    constructor(contents: (Body | Fluid | Area)[], config: WorldConfig = {}) {
-        super()
+    /**
+     * Create a whole new world.
+     * 
+     * @param contents the ThingsWithShape and/or Fluids in the world
+     * @param config the WorldConfig
+     */
+    constructor(contents: (ThingWithShape | Fluid)[], config: WorldConfig = {}) {
         this.timerSpeed = 0
 
         this.name = config.name || ""
@@ -144,11 +207,11 @@ class World extends WorldConfig {
         this.emitter = new TinyEmitter
     }
 
-    get report() {
+    get report(): string {
         return `The local gravity is ${this.gravitationalConstant.toFixed(2)}. Time runs at ${this.ticksPerSecond} hertz. There are ${this.bodies.length} bodies.`
     }
 
-    tick() {
+    tick(): void {
 
         const { fluids, effects, bodies } = this
 
@@ -205,6 +268,11 @@ class World extends WorldConfig {
         this.emitter.emit('tick', tickReport)
     }
 
+    /**
+     * Set the World's timerSpeed in hertz (events per second) and either 
+     * restart the timer at the new rate or clear the time is the timerSpeed
+     * is zero.
+     */
     set ticksPerSecond(speed: number) {
         if (speed == 0) {
             clearInterval(this.timer)
@@ -222,7 +290,12 @@ class World extends WorldConfig {
         return this.timerSpeed
     }
 
-    stopTime() {
+    /**
+     * Set the timerSpeed to zero.
+     * 
+     * @returns the World instance
+     */
+    stopTime(): World {
         clearInterval(this.timer)
         this.timerSpeed = 0
         return this

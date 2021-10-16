@@ -3,31 +3,31 @@ import { Force } from './Force'
 import { Vector, _90deg } from './geometry'
 import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
-import { Shape } from './Shape'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
-import { AbstractGradientFill } from './GradientFill'
-import { ThingWithShape } from './ThingWithShape'
+import { ThingWithShape, ThingWithShapeData } from './ThingWithShape'
 
 
 
-interface BodyData {
-    x: number
-    y: number
-    heading?: number
-    size?: number
+interface BodyData extends ThingWithShapeData {
     headingFollowsDirection?: boolean
-    shape?: Shape
-    color?: string
-    fillColor?: string | AbstractGradientFill
     density?: number
     elasticity?: number
     immobile?: boolean
     renderHeadingIndicator?: boolean
     renderPathAhead?: boolean
-    corners?:Vector[]
 }
 
-
+/**
+ * A Body represents a thing within the world that has a physical shape
+ * and mass and which may or may not be capable of movement.
+ * 
+ * By default, a body's behaviour will simply be to to act a a barrier to other bodies
+ * and (unless immobile) be moved in reaction to any forces (such as gravity
+ * or impacts) that are applied to it, in accordance with the World's laws of
+ * physics.
+ * 
+ * Body is intended to be subClassed to create things with more interesting behaviours.
+ */
 class Body extends ThingWithShape {
     world: World
     data: BodyData

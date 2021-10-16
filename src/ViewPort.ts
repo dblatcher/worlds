@@ -10,8 +10,25 @@ import { World } from "./World"
 interface TransformTestFunction { (body: Body): boolean }
 interface TransformRenderFuncion { (body: Body, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
 
+/**
+ * An instruction to a ViewPort to override the renderOnCanvas method of any
+ * body which meets a test condition. 
+ * 
+ * Used to change the way a Body is rendered
+ * on a partcular ViewPort - for example rendering a circle on a 'minimap' ViewPort
+ * when rendering the 'true' shape of the Body at actual size would make it too small
+ * to see.
+ */
 class RenderTransformationRule {
+    /**
+     * The test function to apply to a body - if true, the RenderTransformationRule.renderOnCanvas method is
+     * used by the ViewPort instead of the Body.renderOnCanvas.
+     */
     test: TransformTestFunction
+
+    /**
+     * The render function to use when rendering Bodies on the ViewPort that pass the test function.
+     */
     renderOnCanvas: TransformRenderFuncion
     constructor(test: TransformTestFunction, renderOnCanvas: TransformRenderFuncion) {
         this.test = test
@@ -36,8 +53,11 @@ interface ViewPortConfig {
 }
 
 
-
-class ViewPort {
+/**
+ * A ViewPort renders a World (or part thereof) onto a canvas Element, updating the image every time the 
+ * World.emitter emits a tick event.
+ */
+class ViewPort implements ViewPortConfig {
     world?: World
     x: number
     y: number
@@ -80,18 +100,34 @@ class ViewPort {
         return Math.ceil(this.canvas.width / this.canvas.offsetWidth)
     }
 
-    setWorld(world: World, renderAfterSetting: boolean = false) {
+    /**
+     * Set which World the ViewPort renders.
+     * 
+     * @param world the World to render
+     * @param renderAfterSetting whether to render the World immediately after setting
+     */
+    setWorld(world: World, renderAfterSetting: boolean = false):void {
         if (this.world) { this.unsetWorld() }
         this.world = world
         this.world.emitter.on('tick', this.renderCanvas)
         if (renderAfterSetting) { this.renderCanvas() }
     }
 
-    unsetWorld() {
+    /**
+     * Unset the ViewPort's World.
+     */
+    unsetWorld():void {
         this.world.emitter.off('tick', this.renderCanvas)
         this.world = null
     }
 
+    /**
+     * Covert a point within the world to a point on the ViewPort's canvas.
+     * 
+     * @param point a Point in the co-ordinate system of the ViewPort's World
+     * @param parallax the amount of parallax to apply in plotting the point on the ViewPort
+     * @returns the Point relative the the co-ordinates of the ViewPort's canvas element
+     */
     mapPoint(point: Point, parallax = 1): Point {
         const { x, y, magnify, width, height, rotate } = this
         const vectorFromCenter = Force.fromVector((magnify / parallax) * (x - point.x), (magnify / parallax) * (y - point.y))
@@ -102,6 +138,13 @@ class ViewPort {
         }
     }
 
+    /**
+     * Covert a point on the canvas to a point within the world.
+     * 
+     * @param pointOnViewport a Point relative the the co-ordinates of the ViewPort's canvas element
+     * @param parallax the parallax level of the layer the pointOnViewport is treated as being at. Defaults to 1.
+     * @returns the Point in the co-ordinate system of the ViewPort's World
+     */
     unMapPoint(pointOnViewport: Point, parallax = 1): Point {
         const { x, y, magnify, width, height, rotate } = this
         const vectorFromCenter = Force.fromVector((width / 2) - pointOnViewport.x, (height / 2) - pointOnViewport.y)
@@ -113,7 +156,7 @@ class ViewPort {
     }
 
     /**
-     * Locate the point int the world the user clicked on.
+     * Locate the point in the world the user clicked on.
      * @param event a pointer event
      * @param locationClicksOutsideCanvas a whether to return a point if the user clicks outside
      * the content box of the canvas element 
@@ -142,6 +185,14 @@ class ViewPort {
         return [topLeft, topRight, bottomRight, bottomleft]
     }
 
+    /**
+     * Center the ViewPort on a point within the World.
+     * 
+     * @param point the Point to ceter on.
+     * @param staywithinWorldEdge whether to prevent to confine the ViewPort to the World's edges
+     * @param magnify the level of maginfication to apply.
+     * @returns the ViewPort
+     */
     focusOn(point: Point, staywithinWorldEdge: boolean = false, magnify?: number) {
         if (magnify) { this.magnify = magnify }
 
@@ -156,6 +207,12 @@ class ViewPort {
         return this
     }
 
+    /**
+     * Set the ViewPorts to be have the same dimensions as its World,
+     * and center it at the World's center at magnification 1.
+     * 
+     * @returns the ViewPort
+     */
     reset() {
         if (!this.world) { return }
         this.x = this.world.width / 2
@@ -233,7 +290,14 @@ class ViewPort {
     }
 
 
-
+    /**
+     * Create a ViewPort rendering the whole of a World at a given magnification level.
+     * 
+     * @param world the World to render
+     * @param canvas the HTML canvas element to render on
+     * @param magnify The level of magnifcation to render the World at.
+     * @returns A ViewPort, rendering the whole of the World on the Canvas at the required magnification level.
+     */
     static full(world: World, canvas: HTMLCanvasElement, magnify: number = 1) {
         return new ViewPort({
             world,
@@ -246,6 +310,15 @@ class ViewPort {
         })
     }
 
+    /**
+     * Create a ViewPort rendering the whole of a World, scaled to fit within given dimensions.
+     * 
+     * @param world the World to render
+     * @param canvas the HTML canvas element to render on
+     * @param width the width of the ViewPort
+     * @param height the height of the ViewPort
+     * @returns A ViewPort, rendering the whole of the World on the Canvas, scaled to fit the height and width.
+     */
     static fitToSize(world: World, canvas: HTMLCanvasElement, width: number, height: number) {
         return new ViewPort({
             world,
