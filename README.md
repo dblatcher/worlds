@@ -2,7 +2,7 @@
 A typeScript library for creating 2d physics simulations within self-contained 'Worlds' which can be rendered on HTML canvas elements.
 
 ## Installation
-```npm i worlds```
+```npm i physics-worlds```
 
 ## Example usage
 ```
