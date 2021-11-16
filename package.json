@@ -1,7 +1,8 @@
 {
-  "name": "worlds",
-  "version": "1.0.0",
-  "description": "",
+  "name": "physics-worlds",
+  "version": "1.0.1",
+  "description": "A typeScript library for creating 2d physics simulations within self-contained 'Worlds' which can be rendered on HTML canvas elements.",
+  "private": false,
   "scripts": {
     "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
     "build": "webpack --mode=production",
