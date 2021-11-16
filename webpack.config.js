@@ -18,6 +18,7 @@ module.exports = {
   },
   output: {
     filename: 'physics-worlds.js',
+    globalObject:'this',
     path: path.resolve(__dirname, 'dist'),
     library: {
       name: "physicsWorlds",
