@@ -50,6 +50,7 @@ interface ViewPortConfig {
     dontRenderEffects?: boolean
     transformRules?: RenderTransformationRule[]
     framefill?: string | AbstractGradientFill
+    backGroundOverride?: string | AbstractGradientFill
 }
 
 
@@ -72,6 +73,7 @@ class ViewPort implements ViewPortConfig {
     dontRenderEffects: boolean
     transformRules: RenderTransformationRule[]
     framefill: string | AbstractGradientFill
+    backGroundOverride?: string | AbstractGradientFill
 
     constructor(config: ViewPortConfig) {
         this.x = config.x
@@ -85,6 +87,7 @@ class ViewPort implements ViewPortConfig {
         this.dontRenderEffects = config.dontRenderEffects || false
         this.transformRules = config.transformRules || []
         this.framefill = config.framefill || "transparent"
+        this.backGroundOverride = config.backGroundOverride
 
         this.canvas = config.canvas
         this.renderCanvas = this.renderCanvas.bind(this)
@@ -241,7 +244,7 @@ class ViewPort implements ViewPortConfig {
         else { this.framefill.setFillStyleForViewPort(ctx, this) }
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        renderPolygon.onCanvas(ctx, worldCorners, { fillColor: world.fillColor }, this)
+        renderPolygon.onCanvas(ctx, worldCorners, { fillColor: this.backGroundOverride || world.fillColor }, this)
 
         if (!this.dontRenderBackground) {
             world.backGrounds.forEach(backGround => backGround.renderOnCanvas(ctx, this))

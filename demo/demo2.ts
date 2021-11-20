@@ -17,6 +17,9 @@ const demoWorld = bigWorld
 
 const viewPort1 = ViewPort.fitToSize(demoWorld, canvasElement1, 150, 150)
 viewPort1.dontRenderBackground = true
+
+viewPort1.backGroundOverride= 'yellowgreen';
+
 viewPort1.transformRules.push(new RenderTransformationRule(
     body => body === redPlanet,
     (body, ctx, viewPort) => {

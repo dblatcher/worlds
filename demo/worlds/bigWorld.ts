@@ -60,8 +60,8 @@ const bigWorld = new World([
     name: "Galaxy",
     airDensity: 20,
     backGrounds: [
-        new StarField({ numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 5 }),
-        new StarField({ numberOfStars: 300, width: worldWidth, height: worldHeight, depth: 10 }),
+        new StarField({ numberOfStars: 100, width: worldWidth, height: worldHeight, depth: 2 }),
+        new StarField({ numberOfStars: 100, width: worldWidth, height: worldHeight, depth: 20 }),
     ]
 });
 
