@@ -1,6 +1,6 @@
 {
   "name": "physics-worlds",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A typeScript library for creating 2d physics simulations within self-contained 'Worlds' which can be rendered on HTML canvas elements.",
   "private": false,
   "scripts": {
@@ -8,7 +8,12 @@
     "build": "webpack --mode=production",
     "demo": "webpack --mode=development --config webpack.demo.config.js"
   },
-  "keywords": ["physics", "geometry","simulation","games"],
+  "keywords": [
+    "physics",
+    "geometry",
+    "simulation",
+    "games"
+  ],
   "author": "David Blatcher",
   "license": "ISC",
   "devDependencies": {
