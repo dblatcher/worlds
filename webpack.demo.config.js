@@ -7,7 +7,6 @@ module.exports = {
     demo2: './demo/demo2.ts',
     demo3: './demo/demo3.ts',
     demo4: './demo/demo4.ts',
-    packageTest: './demo/packageTest.js',
   },
   module: {
     rules: [
