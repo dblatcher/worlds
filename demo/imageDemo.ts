@@ -9,12 +9,8 @@ import { ImageFill } from '../src/AbstractFill';
 console.log('image demo');
 
 async function start() {
-    const soilImage = new Image();
-    soilImage.src = './soil.jpg';
-    const soilFill = new ImageFill({
-        fallbackColor: 'blue',
-        image: soilImage,
-    });
+
+    const soilFill = ImageFill.fromSrc ('./soil.jpg','brown');
 
     const stoneImage = new Image();
     stoneImage.src = './stone.jpg';

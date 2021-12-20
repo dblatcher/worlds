@@ -189,6 +189,12 @@ class ImageFill extends AbstractFill {
             .rotateSelf(-heading / _deg);
         return matrix
     }
+
+    static fromSrc(src: string, fallbackColor = 'transparent'): ImageFill {
+        const image = new Image();
+        image.src = src;
+        return new ImageFill({ image, fallbackColor })
+    }
 }
 
 export { AbstractFill, LinearGradientFill, RadialGradientFill, ImageFill }
