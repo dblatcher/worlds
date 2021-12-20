@@ -28,16 +28,15 @@ viewPort.transformRules.push(
         (subject) => {
             return subject.isArea
         },
-
         (subject: ThingWithShape, ctx: CanvasRenderingContext2D, viewPort: ViewPort) => {
             const duplicate = subject.duplicate() as ThingWithShape
             duplicate.data.fillColor = "red"
             duplicate.data.size *= .5
-            subject.renderOnCanvas(ctx,viewPort)
+            subject.renderOnCanvas(ctx, viewPort)
             duplicate.renderOnCanvas(ctx, viewPort)
         }
-
     )
+);
 
 const frame = document.querySelector('.frame')
 document.body.prepend(panel.makeElement())
