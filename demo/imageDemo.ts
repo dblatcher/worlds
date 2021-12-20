@@ -13,7 +13,6 @@ async function start() {
     soilImage.src = './soil.jpg';
     const soilFill = new ImageFill({
         fallbackColor: 'blue',
-        canvasFunction: () => { },
         image: soilImage,
     });
 
@@ -22,7 +21,6 @@ async function start() {
 
     const stoneFill = new ImageFill({
         fallbackColor: 'red',
-        canvasFunction: () => { },
         image: stoneImage,
     });
 
@@ -32,6 +30,7 @@ async function start() {
         {
             x: 90, y: 150, size: 75,
             fillColor: soilFill,
+            color:'transparent',
             renderHeadingIndicator:true,
         },
         new Force(0, 0)
@@ -64,17 +63,13 @@ async function start() {
 
     const canvasElement = document.createElement('canvas')
     const viewPort = ViewPort.fitToSize(world, canvasElement,300,600)
-
     viewPort.framefill = stoneFill
-
     world.ticksPerSecond = 100;
 
     const frame = document.querySelector('.frame')
     frame.appendChild(canvasElement);
-
     (window as any).world = world;
     (window as any).viewPort = viewPort;
-
 }
 
 start()

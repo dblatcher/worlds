@@ -4,19 +4,10 @@ import { ViewPort } from "./ViewPort"
 
 
 abstract class AbstractFill {
-    makeCanvasFill: Function
     fallbackColor: string
     abstract setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
     abstract setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
     abstract setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
-
-    constructor(config: {
-        fallbackColor: string,
-        canvasFunction: Function
-    }) {
-        this.fallbackColor = config.fallbackColor
-        this.makeCanvasFill = config.canvasFunction
-    }
     get isFillColorObject() { return true }
 }
 
@@ -27,6 +18,15 @@ interface CanvasLinearGradientFunction {
 
 class LinearGradientFill extends AbstractFill {
     makeCanvasFill: CanvasLinearGradientFunction
+
+    constructor(config: {
+        fallbackColor: string,
+        canvasFunction: CanvasLinearGradientFunction
+    }) {
+        super()
+        this.fallbackColor = config.fallbackColor
+        this.makeCanvasFill = config.canvasFunction
+    }
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         const toFront: Vector = {
@@ -75,6 +75,15 @@ interface CanvasRadialGradientFunction {
 class RadialGradientFill extends AbstractFill {
     makeCanvasFill: CanvasRadialGradientFunction
 
+    constructor(config: {
+        fallbackColor: string,
+        canvasFunction: CanvasRadialGradientFunction
+    }) {
+        super()
+        this.fallbackColor = config.fallbackColor
+        this.makeCanvasFill = config.canvasFunction
+    }
+
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
         const mappedCircleCenter = viewPort.mapPoint(circle)
         const mappedCircle = {
@@ -117,19 +126,20 @@ class RadialGradientFill extends AbstractFill {
 
 class ImageFill extends AbstractFill {
     image: CanvasImageSource
+    storedPattern?: CanvasPattern
 
     constructor(config: {
         fallbackColor: string,
-        canvasFunction: Function,
         image: CanvasImageSource
     }) {
-        super(config)
+        super()
+        this.fallbackColor = config.fallbackColor
         this.image = config.image
     }
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
-
-        const pattern = ctx.createPattern(this.image, 'repeat')
+        const pattern = this.makePattern(ctx)
+        if (!pattern) { return this.fallback(ctx) }
         const viewPortCoords = viewPort.mapPoint(circle)
 
         const matrix = this.makeMatrix(viewPortCoords, heading)
@@ -138,7 +148,8 @@ class ImageFill extends AbstractFill {
         ctx.fillStyle = pattern
     }
     setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
-        const pattern = ctx.createPattern(this.image, 'repeat')
+        const pattern = this.makePattern(ctx)
+        if (!pattern) { return this.fallback(ctx) }
         const viewPortCoords = viewPort.mapPoint(polygon[0])
 
         const matrix = this.makeMatrix(viewPortCoords, heading)
@@ -147,13 +158,29 @@ class ImageFill extends AbstractFill {
         ctx.fillStyle = pattern
     }
     setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
-        const pattern = ctx.createPattern(this.image, 'repeat')
+        const pattern = this.makePattern(ctx)
+        if (!pattern) { return this.fallback(ctx) }
         const viewPortCoords = viewPort.mapPoint(originPoint)
 
         const matrix = this.makeMatrix(viewPortCoords, 0)
         pattern.setTransform(matrix)
-
         ctx.fillStyle = pattern
+    }
+
+    fallback(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = this.fallbackColor;
+    }
+
+    makePattern(ctx: CanvasRenderingContext2D): CanvasPattern | null {
+        if (this.storedPattern) { return this.storedPattern }
+
+        try {
+            const pattern = ctx.createPattern(this.image, 'repeat')
+            this.storedPattern = pattern
+            return pattern;
+        } catch (error) {
+            return null
+        }
     }
 
     makeMatrix(point: Point, heading: number): DOMMatrix {
