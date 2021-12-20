@@ -10,18 +10,8 @@ console.log('image demo');
 
 async function start() {
 
-    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { scale: .5, rotate:90 });
+    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { rotate:90 });
     const bigSoilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { scale: 2.5 });
-
-    const stoneImage = new Image();
-    stoneImage.src = './stone.jpg';
-
-    const stoneFill = new ImageFill({
-        fallbackColor: 'red',
-        image: stoneImage,
-    });
-
-
 
     const body1 = new Body(
         {
@@ -36,7 +26,7 @@ async function start() {
     const body2 = new Body(
         {
             x: 250, y: 150, size: 50,
-            fillColor: stoneFill,
+            fillColor: soilFill,
             shape: shapes.square,
             renderHeadingIndicator: true,
         },
