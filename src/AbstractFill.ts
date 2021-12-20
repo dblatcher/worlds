@@ -124,17 +124,25 @@ class RadialGradientFill extends AbstractFill {
 }
 
 
+interface ImageFillTransforms {
+    scale?: number
+    rotate?: number
+}
+
 class ImageFill extends AbstractFill {
     image: CanvasImageSource
     storedPattern?: CanvasPattern
+    transforms: ImageFillTransforms
 
     constructor(config: {
-        fallbackColor: string,
         image: CanvasImageSource
+        fallbackColor: string,
+        transforms?: ImageFillTransforms
     }) {
         super()
         this.fallbackColor = config.fallbackColor
         this.image = config.image
+        this.transforms = config.transforms || {}
     }
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
@@ -186,14 +194,16 @@ class ImageFill extends AbstractFill {
     makeMatrix(point: Point, heading: number): DOMMatrix {
         const matrix = new DOMMatrix()
             .translateSelf(point.x, point.y)
-            .rotateSelf(-heading / _deg);
+            .rotateSelf(-heading / _deg)
+            .scaleSelf(this.transforms.scale || 1)
+            .rotateSelf(this.transforms.rotate || 0)
         return matrix
     }
 
-    static fromSrc(src: string, fallbackColor = 'transparent'): ImageFill {
+    static fromSrc(src: string, fallbackColor = 'transparent', transforms: ImageFillTransforms = {}): ImageFill {
         const image = new Image();
         image.src = src;
-        return new ImageFill({ image, fallbackColor })
+        return new ImageFill({ image, fallbackColor, transforms })
     }
 }
 

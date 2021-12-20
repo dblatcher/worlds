@@ -10,7 +10,8 @@ console.log('image demo');
 
 async function start() {
 
-    const soilFill = ImageFill.fromSrc ('./soil.jpg','brown');
+    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { scale: .5, rotate:90 });
+    const bigSoilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { scale: 2.5 });
 
     const stoneImage = new Image();
     stoneImage.src = './stone.jpg';
@@ -25,9 +26,9 @@ async function start() {
     const body1 = new Body(
         {
             x: 90, y: 150, size: 75,
-            fillColor: soilFill,
-            color:'transparent',
-            renderHeadingIndicator:true,
+            fillColor: bigSoilFill,
+            color: 'transparent',
+            renderHeadingIndicator: true,
         },
         new Force(0, 0)
     )
@@ -35,9 +36,9 @@ async function start() {
     const body2 = new Body(
         {
             x: 250, y: 150, size: 50,
-            fillColor: soilFill,
-            shape:shapes.square,
-            renderHeadingIndicator:true,
+            fillColor: stoneFill,
+            shape: shapes.square,
+            renderHeadingIndicator: true,
         },
         new Force(1, Geometry._deg * 45)
     )
@@ -47,7 +48,7 @@ async function start() {
     }
 
     body1.tick = () => {
-        body1.data.heading -= _deg*1;
+        body1.data.heading -= _deg * 1;
     }
 
     const world = new World([
@@ -58,8 +59,8 @@ async function start() {
 
 
     const canvasElement = document.createElement('canvas')
-    const viewPort = ViewPort.fitToSize(world, canvasElement,300,600)
-    viewPort.framefill = stoneFill
+    const viewPort = ViewPort.fitToSize(world, canvasElement, 300, 600)
+    viewPort.framefill = soilFill
     world.ticksPerSecond = 100;
 
     const frame = document.querySelector('.frame')
