@@ -5,10 +5,11 @@ import { getXYVector, Point, _90deg } from "./geometry"
 import { AbstractFill } from "./AbstractFill"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
+import { ThingWithShape } from "./ThingWithShape"
 
 
-interface TransformTestFunction { (body: Body): boolean }
-interface TransformRenderFuncion { (body: Body, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
+interface TransformTestFunction { (subject: ThingWithShape): boolean }
+interface TransformRenderFuncion { (subject: ThingWithShape, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void }
 
 /**
  * An instruction to a ViewPort to override the renderOnCanvas method of any
@@ -251,7 +252,14 @@ class ViewPort implements ViewPortConfig {
         }
 
         world.fluids.forEach(fluid => { fluid.renderOnCanvas(ctx, this) })
-        world.areas.forEach(area => { area.renderOnCanvas(ctx, this) })
+        world.areas.forEach(area => { 
+            let applicableRule = transformRules.filter(rule => rule.test(area))[0]
+            if (applicableRule) {
+                applicableRule.renderOnCanvas(area, ctx, this)
+            } else {
+                area.renderOnCanvas(ctx, this)
+            }
+        })
 
         world.bodies.forEach(body => {
             let applicableRule = transformRules.filter(rule => rule.test(body))[0]
