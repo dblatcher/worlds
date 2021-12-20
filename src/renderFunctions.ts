@@ -1,10 +1,10 @@
 import { Body } from "./Body"
 import { getVectorX, getVectorY, Point, _90deg, Circle, Wedge, translatePoint, getXYVector, normaliseHeading, _360deg } from './geometry'
 import { ViewPort } from "./World"
-import { AbstractGradientFill } from "./GradientFill"
+import { AbstractFill } from "./AbstractFill"
 
 interface CanvasRenderStyle {
-    fillColor?: string | AbstractGradientFill
+    fillColor?: string | AbstractFill
     strokeColor?: string
     parallax?: number
     lineDash?: number[]
@@ -17,7 +17,7 @@ function beginPathAndStyle(ctx: CanvasRenderingContext2D, style: CanvasRenderSty
     const { fillColor, strokeColor, lineDash = [], lineWidth, lineDashOffset = 0 } = style
 
     const fillStyle = typeof fillColor === 'object'
-        ? (fillColor as AbstractGradientFill).fallbackColor
+        ? (fillColor as AbstractFill).fallbackColor
         : fillColor
 
     ctx.beginPath();
@@ -32,7 +32,7 @@ const renderCircle = {
     onCanvas: function (ctx: CanvasRenderingContext2D, circle: Circle, style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
         if (typeof style.fillColor == 'object') {
-            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(circle, style.heading || 0, ctx, viewPort)
+            (style.fillColor as AbstractFill).setFillStyleForCircle(circle, style.heading || 0, ctx, viewPort)
         }
         const { parallax = 1 } = style
         const { radius } = circle
@@ -49,7 +49,7 @@ const renderWedge = {
     onCanvas: function (ctx: CanvasRenderingContext2D, wedge: Wedge, style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
         if (typeof style.fillColor == 'object') {
-            (style.fillColor as AbstractGradientFill).setFillStyleForCircle(wedge, style.heading || 0, ctx, viewPort)
+            (style.fillColor as AbstractFill).setFillStyleForCircle(wedge, style.heading || 0, ctx, viewPort)
         }
         const { parallax = 1 } = style
         const { radius, heading, angle } = wedge
@@ -112,7 +112,7 @@ const renderPolygon = {
     onCanvas: function (ctx: CanvasRenderingContext2D, polygon: Point[], style: CanvasRenderStyle, viewPort: ViewPort): void {
         beginPathAndStyle(ctx, style);
         if (typeof style.fillColor == 'object') {
-            (style.fillColor as AbstractGradientFill).setFillStyleForPolygon(polygon, style.heading || 0, ctx, viewPort)
+            (style.fillColor as AbstractFill).setFillStyleForPolygon(polygon, style.heading || 0, ctx, viewPort)
         }
         const { parallax = 1 } = style
 

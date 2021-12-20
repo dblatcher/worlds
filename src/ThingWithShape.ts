@@ -1,6 +1,6 @@
 import { Fluid } from "./Fluid"
 import { IntersectionInfo, Point, Vector, AlignedRectangle, Circle, getDistanceBetweenPoints } from "./geometry"
-import { AbstractGradientFill } from "./GradientFill"
+import { AbstractFill } from "./AbstractFill"
 import { Shape, shapes, ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
 
@@ -11,7 +11,7 @@ interface ThingWithShapeData {
     shape?: Shape
     heading?: number
     color?: string
-    fillColor?: string | AbstractGradientFill
+    fillColor?: string | AbstractFill
     corners?:Vector[]
 }
 

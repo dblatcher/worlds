@@ -6,7 +6,7 @@ import { Effect } from './Effect'
 import { TinyEmitter } from 'tiny-emitter'
 import { BackGround } from './BackGround'
 import { Area } from './Area'
-import { AbstractGradientFill } from './GradientFill'
+import { AbstractFill } from './AbstractFill'
 import { ThingWithShape } from './ThingWithShape'
 
 
@@ -73,7 +73,7 @@ interface WorldConfig {
      */
     airDensity?: number
     effects?: Effect[]
-    fillColor?: string | AbstractGradientFill
+    fillColor?: string | AbstractFill
     backGrounds?: BackGround[]
     hasHardEdges?: boolean
     hasWrappingEdges?: boolean
@@ -127,7 +127,7 @@ class World implements WorldConfig {
     areas: Area[]
     fluids: Fluid[]
     effects: Effect[]
-    fillColor?: string | AbstractGradientFill
+    fillColor?: string | AbstractFill
     backGrounds: BackGround[]
     bodiesLeavingAtNextTick: Body[]
     timer: NodeJS.Timeout

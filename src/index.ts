@@ -7,7 +7,7 @@ import { Fluid, FluidData } from './Fluid'
 import { Effect, EffectData, ExpandingRing, ExpandingRingData } from './Effect'
 import { CameraFollowInstruction, CameraInstruction } from "./CameraInstruction";
 import { BackGround, StarField, StarFieldData, } from "./BackGround"
-import { AbstractGradientFill, LinearGradientFill, RadialGradientFill } from "./GradientFill"
+import { AbstractFill, LinearGradientFill, RadialGradientFill, ImageFill } from "./AbstractFill"
 import { Area, AreaData } from './Area'
 
 
@@ -28,7 +28,7 @@ export {
     BackGround, StarField, StarFieldData,
     Physics, Geometry, CollisionDetection, RenderFunctions,
     shapes,
-    AbstractGradientFill, LinearGradientFill, RadialGradientFill,
+    AbstractFill, LinearGradientFill, RadialGradientFill, ImageFill,
     Area, AreaData,
     KeyWatcher, SoundPlayer, ToneConfigInput
 }

@@ -2,7 +2,7 @@ import { Body, Geometry } from "."
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
 import { getXYVector, Point, _90deg } from "./geometry"
-import { AbstractGradientFill } from "./GradientFill"
+import { AbstractFill } from "./AbstractFill"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"
 
@@ -49,8 +49,8 @@ interface ViewPortConfig {
     dontRenderBackground?: boolean
     dontRenderEffects?: boolean
     transformRules?: RenderTransformationRule[]
-    framefill?: string | AbstractGradientFill
-    backGroundOverride?: string | AbstractGradientFill
+    framefill?: string | AbstractFill
+    backGroundOverride?: string | AbstractFill
 }
 
 
@@ -72,8 +72,8 @@ class ViewPort implements ViewPortConfig {
     dontRenderBackground: boolean
     dontRenderEffects: boolean
     transformRules: RenderTransformationRule[]
-    framefill: string | AbstractGradientFill
-    backGroundOverride?: string | AbstractGradientFill
+    framefill: string | AbstractFill
+    backGroundOverride?: string | AbstractFill
 
     constructor(config: ViewPortConfig) {
         this.x = config.x

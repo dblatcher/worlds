@@ -1,19 +1,14 @@
-import { Circle, getDistanceBetweenPoints, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector } from "./geometry"
+import { Circle, getDistanceBetweenPoints, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector, _deg } from "./geometry"
+import { originPoint } from "./geometry/definitions"
 import { ViewPort } from "./ViewPort"
 
 
-class AbstractGradientFill {
+abstract class AbstractFill {
     makeCanvasFill: Function
     fallbackColor: string
-    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
-        ctx.fillStyle = this.fallbackColor
-    }
-    setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
-        ctx.fillStyle = this.fallbackColor
-    }
-    setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
-        ctx.fillStyle = this.fallbackColor
-    }
+    abstract setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
+    abstract setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
+    abstract setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort): void
 
     constructor(config: {
         fallbackColor: string,
@@ -30,7 +25,7 @@ interface CanvasLinearGradientFunction {
     (ctx: CanvasRenderingContext2D, line: [Point, Point]): CanvasGradient
 }
 
-class LinearGradientFill extends AbstractGradientFill {
+class LinearGradientFill extends AbstractFill {
     makeCanvasFill: CanvasLinearGradientFunction
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
@@ -77,7 +72,7 @@ interface CanvasRadialGradientFunction {
     (ctx: CanvasRenderingContext2D, circle: Circle, heading: number): CanvasGradient
 }
 
-class RadialGradientFill extends AbstractGradientFill {
+class RadialGradientFill extends AbstractFill {
     makeCanvasFill: CanvasRadialGradientFunction
 
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort) {
@@ -112,11 +107,61 @@ class RadialGradientFill extends AbstractGradientFill {
         const circle: Circle = {
             x: viewPort.width / 2,
             y: viewPort.height / 2,
-            radius: Math.max(viewPort.width/2, viewPort.height/2)
+            radius: Math.max(viewPort.width / 2, viewPort.height / 2)
         }
         ctx.fillStyle = this.makeCanvasFill(ctx, circle, 0);
     }
 
 }
 
-export { AbstractGradientFill, LinearGradientFill, RadialGradientFill }
+
+class ImageFill extends AbstractFill {
+    image: CanvasImageSource
+
+    constructor(config: {
+        fallbackColor: string,
+        canvasFunction: Function,
+        image: CanvasImageSource
+    }) {
+        super(config)
+        this.image = config.image
+    }
+
+    setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
+
+        const pattern = ctx.createPattern(this.image, 'repeat')
+        const viewPortCoords = viewPort.mapPoint(circle)
+
+        const matrix = this.makeMatrix(viewPortCoords, heading)
+        pattern.setTransform(matrix)
+
+        ctx.fillStyle = pattern
+    }
+    setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
+        const pattern = ctx.createPattern(this.image, 'repeat')
+        const viewPortCoords = viewPort.mapPoint(polygon[0])
+
+        const matrix = this.makeMatrix(viewPortCoords, heading)
+        pattern.setTransform(matrix)
+
+        ctx.fillStyle = pattern
+    }
+    setFillStyleForViewPort(ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
+        const pattern = ctx.createPattern(this.image, 'repeat')
+        const viewPortCoords = viewPort.mapPoint(originPoint)
+
+        const matrix = this.makeMatrix(viewPortCoords, 0)
+        pattern.setTransform(matrix)
+
+        ctx.fillStyle = pattern
+    }
+
+    makeMatrix(point: Point, heading: number): DOMMatrix {
+        const matrix = new DOMMatrix()
+            .translateSelf(point.x, point.y)
+            .rotateSelf(-heading / _deg);
+        return matrix
+    }
+}
+
+export { AbstractFill, LinearGradientFill, RadialGradientFill, ImageFill }

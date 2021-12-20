@@ -1,6 +1,6 @@
 import { Fluid, Force, RenderFunctions } from "../../src";
 import { Circle, getVectorX, getVectorY, getXYVector, Point, reverseHeading, translatePoint, Vector, Wedge, _360deg, _90deg } from "../../src/geometry";
-import { LinearGradientFill, RadialGradientFill } from "../../src/GradientFill"
+import { LinearGradientFill, RadialGradientFill } from "../../src/AbstractFill"
 import { shapes } from "../../src/Shape";
 import { Body } from "../../src/Body";
 import { ViewPort, World } from "../../src/World";
@@ -43,7 +43,7 @@ const redCircles = new RadialGradientFill({
         }
 
         const gradient = ctx.createRadialGradient(innerCircle.x, innerCircle.y, innerCircle.radius, circle.x, circle.y, circle.radius);
-        gradient.addColorStop( 0, 'red');
+        gradient.addColorStop(0, 'red');
         gradient.addColorStop(.1, 'pink');
         gradient.addColorStop(.2, 'red');
         gradient.addColorStop(.3, 'pink');
@@ -53,7 +53,7 @@ const redCircles = new RadialGradientFill({
         gradient.addColorStop(.7, 'pink');
         gradient.addColorStop(.8, 'red');
         gradient.addColorStop(.9, 'pink');
-        gradient.addColorStop( 1, 'red');
+        gradient.addColorStop(1, 'red');
 
         return gradient;
     }
@@ -105,7 +105,7 @@ const world = new World([
     height: 400,
     airDensity: .5,
     gravitationalConstant: 0.05,
-    globalGravityForce: new Force(1,0),
+    globalGravityForce: new Force(1, 0),
     edges: {
         left: "WRAP",
         bottom: "HARD",

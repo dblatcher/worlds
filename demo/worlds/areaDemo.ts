@@ -1,6 +1,6 @@
 import { Area } from '../../src/Area'
 import { Point, _360deg, _90deg, _deg } from '../../src/geometry'
-import { LinearGradientFill } from '../../src/GradientFill'
+import { LinearGradientFill } from '../../src/AbstractFill'
 import { World, Body, Force, shapes } from '../../src/index'
 
 
