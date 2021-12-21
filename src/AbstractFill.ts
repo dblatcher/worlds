@@ -201,8 +201,15 @@ class ImageFill extends AbstractFill {
     }
 
     static fromSrc(src: string, fallbackColor = 'transparent', transforms: ImageFillTransforms = {}): ImageFill {
-        const image = new Image();
-        image.src = src;
+
+        let image = null;
+        if (typeof Image === 'function') {
+            image = new Image();
+            image.src = src;
+        } else {
+            console.warn ("ImageFill.fromSrc() failed - called in a context without the Image constructor. Try creating your CanvasImageSource first and calling new ImageFill()")
+        }
+
         return new ImageFill({ image, fallbackColor, transforms })
     }
 }
