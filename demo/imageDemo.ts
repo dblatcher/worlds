@@ -1,7 +1,7 @@
 
 import { ViewPort } from '../src/ViewPort';
 import { Force, Body, World, Geometry, shapes } from '../src';
-import { Point, _deg } from '../src/geometry';
+import { _deg } from '../src/geometry';
 import './addStyleSheetAndFrame'
 import { ImageFill } from '../src/AbstractFill';
 
@@ -10,8 +10,14 @@ console.log('image demo');
 
 async function start() {
 
-    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { rotate:90 });
-    const bigSoilFill = ImageFill.fromSrc('./soil.jpg', 'brown', { scale: 2.5 });
+    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', {
+        rotate: 90,
+        offset: { x: 10, y: 20 }
+    });
+
+    const bigSoilFill = ImageFill.fromSrc('./soil.jpg', 'brown', {
+        scale: 2.5,
+    });
 
     const body1 = new Body(
         {
@@ -34,7 +40,7 @@ async function start() {
     )
 
     body2.tick = () => {
-        body2.data.heading += _deg;
+        // body2.data.heading += _deg;
     }
 
     body1.tick = () => {

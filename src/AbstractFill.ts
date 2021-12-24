@@ -127,6 +127,8 @@ class RadialGradientFill extends AbstractFill {
 interface ImageFillTransforms {
     scale?: number
     rotate?: number
+    parallax?: number
+    offset?: Vector
 }
 
 class ImageFill extends AbstractFill {
@@ -148,7 +150,7 @@ class ImageFill extends AbstractFill {
     setFillStyleForCircle(circle: Circle, heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
         const pattern = this.makePattern(ctx)
         if (!pattern) { return this.fallback(ctx) }
-        const viewPortCoords = viewPort.mapPoint(circle)
+        const viewPortCoords = viewPort.mapPoint(circle, this.transforms.parallax || 1)
 
         const matrix = this.makeMatrix(viewPortCoords, heading)
         pattern.setTransform(matrix)
@@ -158,7 +160,7 @@ class ImageFill extends AbstractFill {
     setFillStyleForPolygon(polygon: Point[], heading: number, ctx: CanvasRenderingContext2D, viewPort: ViewPort): void {
         const pattern = this.makePattern(ctx)
         if (!pattern) { return this.fallback(ctx) }
-        const viewPortCoords = viewPort.mapPoint(polygon[0])
+        const viewPortCoords = viewPort.mapPoint(polygon[0], this.transforms.parallax || 1)
 
         const matrix = this.makeMatrix(viewPortCoords, heading)
         pattern.setTransform(matrix)
@@ -192,11 +194,14 @@ class ImageFill extends AbstractFill {
     }
 
     makeMatrix(point: Point, heading: number): DOMMatrix {
+        const { scale = 1, rotate = 0, offset = { x: 0, y: 0 } } = this.transforms
+
         const matrix = new DOMMatrix()
             .translateSelf(point.x, point.y)
+            .translateSelf(offset.x, offset.y)
             .rotateSelf(-heading / _deg)
-            .scaleSelf(this.transforms.scale || 1)
-            .rotateSelf(this.transforms.rotate || 0)
+            .scaleSelf(scale || 1)
+            .rotateSelf(rotate || 0)
         return matrix
     }
 
@@ -207,7 +212,7 @@ class ImageFill extends AbstractFill {
             image = new Image();
             image.src = src;
         } else {
-            console.warn ("ImageFill.fromSrc() failed - called in a context without the Image constructor. Try creating your CanvasImageSource first and calling new ImageFill()")
+            console.warn("ImageFill.fromSrc() failed - called in a context without the Image constructor. Try creating your CanvasImageSource first and calling new ImageFill()")
         }
 
         return new ImageFill({ image, fallbackColor, transforms })
