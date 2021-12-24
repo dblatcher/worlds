@@ -1,6 +1,6 @@
 {
   "name": "physics-worlds",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A typeScript library for creating 2d physics simulations within self-contained 'Worlds' which can be rendered on HTML canvas elements.",
   "private": false,
   "scripts": {
