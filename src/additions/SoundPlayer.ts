@@ -183,4 +183,4 @@ class SoundPlayer {
 
 }
 
-export { SoundPlayer, ToneConfigInput }
+export { SoundPlayer, ToneConfigInput, ToneConfig }

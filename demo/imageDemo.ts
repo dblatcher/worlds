@@ -5,6 +5,9 @@ import { _deg } from '../src/geometry';
 import './addStyleSheetAndFrame'
 import { ImageFill } from '../src/AbstractFill';
 
+import { SoundDeck, ToneParams } from '../src/additions/SoundDeck';
+
+
 
 console.log('image demo');
 
@@ -61,8 +64,30 @@ async function start() {
 
     const frame = document.querySelector('.frame')
     frame.appendChild(canvasElement);
-    (window as any).world = world;
-    (window as any).viewPort = viewPort;
+
+    const myWindow: any = window;
+
+    myWindow.world = world;
+    myWindow.viewPort = viewPort;
+
+
+    const soundDeck = new SoundDeck();
+
+    soundDeck.defineSampleBuffer('beep', './beep.mp3');
+
+    const hum: ToneParams = { frequency: 300, endFrequency: 350, type: 'square' };
+
+
+
+    myWindow.soundPlayer = soundDeck;
+    myWindow.sound = soundDeck.playSample("beep");
+
+    document.addEventListener('click', () => {
+        console.log('click is a gesture')
+        soundDeck.enable()
+
+        soundDeck.playTone(hum)
+    }, { once: true })
 }
 
 start()
