@@ -78,14 +78,12 @@ async function start() {
     const hum: ToneParams = { frequency: 300, endFrequency: 350, type: 'square' };
 
 
-
-    myWindow.soundPlayer = soundDeck;
-    myWindow.sound = soundDeck.playSample("beep");
+    myWindow.soundDeck = soundDeck;
 
     document.addEventListener('click', () => {
         console.log('click is a gesture')
         soundDeck.enable()
-
+        soundDeck.masterVolume = .5
         soundDeck.playTone(hum)
     }, { once: true })
 }
