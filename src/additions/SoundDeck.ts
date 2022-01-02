@@ -113,10 +113,7 @@ class SoundDeck {
     }
 
 
-
-
     makeNoiseSourceNodeAndFilter(params: NoiseParams): [AudioBufferSourceNode, BiquadFilterNode] | null {
-
         const { duration = 1, frequency = 1000 } = params;
         const bufferSize = this.audioCtx.sampleRate * duration; // set the time of the note
         const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate); // create an empty buffer
@@ -142,9 +139,7 @@ class SoundDeck {
     playNoise(params: NoiseParams = {}, options: PlayOptions = {}): SoundControl | null {
         if (!this.audioCtx) { return null }
 
-
         const { loop = false, volume = 1 } = options;
-
         const gainNode = this.audioCtx.createGain()
         const [noiseNode, bandpass] = this.makeNoiseSourceNodeAndFilter(params)
 

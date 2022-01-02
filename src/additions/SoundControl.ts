@@ -6,14 +6,20 @@ type SourceWithLoop = AudioBufferSourceNode | HTMLAudioElement;
 class SoundControl {
     sourceNode: Readonly<SupportedAudioNode | HTMLAudioElement>
     gainNode?: Readonly<GainNode>
+    whenEnded: Promise<SoundControl>
 
     constructor(sourceNode: SupportedAudioNode | HTMLAudioElement, gainNode?: GainNode) {
         this.sourceNode = sourceNode
         this.gainNode = gainNode
+
+        this.whenEnded = new Promise(resolve => {
+            this.sourceNode.addEventListener('ended', () => { resolve(this) })
+        })
     }
 
     stop() {
         if (this.sourceNode instanceof HTMLAudioElement) {
+            this.sourceNode.currentTime = 0
             return this.sourceNode.pause()
         }
 
