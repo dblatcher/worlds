@@ -8,6 +8,7 @@ import { BackGround } from './BackGround'
 import { Area } from './Area'
 import { AbstractFill } from './AbstractFill'
 import { ThingWithShape } from './ThingWithShape'
+import { SoundDeck } from './additions/SoundDeck'
 
 
 class WorldTickReport {
@@ -83,6 +84,7 @@ interface WorldConfig {
         bottom?: "HARD" | "WRAP" | "SOFT"
         right?: "HARD" | "WRAP" | "SOFT"
     }
+    soundDeck? :SoundDeck
 }
 
 /**
@@ -132,6 +134,7 @@ class World implements WorldConfig {
     bodiesLeavingAtNextTick: Body[]
     timer: NodeJS.Timeout
     emitter: TinyEmitter
+    soundDeck?: SoundDeck;
 
     /**
      * Create a whole new world.
@@ -204,6 +207,7 @@ class World implements WorldConfig {
 
         this.bodiesLeavingAtNextTick = []
 
+        this.soundDeck = config.soundDeck
         this.emitter = new TinyEmitter
     }
 

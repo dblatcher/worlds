@@ -50,10 +50,13 @@ async function start() {
         body1.data.heading -= _deg * 1;
     }
 
+    const soundDeck = new SoundDeck();
+    soundDeck.defineSampleBuffer('beep', './beep.mp3');
+
     const world = new World([
         body1, body2
     ], {
-        width: 500, height: 500, hasHardEdges: true
+        width: 500, height: 500, hasHardEdges: true, soundDeck
     })
 
 
@@ -70,21 +73,14 @@ async function start() {
     myWindow.world = world;
     myWindow.viewPort = viewPort;
 
-
-    const soundDeck = new SoundDeck();
-
-    soundDeck.defineSampleBuffer('beep', './beep.mp3');
-
     const hum: ToneParams = { frequency: 300, endFrequency: 350, type: 'square' };
 
 
-    myWindow.soundDeck = soundDeck;
-
     document.addEventListener('click', () => {
         console.log('click is a gesture')
-        soundDeck.enable()
-        soundDeck.masterVolume = .5
-        soundDeck.playTone(hum)
+        world.soundDeck.enable()
+        world.soundDeck.masterVolume = .5
+        world.soundDeck.playTone(hum)
     }, { once: true })
 }
 
