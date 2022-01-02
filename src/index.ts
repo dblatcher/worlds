@@ -18,6 +18,10 @@ import * as RenderFunctions from './renderFunctions'
 
 import { KeyWatcher } from './additions/KeyWatcher';
 import { SoundPlayer, ToneConfigInput } from './additions/SoundPlayer';
+import { SoundDeck, ToneParams, NoiseParams, PlayOptions } from './additions/SoundDeck'
+import { SoundControl } from './additions/SoundControl'
+
+
 
 export {
     Body, World, Force, Shape, Fluid,
@@ -30,7 +34,8 @@ export {
     shapes,
     AbstractFill, LinearGradientFill, RadialGradientFill, ImageFill,
     Area, AreaData,
-    KeyWatcher, SoundPlayer, ToneConfigInput
+    KeyWatcher, SoundPlayer, ToneConfigInput,
+    SoundDeck, ToneParams, NoiseParams, PlayOptions, SoundControl
 }
 
 

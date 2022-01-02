@@ -237,5 +237,5 @@ class SoundDeck {
 
 }
 
-export type { ToneParams, NoiseParams }
+export type { ToneParams, NoiseParams, PlayOptions }
 export { SoundDeck }
