@@ -39,15 +39,16 @@ const viewPort2 = new ViewPort({
     height: demoWorld.height,
     width: demoWorld.width,
     world: demoWorld,
-    rotate: 3,
+    rotate: 0,
     framefill:'white',
 })
 
 viewPort2.cameraInstruction = new CameraFollowInstruction({
     body: redPlanet,
     followHeading: false,
-    magnify: .5,
-    leadDistance: 0
+    magnify: 1.5,
+    leadDistance: 0,
+    staywithinWorldEdge:true
 })
 
 demoWorld.emitter.on('tick', () => {

@@ -18,19 +18,21 @@ class CameraFollowInstruction extends CameraInstruction {
     followHeading: boolean
     magnify: number
     leadDistance: number
-
+    staywithinWorldEdge:boolean
 
     constructor(config: {
         body: Body
         followHeading?: boolean
         magnify?: number
         leadDistance?: number
+        staywithinWorldEdge?:boolean
     }) {
         super (config)
         this.body = config.body
         this.followHeading = config.followHeading || false
         this.magnify = config.magnify || 1
         this.leadDistance = config.leadDistance || 0
+        this.staywithinWorldEdge = config.staywithinWorldEdge || false
     }
 
     focusViewPort(viewPort: ViewPort) {
@@ -48,7 +50,7 @@ class CameraFollowInstruction extends CameraInstruction {
             viewPort.rotate = normaliseHeading( _90deg * 2 - this.body.data.heading)
         }
 
-        viewPort.focusOn(targetPoint, false, this.magnify)
+        viewPort.focusOn(targetPoint, this.staywithinWorldEdge, this.magnify)
     }
 
 }
