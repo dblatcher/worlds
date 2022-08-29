@@ -42,7 +42,14 @@ function arePolygonsIntersecting(polygon1: Point[], polygon2: Point[]) {
 }
 
 /**
- * PROBLEM - seems to fail when squares are at a 45 degree orientation...?
+ * BUG - if line from point to the extreme point passes through a vertex
+ * the same vertex is on two edges of the polygon, so this is counted
+ * as two intersections, not one!!
+ * 
+ * TO DO - count intersections between the point-extreme line and polygon vertices
+ * subtract the number of vertex intersections from the segment intersections
+ * for final test
+ * 
  * @param point 
  * @param polygon 
  * @returns if the point is inside the polygon
@@ -51,16 +58,16 @@ function isPointInsidePolygon(point: Point, polygon: Point[]) {
     var n = polygon.length;
     if (n < 3) { return false };
     var extremeXPoint = { y: point.y, x: _extreme };
-    var intersections = 0;
+    var segmentIntersections = 0;
 
     let point1, point2
     for (let i = 0; i < polygon.length; i++) {
         point1 = polygon[i]
         point2 = i + 1 >= polygon.length ? polygon[0] : polygon[i + 1]
-        if (doLineSegmentsIntersect([point, extremeXPoint], [point1, point2])) { intersections++ }
+        if (doLineSegmentsIntersect([point, extremeXPoint], [point1, point2])) { segmentIntersections++ }
     }
 
-    return intersections % 2 !== 0
+    return segmentIntersections % 2 !== 0
 }
 
 
