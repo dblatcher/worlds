@@ -1,4 +1,5 @@
 
+import { shapes } from "./Shape"
 import { ThingWithShape, ThingWithShapeData } from "./ThingWithShape"
 import { World } from "./World"
 
@@ -19,7 +20,11 @@ class Area extends ThingWithShape {
 
     constructor(config: AreaData) {
         super(config)
-
+        this.data = {
+            ...config,
+            shape: config.shape ?? shapes.circle,
+            corners: config.corners ?? [],
+        }
         this.data.density = config.density || 0
         this.data.heading = config.heading || 0
 
