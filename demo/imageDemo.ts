@@ -5,20 +5,21 @@ import { _deg } from '../src/geometry';
 import './addStyleSheetAndFrame'
 import { ImageFill } from '../src/AbstractFill';
 
-import { SoundDeck, ToneParams } from '../src/additions/SoundDeck';
+import { SoundDeck, type ToneParams } from '../src/additions/SoundDeck';
 
+import soil from './soil.jpg'
+import beep from './beep.mp3'
 
-
-console.log('image demo');
+console.log('image demo', { soil });
 
 async function start() {
 
-    const soilFill = ImageFill.fromSrc('./soil.jpg', 'brown', {
+    const soilFill = ImageFill.fromSrc(soil, 'brown', {
         rotate: 90,
         offset: { x: 10, y: 20 }
     });
 
-    const bigSoilFill = ImageFill.fromSrc('./soil.jpg', 'brown', {
+    const bigSoilFill = ImageFill.fromSrc(soil, 'brown', {
         scale: 2.5,
     });
 
@@ -27,7 +28,7 @@ async function start() {
             x: 90, y: 150, size: 75,
             fillColor: bigSoilFill,
             color: 'transparent',
-            renderHeadingIndicator: true,
+            renderHeadingIndicator: true
         },
         new Force(0, 0)
     )
@@ -44,6 +45,11 @@ async function start() {
 
     body2.tick = () => {
         // body2.data.heading += _deg;
+        const {otherBodiesCollidedWithThisTick} = body2;
+        if (otherBodiesCollidedWithThisTick.length) {
+            console.log(otherBodiesCollidedWithThisTick)
+            body2.world.soundDeck?.playSample('beep')
+        }
     }
 
     body1.tick = () => {
@@ -51,7 +57,7 @@ async function start() {
     }
 
     const soundDeck = new SoundDeck();
-    soundDeck.defineSampleBuffer('beep', './beep.mp3');
+    soundDeck.defineSampleBuffer('beep', beep);
 
     const world = new World([
         body1, body2
@@ -81,6 +87,7 @@ async function start() {
         world.soundDeck.enable()
         world.soundDeck.masterVolume = .5
         world.soundDeck.playTone(hum)
+
     }, { once: true })
 }
 
