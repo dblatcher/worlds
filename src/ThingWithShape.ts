@@ -8,7 +8,7 @@ interface ThingWithShapeData {
     x: number
     y: number
     size?: number
-    shape?: Shape
+    shape: Shape
     heading?: number
     color?: string
     fillColor?: string | AbstractFill

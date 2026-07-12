@@ -5,6 +5,7 @@ import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToSh
 import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
 import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
 import { ThingWithShape, ThingWithShapeData } from './ThingWithShape'
+import { shapes } from '.'
 
 
 
@@ -35,6 +36,11 @@ class Body extends ThingWithShape {
     otherBodiesCollidedWithThisTick: Body[]
     constructor(config: BodyData, momentum: Force = Force.none) {
         super(config)
+        this.data = {
+            ...config,
+            shape: config.shape ?? shapes.circle,
+            corners: config.corners ?? [],
+        }
         this.data.heading = this.data.heading || 0
         this.data.density = typeof this.data.density === 'number' ? this.data.density : 1
         this.data.size = typeof this.data.size === 'number' ? this.data.size : 1
