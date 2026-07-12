@@ -24,6 +24,6 @@
   "dependencies": {
     "tiny-emitter": "^2.1.0"
   },
-  "main": "dist/physics-worlds.js",
-  "types": "dist/src/index.d.ts"
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts"
 }
