@@ -1,7 +1,7 @@
 import { Body } from '../Body'
 import { Force } from '../Force'
 import * as Geometry from '../geometry'
-import { Vector, _90deg } from '../geometry'
+import { type Vector, _90deg } from '../geometry'
 
 import { CollisionReport } from './CollisionReport'
 import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon, getPolygonPathArea } from './utility'

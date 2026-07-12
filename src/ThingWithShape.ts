@@ -1,7 +1,7 @@
 import { Fluid } from "./Fluid"
-import { IntersectionInfo, Point, Vector, AlignedRectangle, Circle, getDistanceBetweenPoints } from "./geometry"
+import { type IntersectionInfo, type Point, type Vector, type AlignedRectangle, type Circle, getDistanceBetweenPoints } from "./geometry"
 import { AbstractFill } from "./AbstractFill"
-import { Shape, shapes, ShapeValues } from "./Shape"
+import { Shape, shapes, type ShapeValues } from "./Shape"
 import { ViewPort } from "./ViewPort"
 
 interface ThingWithShapeData {
@@ -113,4 +113,5 @@ class ThingWithShape {
 }
 
 
-export { ThingWithShape, ThingWithShapeData }
+export { ThingWithShape }
+export type { ThingWithShapeData }

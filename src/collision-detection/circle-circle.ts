@@ -3,7 +3,7 @@ import { CollisionReport } from './CollisionReport'
 import { Body } from '../Body'
 import { Force } from '../Force'
 import * as Geometry from '../geometry'
-import { Point, _90deg } from '../geometry'
+import { type Point, _90deg } from '../geometry'
 
 
 /**

@@ -1,5 +1,5 @@
 import { Body } from '../Body'
-import { Vector, Point, _90deg, AlignedRectangle, translatePoint } from '../geometry'
+import { type Vector, type Point, _90deg, type AlignedRectangle, translatePoint } from '../geometry'
 
 import { EdgeCollisionReport } from './CollisionReport'
 

@@ -1,6 +1,6 @@
 
 import { shapes } from "./Shape"
-import { ThingWithShape, ThingWithShapeData } from "./ThingWithShape"
+import { ThingWithShape, type ThingWithShapeData } from "./ThingWithShape"
 import { World } from "./World"
 
 interface AreaData extends ThingWithShapeData {
@@ -53,4 +53,5 @@ class Area extends ThingWithShape {
 }
 
 
-export { Area, AreaData }
+export { Area }
+export type { AreaData }

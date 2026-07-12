@@ -1,7 +1,7 @@
 
 import { Body } from '../Body'
 import * as Geometry from '../geometry'
-import { Point, Circle, areCircleAndPolygonIntersecting, _90deg } from '../geometry'
+import { type Point, type Circle, areCircleAndPolygonIntersecting, _90deg } from '../geometry'
 
 import { CollisionReport } from './CollisionReport'
 import { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon } from './utility'

@@ -1,4 +1,4 @@
-import { Point, _90deg, _360deg, _extreme, originPoint, Vector } from './definitions';
+import { type Point, _90deg, _360deg, _extreme, originPoint, type Vector } from './definitions';
 
 /**
  * Calculate the distance between point1 and either point2 if present or 

@@ -1,6 +1,7 @@
 import { Body } from '../Body'
 import { Force } from '../Force'
-import { Vector, Point, Circle, _90deg } from '../geometry'
+import type { Vector, Point, Circle, } from '../geometry'
+import { _90deg } from '../geometry'
 
 import { EdgeCollisionReport } from './CollisionReport'
 

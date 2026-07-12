@@ -1,4 +1,4 @@
-import { Circle, getDistanceBetweenPoints, getPolygonLineSegments, getVectorX, getVectorY, Point, Vector, _deg } from "./geometry"
+import { type Circle, getDistanceBetweenPoints, getPolygonLineSegments, getVectorX, getVectorY, type Point, type Vector, _deg } from "./geometry"
 import { originPoint } from "./geometry/definitions"
 import { ViewPort } from "./ViewPort"
 

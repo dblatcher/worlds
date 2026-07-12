@@ -2,7 +2,7 @@ import { Force, World } from '..'
 import { Body } from '../Body'
 import { Effect } from '../Effect'
 import * as Geometry from '../geometry'
-import { Vector, Point, _90deg, getSortedIntersectionInfoWithCircle, closestPointOnLineSegment } from '../geometry'
+import { type Point, type Vector, _90deg, closestPointOnLineSegment, getSortedIntersectionInfoWithCircle } from '../geometry'
 
 
 /**
@@ -180,4 +180,4 @@ function getCircleSquareCollisionInfo(circularBody: Body, squareBody: Body, worl
 }
 
 
-export { getInfoAboutNearestPointOnPolygon, getCircleSquareCollisionInfo, getPolygonPathArea }
+export { getCircleSquareCollisionInfo, getInfoAboutNearestPointOnPolygon, getPolygonPathArea }

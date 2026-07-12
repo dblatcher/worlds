@@ -2,10 +2,10 @@ import { Body } from './Body'
 import { Force } from './Force'
 
 import * as Geometry from './geometry'
-import { Vector } from './geometry'
+import type { Vector } from './geometry'
 import { CollisionReport, EdgeCollisionReport } from './collisionDetection'
 import { Fluid } from './Fluid'
-import { Point, _90deg } from './geometry/definitions'
+import { type Point, _90deg } from './geometry/definitions'
 
 
 function getUpthrustForce(gravitationalConstant: number, globalGravityForce: Force, body: Body, fluid: Fluid): Force {

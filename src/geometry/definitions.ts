@@ -18,6 +18,6 @@ const originPoint: Point = { x: 0, y: 0 }
 
 
 export {
-    Point, Circle, Vector, Wedge, IntersectionInfo, AlignedRectangle,
     _deg, _90deg, _360deg, _extreme, originPoint
 }
+export type { Point, Circle, Vector, Wedge, IntersectionInfo, AlignedRectangle }

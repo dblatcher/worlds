@@ -1,11 +1,10 @@
-import { World, ViewPort } from './World'
-import { Force } from './Force'
-import { Vector, _90deg } from './geometry'
-import { getGravitationalForce, bounceOffWorldEdge, handleCollisionAccordingToShape, getUpthrustForce, calculateDragForce } from './physics'
-import { CollisionReport, getEdgeCollisionDetectionFunction, EdgeCollisionReport, getCollisionDetectionFunction } from './collisionDetection'
-import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
-import { ThingWithShape, ThingWithShapeData } from './ThingWithShape'
 import { shapes } from '.'
+import { CollisionReport, EdgeCollisionReport, getCollisionDetectionFunction, getEdgeCollisionDetectionFunction } from './collisionDetection'
+import { Force } from './Force'
+import { bounceOffWorldEdge, calculateDragForce, getGravitationalForce, getUpthrustForce, handleCollisionAccordingToShape } from './physics'
+import { renderHeadingIndicator, renderPathAhead } from './renderFunctions'
+import { ThingWithShape, type ThingWithShapeData } from './ThingWithShape'
+import { ViewPort, World } from './World'
 
 
 
@@ -140,7 +139,7 @@ class Body extends ThingWithShape {
         this.otherBodiesCollidedWithThisTick = []
     }
 
-    tick() {}
+    tick() { }
 
     move(timeRemaining = 1) {
         const copyOfThis = this.duplicate();
@@ -278,4 +277,6 @@ class Body extends ThingWithShape {
 
 
 
-export { Body, BodyData }
+export { Body }
+export type { BodyData }
+

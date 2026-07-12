@@ -3,7 +3,7 @@ import {
     areCircleAndPolygonIntersecting, areCirclesIntersecting, arePolygonsIntersecting,
     getDistanceBetweenPoints, getPolygonLineSegments,
     getSortedIntersectionInfoWithEdges, getSortedIntersectionInfoWithCircle,
-    getVectorX, getVectorY, IntersectionInfo, isPointInsidePolygon, Point, _90deg
+    getVectorX, getVectorY, type IntersectionInfo, isPointInsidePolygon, type Point, _90deg
 } from "./geometry"
 import { renderCircle, renderPolygon } from "./renderFunctions"
 import { ViewPort } from "./World"

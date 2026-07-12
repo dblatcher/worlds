@@ -1,5 +1,5 @@
-import { Point, Circle, Vector, Wedge, _90deg, _360deg, _extreme, originPoint } from './definitions';
 import { getDistanceBetweenPoints, getHeadingFromPointToPoint } from './basics';
+import type { Circle, Point } from './definitions';
 
 /**
  * 
@@ -33,4 +33,4 @@ function isPointInsideCircle(circle:Circle, point:Point){
    return getDistanceBetweenPoints(circle, point) <= circle.radius
 }
 
-export {areCirclesIntersecting, getCircleTangentAtPoint, isPointInsideCircle}
+export { areCirclesIntersecting, getCircleTangentAtPoint, isPointInsideCircle };

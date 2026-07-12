@@ -1,8 +1,6 @@
 import { Body } from '../Body'
-import { Effect } from '../Effect'
-import { Force } from '../Force'
 import * as Geometry from '../geometry'
-import { Vector, _90deg, Point } from '../geometry'
+import type { Point, Vector } from '../geometry'
 import { arePolygonsIntersecting } from '../geometry/polygons'
 
 import { CollisionReport } from './CollisionReport'

@@ -1,5 +1,5 @@
 import { Body } from "./Body"
-import { getVectorX, getVectorY, Point, _90deg, Circle, Wedge, translatePoint, getXYVector, normaliseHeading, _360deg } from './geometry'
+import { getVectorX, getVectorY, type Point, _90deg, type Circle, type Wedge, translatePoint, getXYVector, normaliseHeading, _360deg } from './geometry'
 import { ViewPort } from "./World"
 import { AbstractFill } from "./AbstractFill"
 

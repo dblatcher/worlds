@@ -1,4 +1,4 @@
-import { Point, _90deg, _360deg, _extreme } from './definitions';
+import { type Point, _extreme } from './definitions';
 import { doLineSegmentsIntersect } from './line-intersections';
 
 
@@ -71,4 +71,4 @@ function isPointInsidePolygon(point: Point, polygon: Point[]) {
 }
 
 
-export { getPolygonLineSegments, arePolygonsIntersecting, isPointInsidePolygon }
+export { arePolygonsIntersecting, getPolygonLineSegments, isPointInsidePolygon };

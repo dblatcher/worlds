@@ -1,7 +1,7 @@
 import { closestpointonline } from '../geometry';
 import { closestPointOnLineSegment, getDistanceBetweenPoints, getHeadingFromPointToPoint } from './basics';
 import { getCircleTangentAtPoint, isPointInsideCircle } from './circles';
-import { Point, _90deg, _360deg, _extreme, IntersectionInfo, Circle, } from './definitions'
+import { type Point, _90deg, _360deg, _extreme, type IntersectionInfo, type Circle, } from './definitions'
 
 
 

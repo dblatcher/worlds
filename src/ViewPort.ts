@@ -1,7 +1,7 @@
 import { Body, Geometry } from "."
 import { CameraInstruction } from "./CameraInstruction"
 import { Force } from "./Force"
-import { getXYVector, Point, _90deg } from "./geometry"
+import { getXYVector, type Point, _90deg } from "./geometry"
 import { AbstractFill } from "./AbstractFill"
 import { renderPolygon } from "./renderFunctions"
 import { World } from "./World"

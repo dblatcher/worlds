@@ -1,4 +1,4 @@
-import { Point } from "./geometry"
+import { type Point } from "./geometry"
 import { renderPolygon } from "./renderFunctions"
 import { ViewPort, World } from "./World"
 
@@ -97,4 +97,5 @@ class Fluid {
 }
 
 
-export { Fluid, FluidData }
+export { Fluid }
+export type { FluidData }
