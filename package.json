@@ -4,7 +4,7 @@
   "description": "A typeScript library for creating 2d physics simulations within self-contained 'Worlds' which can be rendered on HTML canvas elements.",
   "private": true,
   "scripts": {
-    "test": "webpack --mode=development --config webpack.test.config.js && node ./tests/built/tests.js",
+    "test": "bun test",
     "build": "node ./build.ts",
     "demo": "bun ./demo/demo.html"
   },
